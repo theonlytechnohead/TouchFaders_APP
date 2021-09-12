@@ -67,6 +67,6 @@
 	<path
 		android:pathData="M53.4,30 h12.1 v44.5 h-24.1 v-44.5 z"
 		android:strokeWidth="1"
-		android:strokeColor="#FFFFFF"/>
+		android:strokeColor="#000000"/>
 
 </vector>
