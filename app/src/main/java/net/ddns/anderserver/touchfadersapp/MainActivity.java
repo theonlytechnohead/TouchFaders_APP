@@ -217,7 +217,8 @@ public class MainActivity extends AppCompatActivity {
 				for (Enumeration<InetAddress> enumIpAddr = networkInterface.getInetAddresses(); enumIpAddr.hasMoreElements(); ) {
 					InetAddress inetAddress = enumIpAddr.nextElement();
 					if (!inetAddress.isLinkLocalAddress()) {
-						localAddress = inetAddress.getHostAddress();
+						if (!inetAddress.toString().contains(":"))
+							localAddress = inetAddress.getHostAddress();
 					}
 				}
 			}

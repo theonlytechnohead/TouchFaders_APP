@@ -282,7 +282,8 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
                     while (enumIpAddr.hasMoreElements()) {
                         val inetAddress = enumIpAddr.nextElement()
                         if (!inetAddress.isLinkLocalAddress) {
-                            localAddress = inetAddress.hostAddress
+                            if (!inetAddress.toString().contains(':'))
+                                localAddress = inetAddress.hostAddress
                         }
                     }
                 }
