@@ -15,6 +15,7 @@
 	<color name="light_blue_A200">#FF40C4FF</color>
 	<color name="black_overlay">#66000000</color>
 	<color name="background">#B0000000</color>
+	<color name="transparent">#00000000</color>
 
 	<!-- Metering colours -->
 	<color name="meter_start">#00A500</color>
@@ -77,4 +78,9 @@
 	<color name="color_progress">#fbfbfb</color>
 	<color name="color_background">#4b4b4b</color>
 	<color name="color_text">#00B7FF</color>
+
+	<color name="fader_light_even">#33000000</color>
+	<color name="fader_light_odd">#44000000</color>
+	<color name="fader_dark_even">#99000000</color>
+	<color name="fader_dark_odd">#BB000000</color>
 </resources>

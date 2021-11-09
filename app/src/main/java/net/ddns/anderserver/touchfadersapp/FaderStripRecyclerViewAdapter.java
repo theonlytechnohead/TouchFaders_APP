@@ -15,6 +15,7 @@ import android.view.WindowInsets;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -75,6 +76,17 @@ public class FaderStripRecyclerViewAdapter extends RecyclerView.Adapter<FaderStr
         holder.channelNumber.setText(number);
         holder.channelPatch.setText(channelPatchIn.get(position));
         holder.channelName.setText(channelNames.get(position));
+        if ((position / 8) % 2 == 0) {
+            if (position % 2 == 0)
+                holder.faderBackground.setBackgroundColor(context.getColor(R.color.fader_light_even));
+            else
+                holder.faderBackground.setBackgroundColor(context.getColor(R.color.fader_light_odd));
+        } else {
+            if (position % 2 == 0)
+                holder.faderBackground.setBackgroundColor(context.getColor(R.color.fader_dark_even));
+            else
+                holder.faderBackground.setBackgroundColor(context.getColor(R.color.fader_dark_odd));
+        }
 
         // Set channel name sizing, per channel name length
         if (holder.channelName.getText().length() <= 3) {
@@ -110,6 +122,7 @@ public class FaderStripRecyclerViewAdapter extends RecyclerView.Adapter<FaderStr
     public class FaderStripViewHolder extends RecyclerView.ViewHolder implements FaderStripRecyclerViewAdapter.FaderValueChangedListener {
 
         int position;
+        ConstraintLayout faderBackground;
         BoxedVertical fader;
         TextView channelNumber;
         TextView channelPatch;
@@ -117,6 +130,7 @@ public class FaderStripRecyclerViewAdapter extends RecyclerView.Adapter<FaderStr
 
         FaderStripViewHolder(View itemView) {
             super(itemView);
+            faderBackground = itemView.findViewById(R.id.faderBackground);
             fader = itemView.findViewById(R.id.fader);
             fader.setOnBoxedPointsChangeListener((boxedPoints, points) -> {
                 faderLevels.set(position, points);
