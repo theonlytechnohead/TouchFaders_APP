@@ -80,6 +80,7 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
          */
         binding.demoButton.setOnClickListener {
             val intent = Intent(it.context, MainActivity::class.java)
+            intent.putExtra(EXTRA_DEMO_MODE, true)
             intent.putExtra(EXTRA_NUM_CHANNELS, 0x20.toByte())
             intent.putExtra(MixSelectActivity.EXTRA_MIX_INDEX, 1)
             startActivity(intent)
@@ -144,7 +145,8 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
                 launch {
                     async(Dispatchers.IO) {
                         try {
-                            val targetAddress: InetAddress = InetAddress.getByName(binding.ipEditText.text.toString())
+                            val targetAddress: InetAddress =
+                                InetAddress.getByName(binding.ipEditText.text.toString())
                             val socketAddress = InetSocketAddress(targetAddress, 8878)
                             val socket = Socket();
                             socket.connect(socketAddress, 100);
@@ -153,7 +155,8 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
                             byteArraySend += android.os.Build.MODEL.encodeToByteArray()
                             socket.getOutputStream().write(byteArraySend)
                             val byteArrayReceive = ByteArray(socket.receiveBufferSize)
-                            socket.getInputStream().read(byteArrayReceive, 0, socket.receiveBufferSize)
+                            socket.getInputStream()
+                                .read(byteArrayReceive, 0, socket.receiveBufferSize)
                             //Log.i("TCP", byteArrayReceive.toHexString(bytesRead))
                             socket.close()
 
@@ -166,7 +169,11 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
                             startActivity(intent)
                         } catch (e: SocketTimeoutException) {
                             Handler(Looper.getMainLooper()).post {
-                                Toast.makeText(applicationContext, "No response...", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    applicationContext,
+                                    "No response...",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
                         }
 
@@ -176,7 +183,8 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
         } else {
             binding.startButton.setOnClickListener { checkNetwork() }
             Handler(Looper.getMainLooper()).post {
-            Toast.makeText(this, "You're not connected to a network!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "You're not connected to a network!", Toast.LENGTH_SHORT)
+                    .show()
             }
         }
     }
@@ -215,7 +223,7 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
         socket.close()
     }
 
-    private val clickListener = object: DeviceSelectRecyclerViewAdapter.DeviceButtonClickListener {
+    private val clickListener = object : DeviceSelectRecyclerViewAdapter.DeviceButtonClickListener {
         override fun onItemClick(view: View?, index: Int) {
             val name = deviceNames[index]
             val ip = devices[name]
@@ -226,7 +234,7 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
         }
     }
 
-    private fun connect (address: InetAddress) {
+    private fun connect(address: InetAddress) {
         launch {
             async(Dispatchers.IO) {
                 try {
@@ -238,7 +246,8 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
                     byteArraySend += android.os.Build.MODEL.encodeToByteArray()
                     socket.getOutputStream().write(byteArraySend)
                     val byteArrayReceive = ByteArray(socket.receiveBufferSize)
-                    val bytesRead = socket.getInputStream().read(byteArrayReceive, 0, socket.receiveBufferSize)
+                    val bytesRead =
+                        socket.getInputStream().read(byteArrayReceive, 0, socket.receiveBufferSize)
                     //Log.i("TCP", byteArrayReceive.toHexString(bytesRead))
                     socket.close()
 
@@ -251,7 +260,8 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
                     startActivity(intent)
                 } catch (e: SocketTimeoutException) {
                     Handler(Looper.getMainLooper()).post {
-                        Toast.makeText(applicationContext, "No response...", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(applicationContext, "No response...", Toast.LENGTH_SHORT)
+                            .show()
                         if (devices.containsValue(address)) {
                             val name: String = devices.filterValues { it == address }.keys.first()
                             devices.remove(name, address)
@@ -267,13 +277,14 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
     companion object {
         const val IP_ADDRESS_PREFERENCES = "ipAddress"
 
+        const val EXTRA_DEMO_MODE = "EXTRA_DEMO_MODE"
         const val EXTRA_IP_ADDRESS = "EXTRA_IP_ADDRESS"
         const val EXTRA_RECEIVE_PORT = "EXTRA_RECEIVE_PORT"
         const val EXTRA_SEND_PORT = "EXTRA_SEND_PORT"
         const val EXTRA_NUM_CHANNELS = "EXTRA_NUM_CHANNELS"
         const val EXTRA_NUM_MIXES = "EXTRA_NUM_MIXES"
 
-        fun ByteArray.toHexString(length: Int) : String {
+        fun ByteArray.toHexString(length: Int): String {
             return this.joinToString("", limit = length) {
                 java.lang.String.format("%02x ", it)
             }
@@ -302,9 +313,11 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
         }
 
         fun isConnected(context: Context): Boolean {
-            val connectivityManager = context.getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
+            val connectivityManager =
+                context.getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
             val networkCapabilities = connectivityManager.activeNetwork ?: return false
-            val actNw = connectivityManager.getNetworkCapabilities(networkCapabilities) ?: return false
+            val actNw =
+                connectivityManager.getNetworkCapabilities(networkCapabilities) ?: return false
             return when {
                 actNw.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
                 actNw.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
