@@ -17,6 +17,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <Button
+        android:id="@+id/demoButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Demo"
+        android:textSize="25sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/ipEditText"
+        app:layout_constraintTop_toBottomOf="@id/greetingsText" />
+
     <EditText
         android:id="@+id/ipEditText"
         android:layout_width="wrap_content"
@@ -29,7 +39,7 @@
         android:textSize="25sp"
         app:layout_constraintTop_toBottomOf="@id/greetingsText"
         app:layout_constraintEnd_toStartOf="@id/startButton"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toEndOf="@id/demoButton" />
 
     <Button
         android:id="@+id/startButton"

@@ -78,6 +78,13 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
 
         };
          */
+        binding.demoButton.setOnClickListener {
+            val intent = Intent(it.context, MainActivity::class.java)
+            intent.putExtra(EXTRA_NUM_CHANNELS, 0x20.toByte())
+            intent.putExtra(MixSelectActivity.EXTRA_MIX_INDEX, 1)
+            startActivity(intent)
+        }
+
         binding.ipEditText.setText(sharedPreferences?.getString("ipAddress", "192.168.1.2"))
         binding.ipEditText.setOnEditorActionListener { _: TextView?, actionId: Int, _: KeyEvent? ->
             if (actionId == EditorInfo.IME_ACTION_GO) {
