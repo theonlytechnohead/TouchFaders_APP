@@ -9,4 +9,5 @@
 	<string name="hint_ip">192.168.1.2</string>
 	<string name="start">CONNECT</string>
 	<string name="greeting_msg">TouchFaders</string>
+    <string name="demo_button">Demo</string>
 </resources>
