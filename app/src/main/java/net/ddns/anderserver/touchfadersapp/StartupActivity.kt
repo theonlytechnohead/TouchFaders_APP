@@ -229,6 +229,7 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
             val ip = devices[name]
             if (ip != null) {
                 //Toast.makeText(applicationContext, "Connecting to " + name + " at " + ip.toString(), Toast.LENGTH_SHORT).show()
+                binding.ipEditText.setText(ip.toString().removePrefix("/"))
                 connect(ip)
             }
         }
