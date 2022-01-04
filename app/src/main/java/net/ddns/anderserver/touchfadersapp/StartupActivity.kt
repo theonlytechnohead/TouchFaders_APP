@@ -1,12 +1,11 @@
 package net.ddns.anderserver.touchfadersapp
 
-import android.content.Context
-import android.content.Intent
-import android.content.SharedPreferences
+import android.content.*
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.os.Handler
+import android.os.IBinder
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
@@ -21,7 +20,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import net.ddns.anderserver.touchfadersapp.databinding.StartupBinding
 import java.io.IOException
@@ -38,6 +36,11 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
     var sharedPreferences: SharedPreferences? = null
 
     var listenUDP = true
+
+    lateinit var connectionService: ConnectionService
+    var bound = false
+
+    var broadcastReceiver: BroadcastReceiver? = null
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main
@@ -81,8 +84,6 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
         binding.demoButton.setOnClickListener {
             val intent = Intent(it.context, MainActivity::class.java)
             intent.putExtra(EXTRA_DEMO_MODE, true)
-            intent.putExtra(EXTRA_NUM_CHANNELS, 0x20.toByte())
-            intent.putExtra(MixSelectActivity.EXTRA_MIX_INDEX, 1)
             startActivity(intent)
         }
 
@@ -111,6 +112,28 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
         adapter = DeviceSelectRecyclerViewAdapter(applicationContext, deviceNames)
         adapter.setClickListener(clickListener)
         binding.deviceRecyclerView.adapter = adapter
+
+        // Start connection service
+        val serviceIntent = Intent(applicationContext, ConnectionService::class.java)
+        applicationContext.startForegroundService(serviceIntent)
+
+        // create broadcast receiver to start activity
+        broadcastReceiver = Receiver()
+    }
+
+    inner class Receiver : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent?.action == START_MIX_ACTIVITY) {
+                val mixIntent = Intent(applicationContext, MixSelectActivity::class.java)
+                startActivity(mixIntent)
+            }
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val serviceIntent = Intent(applicationContext, ConnectionService::class.java)
+        bindService(serviceIntent, connection, 0)
     }
 
     override fun onResume() {
@@ -132,53 +155,78 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
             checkNetwork()
         }
         adapter.notifyDataSetChanged()
+
+        registerReceiver(broadcastReceiver, IntentFilter(START_MIX_ACTIVITY))
     }
 
     override fun onPause() {
         super.onPause()
         listenUDP = false;
+        unregisterReceiver(broadcastReceiver)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        unbindService(connection)
+        bound = false
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        val serviceIntent = Intent(applicationContext, ConnectionService::class.java)
+        stopService(serviceIntent)
     }
 
     private fun checkNetwork() {
         if (isConnected(applicationContext)) {
             binding.startButton.setOnClickListener {
-                launch {
-                    async(Dispatchers.IO) {
-                        try {
-                            val targetAddress: InetAddress =
-                                InetAddress.getByName(binding.ipEditText.text.toString())
-                            val socketAddress = InetSocketAddress(targetAddress, 8878)
-                            val socket = Socket();
-                            socket.connect(socketAddress, 100);
-                            socket.soTimeout = 100;
-                            var byteArraySend = InetAddress.getByName(getLocalIP()).address
-                            byteArraySend += android.os.Build.MODEL.encodeToByteArray()
-                            socket.getOutputStream().write(byteArraySend)
-                            val byteArrayReceive = ByteArray(socket.receiveBufferSize)
-                            socket.getInputStream()
-                                .read(byteArrayReceive, 0, socket.receiveBufferSize)
-                            //Log.i("TCP", byteArrayReceive.toHexString(bytesRead))
-                            socket.close()
-
-                            val intent = Intent(it.context, MixSelectActivity::class.java)
-                            intent.putExtra(EXTRA_IP_ADDRESS, binding.ipEditText.text.toString())
-                            intent.putExtra(EXTRA_RECEIVE_PORT, byteArrayReceive[0])
-                            intent.putExtra(EXTRA_SEND_PORT, byteArrayReceive[1])
-                            intent.putExtra(EXTRA_NUM_CHANNELS, byteArrayReceive[2])
-                            intent.putExtra(EXTRA_NUM_MIXES, byteArrayReceive[(3)])
-                            startActivity(intent)
-                        } catch (e: SocketTimeoutException) {
-                            Handler(Looper.getMainLooper()).post {
-                                Toast.makeText(
-                                    applicationContext,
-                                    "No response...",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                        }
-
-                    }
-                }
+                connectionService.Connect(InetAddress.getByName(binding.ipEditText.text.toString()))
+                return@setOnClickListener
+//                launch {
+//                    async(Dispatchers.IO) {
+//                        try {
+//                            val targetAddress: InetAddress =
+//                                InetAddress.getByName(binding.ipEditText.text.toString())
+//                            val socketAddress = InetSocketAddress(targetAddress, 8878)
+//                            val socket = Socket();
+//                            socket.connect(socketAddress, 100);
+//                            socket.soTimeout = 100;
+//                            var byteArraySend = InetAddress.getByName(getLocalIP()).address
+//                            byteArraySend += android.os.Build.MODEL.encodeToByteArray()
+//                            socket.getOutputStream().write(byteArraySend)
+//                            val byteArrayReceive = ByteArray(socket.receiveBufferSize)
+//                            socket.getInputStream()
+//                                .read(byteArrayReceive, 0, socket.receiveBufferSize)
+//                            //Log.i("TCP", byteArrayReceive.toHexString(bytesRead))
+//                            socket.close()
+//
+////                            val serviceIntent = Intent(applicationContext, ConnectionService::class.java)
+////                            serviceIntent.putExtra(EXTRA_IP_ADDRESS, targetAddress.toString().trim('/'))
+////                            serviceIntent.putExtra(EXTRA_RECEIVE_PORT, byteArrayReceive[0])
+////                            serviceIntent.putExtra(EXTRA_SEND_PORT, byteArrayReceive[1])
+////                            serviceIntent.putExtra(EXTRA_NUM_CHANNELS, byteArrayReceive[2])
+////                            serviceIntent.putExtra(EXTRA_NUM_MIXES, byteArrayReceive[(3)])
+////                            applicationContext.startForegroundService(serviceIntent)
+//
+//                            val intent = Intent(it.context, MixSelectActivity::class.java)
+//                            intent.putExtra(EXTRA_IP_ADDRESS, binding.ipEditText.text.toString())
+//                            intent.putExtra(EXTRA_RECEIVE_PORT, byteArrayReceive[0])
+//                            intent.putExtra(EXTRA_SEND_PORT, byteArrayReceive[1])
+//                            intent.putExtra(EXTRA_NUM_CHANNELS, byteArrayReceive[2])
+//                            intent.putExtra(EXTRA_NUM_MIXES, byteArrayReceive[(3)])
+//                            startActivity(intent)
+//                        } catch (e: SocketTimeoutException) {
+//                            Handler(Looper.getMainLooper()).post {
+//                                Toast.makeText(
+//                                    applicationContext,
+//                                    "No response...",
+//                                    Toast.LENGTH_SHORT
+//                                ).show()
+//                            }
+//                        }
+//
+//                    }
+//                }
             }
         } else {
             binding.startButton.setOnClickListener { checkNetwork() }
@@ -230,60 +278,32 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
             if (ip != null) {
                 //Toast.makeText(applicationContext, "Connecting to " + name + " at " + ip.toString(), Toast.LENGTH_SHORT).show()
                 binding.ipEditText.setText(ip.toString().removePrefix("/"))
-                connect(ip)
+                connectionService.Connect(ip, name)
             }
         }
     }
 
-    private fun connect(address: InetAddress) {
-        launch {
-            async(Dispatchers.IO) {
-                try {
-                    val socketAddress = InetSocketAddress(address, 8878)
-                    val socket = Socket();
-                    socket.connect(socketAddress, 100);
-                    socket.soTimeout = 100;
-                    var byteArraySend = InetAddress.getByName(getLocalIP()).address
-                    byteArraySend += android.os.Build.MODEL.encodeToByteArray()
-                    socket.getOutputStream().write(byteArraySend)
-                    val byteArrayReceive = ByteArray(socket.receiveBufferSize)
-                    val bytesRead =
-                        socket.getInputStream().read(byteArrayReceive, 0, socket.receiveBufferSize)
-                    //Log.i("TCP", byteArrayReceive.toHexString(bytesRead))
-                    socket.close()
+    private val connection = object : ServiceConnection {
+        override fun onServiceConnected(className: ComponentName?, service: IBinder?) {
+            val binder = service as ConnectionService.ConnectionBinder
+            connectionService = binder.getService()
+            bound = true
 
-                    val intent = Intent(applicationContext, MixSelectActivity::class.java)
-                    intent.putExtra(EXTRA_IP_ADDRESS, address.toString().trim('/'))
-                    intent.putExtra(EXTRA_RECEIVE_PORT, byteArrayReceive[0])
-                    intent.putExtra(EXTRA_SEND_PORT, byteArrayReceive[1])
-                    intent.putExtra(EXTRA_NUM_CHANNELS, byteArrayReceive[2])
-                    intent.putExtra(EXTRA_NUM_MIXES, byteArrayReceive[(3)])
-                    startActivity(intent)
-                } catch (e: SocketTimeoutException) {
-                    Handler(Looper.getMainLooper()).post {
-                        Toast.makeText(applicationContext, "No response...", Toast.LENGTH_SHORT)
-                            .show()
-                        if (devices.containsValue(address)) {
-                            val name: String = devices.filterValues { it == address }.keys.first()
-                            devices.remove(name, address)
-                            adapter.removeDevice(name)
-                        }
-                    }
-                }
-
-            }
+            if (connectionService.state() == ConnectionService.states.CONNECTED) connectionService.Disconnect()
         }
+
+        override fun onServiceDisconnected(className: ComponentName?) {
+            bound = false
+        }
+
     }
 
     companion object {
         const val IP_ADDRESS_PREFERENCES = "ipAddress"
 
+        const val START_MIX_ACTIVITY = "START_MIX_ACTIVITY"
+
         const val EXTRA_DEMO_MODE = "EXTRA_DEMO_MODE"
-        const val EXTRA_IP_ADDRESS = "EXTRA_IP_ADDRESS"
-        const val EXTRA_RECEIVE_PORT = "EXTRA_RECEIVE_PORT"
-        const val EXTRA_SEND_PORT = "EXTRA_SEND_PORT"
-        const val EXTRA_NUM_CHANNELS = "EXTRA_NUM_CHANNELS"
-        const val EXTRA_NUM_MIXES = "EXTRA_NUM_MIXES"
 
         fun ByteArray.toHexString(length: Int): String {
             return this.joinToString("", limit = length) {
@@ -291,7 +311,7 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
             }
         }
 
-        private fun getLocalIP(): String? {
+        fun getLocalIP(): String? {
             return try {
                 var localAddress = ""
                 val en = NetworkInterface.getNetworkInterfaces()

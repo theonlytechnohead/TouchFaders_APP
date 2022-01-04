@@ -1,11 +1,16 @@
 package net.ddns.anderserver.touchfadersapp;
 
 import android.annotation.SuppressLint;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
 import android.view.DisplayCutout;
@@ -55,14 +60,47 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<BoxedVertical> faders = new ArrayList<>();
     RecyclerView recyclerView;
     FaderStripRecyclerViewAdapter adapter;
+    Context instanceContext;
     BoxedVertical mixMeter;
 
     private Boolean demo;
     private String ipAddress;
-    private byte receivePort;
-    private byte sendPort;
-    private byte numChannels;
+    private int receivePort;
+    private int sendPort;
+    private int numChannels;
     private int currentMix;
+
+    ConnectionService connectionService;
+    Boolean bound = false;
+    ServiceConnection connection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            connectionService = ((ConnectionService.ConnectionBinder) iBinder).getService();
+            bound = true;
+
+            // grab variables and setup stuffs
+            if (!demo) {
+                ipAddress = connectionService.address();
+                receivePort = connectionService.receivePort();
+                sendPort = connectionService.sendPort();
+                numChannels = connectionService.channels();
+                currentMix = connectionService.selectedMix();
+
+                AsyncTask.execute(MainActivity.this::OpenOSCPortIn);
+                AsyncTask.execute(MainActivity.this::OpenOSCPortOut);
+            }
+
+            adapter = new FaderStripRecyclerViewAdapter(instanceContext, numChannels, currentMix);
+            adapter.setValuesChangeListener((view, index, boxedVertical, points) -> SendOSCFaderValue(index + 1, points));
+            recyclerView = findViewById(R.id.faderRecyclerView);
+            recyclerView.setAdapter(adapter);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            bound = false;
+        }
+    };
 
     OSCPacketListener packetListener = new OSCPacketListener() {
         @Override
@@ -126,24 +164,23 @@ public class MainActivity extends AppCompatActivity {
         //BasicConfigurator.configure();
 
         demo = getIntent().getBooleanExtra(StartupActivity.EXTRA_DEMO_MODE, false);
-        ipAddress = getIntent().getStringExtra(StartupActivity.EXTRA_IP_ADDRESS);
-        receivePort = getIntent().getByteExtra(StartupActivity.EXTRA_RECEIVE_PORT, (byte) 0x0);
-        sendPort = getIntent().getByteExtra(StartupActivity.EXTRA_SEND_PORT, (byte) 0x0);
-        numChannels = getIntent().getByteExtra(StartupActivity.EXTRA_NUM_CHANNELS, (byte) 0x40);
-        currentMix = getIntent().getIntExtra(MixSelectActivity.EXTRA_MIX_INDEX, 0) + 1;
 
         setContentView(R.layout.main);
-
-        if (!demo) {
-            AsyncTask.execute(this::OpenOSCPortIn);
-            AsyncTask.execute(this::OpenOSCPortOut);
-        }
 
         mixMeter = findViewById(R.id.mixMeter);
         mixMeter.setValue(0);
 
+        instanceContext = this;
+
         if (!demo)
             udpListenerThread = new Thread(new ClientListen());
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Intent serviceIntent = new Intent(this, ConnectionService.class);
+        bindService(serviceIntent, connection, 0);
     }
 
     @Override
@@ -163,10 +200,7 @@ public class MainActivity extends AppCompatActivity {
                         | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                         | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         // Fullscreen done!
-        adapter = new FaderStripRecyclerViewAdapter(this, numChannels, currentMix);
-        adapter.setValuesChangeListener((view, index, boxedVertical, points) -> SendOSCFaderValue(index + 1, points));
-        recyclerView = findViewById(R.id.faderRecyclerView);
-        recyclerView.setAdapter(adapter);
+
 
         runUDP = true;
         if (!demo) {
@@ -212,6 +246,18 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         runUDP = false;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unbindService(connection);
+        try {
+            if (oscPortIn != null) oscPortIn.close();
+            if (oscPortOut != null) oscPortOut.close();
+        } catch (IOException exception) {
+            exception.printStackTrace();
+        }
     }
 
     private String GetLocalIP() {
