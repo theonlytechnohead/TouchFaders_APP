@@ -172,15 +172,26 @@ public class MainActivity extends AppCompatActivity {
 
         instanceContext = this;
 
-        if (!demo)
+        if (!demo) {
             udpListenerThread = new Thread(new ClientListen());
+        } else {
+            numChannels = 32;
+            currentMix = 1;
+        }
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        Intent serviceIntent = new Intent(this, ConnectionService.class);
-        bindService(serviceIntent, connection, 0);
+        if (!demo) {
+            Intent serviceIntent = new Intent(this, ConnectionService.class);
+            bindService(serviceIntent, connection, 0);
+        } else {
+            adapter = new FaderStripRecyclerViewAdapter(instanceContext, numChannels, currentMix);
+            adapter.setValuesChangeListener((view, index, boxedVertical, points) -> SendOSCFaderValue(index + 1, points));
+            recyclerView = findViewById(R.id.faderRecyclerView);
+            recyclerView.setAdapter(adapter);
+        }
     }
 
     @Override
@@ -251,7 +262,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        unbindService(connection);
+        if (bound)
+            unbindService(connection);
         try {
             if (oscPortIn != null) oscPortIn.close();
             if (oscPortOut != null) oscPortOut.close();
