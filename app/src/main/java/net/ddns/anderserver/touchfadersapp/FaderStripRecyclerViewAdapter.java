@@ -4,27 +4,22 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.res.TypedArray;
-import android.os.Debug;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.DisplayCutout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowInsets;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class FaderStripRecyclerViewAdapter extends RecyclerView.Adapter<FaderStripRecyclerViewAdapter.FaderStripViewHolder> {
 
-    private Context context;
+    private final Context context;
     public static Activity getActivity(Context context) {
         if (context == null) return null;
         if (context instanceof Activity) return (Activity) context;
@@ -34,25 +29,25 @@ public class FaderStripRecyclerViewAdapter extends RecyclerView.Adapter<FaderStr
 
     private final ArrayList<Integer> faderLevels = new ArrayList<>();
     private final ArrayList<String> channelNames = new ArrayList<>();
-    private final List<Integer> channelColours;
+    private final ArrayList<Integer> faderColours = new ArrayList<>();
     private final ArrayList<String> channelPatchIn = new ArrayList<>();
     private FaderValueChangedListener faderValueChangedListener;
     private final Integer mixColour;
 
     int[] colourArray;
 
-    public FaderStripRecyclerViewAdapter(Context context, int numChannels, List<Integer> channelColours, Integer mixColour) {
+    public FaderStripRecyclerViewAdapter(Context context, int numChannels, ArrayList<Integer> channelColours, Integer mixColour) {
         this.context = context;
-        this.channelColours = channelColours;
-        this.mixColour = mixColour;
+        colourArray = context.getResources().getIntArray(R.array.mixer_colours);
+        this.mixColour = colourArray[mixColour];
         TypedArray array = context.obtainStyledAttributes(R.style.Widget_Theme_TouchFaders_BoxedVerticalSeekBar, new int[]{R.attr.startValue});
         for (int channel = 0; channel < numChannels; channel++ ){
             faderLevels.add(array.getInt(0, 623));
             channelNames.add("CH " + (channel + 1));
+            faderColours.add(colourArray[channelColours.get(channel)]);
             channelPatchIn.add(String.format("IN %02d", channel + 1));
         }
         array.recycle();
-        colourArray = context.getResources().getIntArray(R.array.mixer_colours);
     }
 
     @NonNull
@@ -106,7 +101,7 @@ public class FaderStripRecyclerViewAdapter extends RecyclerView.Adapter<FaderStr
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
             ViewGroup.MarginLayoutParams marginLayoutParams = (ViewGroup.MarginLayoutParams) holder.itemView.getLayoutParams();
-            if (position == faderLevels.size() - 1) {
+            if (holder.getAdapterPosition() == faderLevels.size() - 1) {
                 DisplayCutout cutout = getActivity(context).getWindow().getDecorView().getRootWindowInsets().getDisplayCutout();
                 if (cutout != null) marginLayoutParams.rightMargin = cutout.getSafeInsetRight();
             } else {

@@ -42,38 +42,6 @@
 		<item>@color/mixer_green</item>
 	</array>
 
-	<!-- Mix colours -->
-	<color name="mix1">#F4511E</color>
-	<color name="mix1_lighter">#FF9E80</color>
-	<color name="mix2">#4CAF50</color>
-	<color name="mix2_lighter">#CCFF90</color>
-	<color name="mix3">#039BE5</color>
-	<color name="mix3_lighter">#80D8FF</color>
-	<color name="mix4">#3949AB</color>
-	<color name="mix4_lighter">#8C9EFF</color>
-	<color name="mix5">#9C27B0</color>
-	<color name="mix5_lighter">#EA80FC</color>
-	<color name="mix6">#FFB300</color>
-	<color name="mix6_lighter">#FFE57F</color>
-
-	<array name="mix_colours">
-		<item>@color/mix1</item>
-		<item>@color/mix2</item>
-		<item>@color/mix3</item>
-		<item>@color/mix4</item>
-		<item>@color/mix5</item>
-		<item>@color/mix6</item>
-	</array>
-
-	<array name="mix_colours_lighter">
-		<item>@color/mix1_lighter</item>
-		<item>@color/mix2_lighter</item>
-		<item>@color/mix3_lighter</item>
-		<item>@color/mix4_lighter</item>
-		<item>@color/mix5_lighter</item>
-		<item>@color/mix6_lighter</item>
-	</array>
-
 	<!-- VerticalSeekBar -->
 	<color name="color_progress">#fbfbfb</color>
 	<color name="color_background">#4b4b4b</color>

@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
     private int receivePort;
     private int sendPort;
     private int numChannels;
-    private List<Integer> channelColours;
+    private ArrayList<Integer> channelColours;
     private int currentMix;
     private Integer mixColour;
 
@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
                 receivePort = connectionService.receivePort();
                 sendPort = connectionService.sendPort();
                 numChannels = connectionService.channels();
-                channelColours = connectionService.channelColours();
+                channelColours = new ArrayList<>(connectionService.channelColours());
                 currentMix = connectionService.selectedMix();
                 mixColour = connectionService.mixColours().get(currentMix);
 
@@ -180,7 +180,42 @@ public class MainActivity extends AppCompatActivity {
             udpListenerThread = new Thread(new ClientListen());
         } else {
             numChannels = 32;
+            channelColours = new ArrayList<>();
+            channelColours.add(7);
+            channelColours.add(7);
+            channelColours.add(7);
+            channelColours.add(7);
+            channelColours.add(7);
+            channelColours.add(7);
+            channelColours.add(6);
+            channelColours.add(2);
+            channelColours.add(2);
+            channelColours.add(5);
+            channelColours.add(3);
+            channelColours.add(3);
+            channelColours.add(0);
+            channelColours.add(0);
+            channelColours.add(0);
+            channelColours.add(6);
+            channelColours.add(6);
+            channelColours.add(0);
+            channelColours.add(0);
+            channelColours.add(0);
+            channelColours.add(0);
+            channelColours.add(0);
+            channelColours.add(0);
+            channelColours.add(5);
+            channelColours.add(4);
+            channelColours.add(1);
+            channelColours.add(0);
+            channelColours.add(0);
+            channelColours.add(0);
+            channelColours.add(0);
+            channelColours.add(0);
+            channelColours.add(0);
+//            channelColours.set(23, 3);
             currentMix = 1;
+            mixColour = 4;
         }
     }
 
