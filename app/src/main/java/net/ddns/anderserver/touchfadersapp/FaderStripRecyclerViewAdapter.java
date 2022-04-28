@@ -69,10 +69,12 @@ public class FaderStripRecyclerViewAdapter extends RecyclerView.Adapter<FaderStr
         holder.fader.setValue(faderLevels.get(holder.getAdapterPosition()));
         holder.fader.setGradientEnd(faderColours.get(holder.getAdapterPosition()));
         holder.fader.setGradientStart(mixColour);
+        holder.channelBackground.setBackgroundColor(mixColour);
         String number = String.valueOf((holder.getAdapterPosition() + 1));
         holder.channelNumber.setText(number);
         holder.channelPatch.setText(channelPatchIn.get(holder.getAdapterPosition()));
         holder.channelName.setText(channelNames.get(holder.getAdapterPosition()));
+        holder.channelName.setBackgroundColor(faderColours.get(holder.getAdapterPosition()));
         if ((holder.getAdapterPosition() / 8) % 2 == 0) {
             if (holder.getAdapterPosition() % 2 == 0)
                 holder.faderBackground.setBackgroundColor(context.getColor(R.color.fader_light_even));
@@ -120,6 +122,7 @@ public class FaderStripRecyclerViewAdapter extends RecyclerView.Adapter<FaderStr
 
         int position;
         ConstraintLayout faderBackground;
+        ConstraintLayout channelBackground;
         BoxedVertical fader;
         TextView channelNumber;
         TextView channelPatch;
@@ -128,6 +131,7 @@ public class FaderStripRecyclerViewAdapter extends RecyclerView.Adapter<FaderStr
         FaderStripViewHolder(View itemView) {
             super(itemView);
             faderBackground = itemView.findViewById(R.id.faderBackground);
+            channelBackground = itemView.findViewById(R.id.stripLayout);
             fader = itemView.findViewById(R.id.fader);
             fader.setOnBoxedPointsChangeListener((boxedPoints, points) -> {
                 faderLevels.set(position, points);
