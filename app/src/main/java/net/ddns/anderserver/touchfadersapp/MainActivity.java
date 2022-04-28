@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
                 numChannels = connectionService.channels();
                 channelColours = new ArrayList<>(connectionService.channelColours());
                 currentMix = connectionService.selectedMix();
-                mixColour = connectionService.mixColours().get(currentMix);
+                mixColour = connectionService.mixColours().get(currentMix - 1);
 
                 AsyncTask.execute(MainActivity.this::OpenOSCPortIn);
                 AsyncTask.execute(MainActivity.this::OpenOSCPortOut);
