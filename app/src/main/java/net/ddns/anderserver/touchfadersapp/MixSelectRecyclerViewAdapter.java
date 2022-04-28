@@ -13,11 +13,13 @@ import java.util.List;
 
 public class MixSelectRecyclerViewAdapter extends RecyclerView.Adapter<MixSelectRecyclerViewAdapter.ViewHolder> {
 
-    private List<String> mixNames;
+    private final List<String> mixNames;
+    private final List<Integer> mixColours;
     private MixButtonClickListener clickListener;
 
-    MixSelectRecyclerViewAdapter(Context context, List<String> data) {
-        this.mixNames = data;
+    MixSelectRecyclerViewAdapter(Context context, List<String> names, List<Integer> colours) {
+        this.mixNames = names;
+        this.mixColours = colours;
     }
 
     @NonNull
@@ -31,6 +33,7 @@ public class MixSelectRecyclerViewAdapter extends RecyclerView.Adapter<MixSelect
     public void onBindViewHolder(@NonNull MixSelectRecyclerViewAdapter.ViewHolder holder, int position) {
         holder.mixSelectButton.setText(mixNames.get(position));
         holder.mixSelectButton.setEnabled(true);
+        holder.mixSelectButton.setBackgroundColor(mixColours.get(position));
         holder.position = position;
     }
 

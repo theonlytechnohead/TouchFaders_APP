@@ -31,12 +31,45 @@ public class MixSelectActivity extends AppCompatActivity implements MixSelectRec
             if (connectionService.state() == ConnectionService.states.RUNNING)
                 connectionService.deselectMix();
 
+            // Generate mix names
             ArrayList<String> mixNames = new ArrayList<>();
             for (int i = 1; i <= connectionService.mixes(); i++) mixNames.add("Mix " + i);
 
+            // Assign mix colours
+            ArrayList<Integer> mixColours = new ArrayList<>();
+            for (int i = 0; i < connectionService.mixes(); i++) {
+                Integer mixColour = connectionService.mixColours().get(i);
+                switch (mixColour) {
+                    default:
+                        mixColours.add(getColor(R.color.mixer_blue));
+                        break;
+                    case 1:
+                        mixColours.add(getColor(R.color.mixer_orange));
+                        break;
+                    case 2:
+                        mixColours.add(getColor(R.color.mixer_brown));
+                        break;
+                    case 3:
+                        mixColours.add(getColor(R.color.mixer_purple));
+                        break;
+                    case 4:
+                        mixColours.add(getColor(R.color.mixer_cyan));
+                        break;
+                    case 5:
+                        mixColours.add(getColor(R.color.mixer_pink));
+                        break;
+                    case 6:
+                        mixColours.add(getColor(R.color.mixer_bergundy));
+                        break;
+                    case 7:
+                        mixColours.add(getColor(R.color.mixer_green));
+                        break;
+                }
+            }
+
             // set up the RecyclerView
             RecyclerView recyclerView = findViewById(R.id.mix_select_recyclerview);
-            adapter = new MixSelectRecyclerViewAdapter(getApplicationContext(), mixNames);
+            adapter = new MixSelectRecyclerViewAdapter(getApplicationContext(), mixNames, mixColours);
             adapter.setClickListener(MixSelectActivity.this);
             recyclerView.setAdapter(adapter);
         }

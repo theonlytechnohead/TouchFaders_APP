@@ -68,7 +68,9 @@ public class MainActivity extends AppCompatActivity {
     private int receivePort;
     private int sendPort;
     private int numChannels;
+    private List<Integer> channelColours;
     private int currentMix;
+    private Integer mixColour;
 
     ConnectionService connectionService;
     Boolean bound = false;
@@ -84,13 +86,15 @@ public class MainActivity extends AppCompatActivity {
                 receivePort = connectionService.receivePort();
                 sendPort = connectionService.sendPort();
                 numChannels = connectionService.channels();
+                channelColours = connectionService.channelColours();
                 currentMix = connectionService.selectedMix();
+                mixColour = connectionService.mixColours().get(currentMix);
 
                 AsyncTask.execute(MainActivity.this::OpenOSCPortIn);
                 AsyncTask.execute(MainActivity.this::OpenOSCPortOut);
             }
 
-            adapter = new FaderStripRecyclerViewAdapter(instanceContext, numChannels, currentMix);
+            adapter = new FaderStripRecyclerViewAdapter(instanceContext, numChannels, channelColours, mixColour);
             adapter.setValuesChangeListener((view, index, boxedVertical, points) -> SendOSCFaderValue(index + 1, points));
             recyclerView = findViewById(R.id.faderRecyclerView);
             recyclerView.setAdapter(adapter);
@@ -187,7 +191,7 @@ public class MainActivity extends AppCompatActivity {
             Intent serviceIntent = new Intent(this, ConnectionService.class);
             bindService(serviceIntent, connection, 0);
         } else {
-            adapter = new FaderStripRecyclerViewAdapter(instanceContext, numChannels, currentMix);
+            adapter = new FaderStripRecyclerViewAdapter(instanceContext, numChannels, channelColours, mixColour);
             adapter.setValuesChangeListener((view, index, boxedVertical, points) -> SendOSCFaderValue(index + 1, points));
             recyclerView = findViewById(R.id.faderRecyclerView);
             recyclerView.setAdapter(adapter);

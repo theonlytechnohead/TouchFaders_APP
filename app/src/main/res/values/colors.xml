@@ -22,24 +22,24 @@
 	<color name="meter_end">#00D600</color>
 
 	<!-- Channel colours -->
-	<color name="ch_blue">#0101FD</color>
-	<color name="ch_orange">#FF6601</color>
-	<color name="ch_brown">#996601</color>
-	<color name="ch_purple">#660199</color>
-	<color name="ch_cyan">#0199FF</color>
-	<color name="ch_pink">#FF6699</color>
-	<color name="ch_bergundy">#660101</color>
-	<color name="ch_green">#016633</color>
+	<color name="mixer_blue">#0101FD</color>
+	<color name="mixer_orange">#FF6601</color>
+	<color name="mixer_brown">#996601</color>
+	<color name="mixer_purple">#660199</color>
+	<color name="mixer_cyan">#0199FF</color>
+	<color name="mixer_pink">#FF6699</color>
+	<color name="mixer_bergundy">#660101</color>
+	<color name="mixer_green">#016633</color>
 
-	<array name="channel_colours">
-		<item>@color/ch_blue</item>
-		<item>@color/ch_orange</item>
-		<item>@color/ch_brown</item>
-		<item>@color/ch_purple</item>
-		<item>@color/ch_cyan</item>
-		<item>@color/ch_pink</item>
-		<item>@color/ch_bergundy</item>
-		<item>@color/ch_green</item>
+	<array name="mixer_colours">
+		<item>@color/mixer_blue</item>
+		<item>@color/mixer_orange</item>
+		<item>@color/mixer_brown</item>
+		<item>@color/mixer_purple</item>
+		<item>@color/mixer_cyan</item>
+		<item>@color/mixer_pink</item>
+		<item>@color/mixer_bergundy</item>
+		<item>@color/mixer_green</item>
 	</array>
 
 	<!-- Mix colours -->

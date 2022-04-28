@@ -6,10 +6,12 @@ import android.content.Intent
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
+import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import net.ddns.anderserver.touchfadersapp.StartupActivity.Companion.toHexString
 import java.io.IOException
 import java.net.*
 
@@ -96,7 +98,7 @@ class ConnectionService : Service() {
                 val byteArrayReceive = ByteArray(socket.receiveBufferSize)
                 val bytesRead =
                     socket.getInputStream().read(byteArrayReceive, 0, socket.receiveBufferSize)
-                //Log.i("TCP", byteArrayReceive.toHexString(bytesRead))
+                Log.i("TCP", byteArrayReceive.toHexString(bytesRead))
                 socket.close()
 
                 state = states.CONNECTED
@@ -104,7 +106,15 @@ class ConnectionService : Service() {
                 receivePort = byteArrayReceive[0].toInt()
                 sendPort = byteArrayReceive[1].toInt()
                 channels = byteArrayReceive[2].toInt()
-                mixes = byteArrayReceive[(3)].toInt()
+                // get channel colours
+                for (i: Int in 0 until channels()) {
+                    channelColours().add(byteArrayReceive[3 + i].toInt())
+                }
+                // offset mixes by number of channels
+                mixes = byteArrayReceive[3 + channels()].toInt()
+                for (i: Int in 0 until mixes()) {
+                    mixColours().add(byteArrayReceive[4 + channels() + i].toInt())
+                }
 
                 launch(Dispatchers.Default) {
                     val newNotification = buildNotification(
@@ -133,8 +143,14 @@ class ConnectionService : Service() {
     private var channels: Int? = null
     fun channels(): Int = channels ?: 0
 
+    private var channelColours: MutableList<Int> = mutableListOf()
+    fun channelColours(): MutableList<Int> = channelColours
+
     private var mixes: Int? = null
     fun mixes(): Int = mixes ?: 0
+
+    private var mixColours: MutableList<Int> = mutableListOf()
+    fun mixColours(): MutableList<Int> = mixColours
 
     private var selectedMix: Int? = null
     fun selectedMix(): Int = selectedMix ?: 0
@@ -174,6 +190,8 @@ class ConnectionService : Service() {
                 } catch (e: IOException) {
                     e.printStackTrace()
                 }
+                channelColours = mutableListOf()
+                mixColours = mutableListOf()
             }
         }
     }
