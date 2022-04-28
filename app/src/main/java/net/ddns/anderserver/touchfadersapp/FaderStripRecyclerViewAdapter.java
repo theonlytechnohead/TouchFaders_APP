@@ -62,26 +62,29 @@ public class FaderStripRecyclerViewAdapter extends RecyclerView.Adapter<FaderStr
         return new FaderStripViewHolder(view);
     }
 
+    @Override
+    public int getItemViewType(int position) {
+        return position;
+    }
+
     // Gets called every time a ViewHolder is reused (with a new position)
     @Override
     public void onBindViewHolder(@NonNull FaderStripViewHolder holder, int position) {
-        holder.position = position;
-        holder.fader.setValue(faderLevels.get(position));
-        // channel colour
-        holder.fader.setGradientEnd(colourArray[channelColours.get(position)]);
-        // mix colour
-        holder.fader.setGradientStart(colourArray[mixColour]);
-        String number = String.valueOf((position + 1));
+        holder.position = holder.getAdapterPosition();
+        holder.fader.setValue(faderLevels.get(holder.getAdapterPosition()));
+        holder.fader.setGradientEnd(faderColours.get(holder.getAdapterPosition()));
+        holder.fader.setGradientStart(mixColour);
+        String number = String.valueOf((holder.getAdapterPosition() + 1));
         holder.channelNumber.setText(number);
-        holder.channelPatch.setText(channelPatchIn.get(position));
-        holder.channelName.setText(channelNames.get(position));
-        if ((position / 8) % 2 == 0) {
-            if (position % 2 == 0)
+        holder.channelPatch.setText(channelPatchIn.get(holder.getAdapterPosition()));
+        holder.channelName.setText(channelNames.get(holder.getAdapterPosition()));
+        if ((holder.getAdapterPosition() / 8) % 2 == 0) {
+            if (holder.getAdapterPosition() % 2 == 0)
                 holder.faderBackground.setBackgroundColor(context.getColor(R.color.fader_light_even));
             else
                 holder.faderBackground.setBackgroundColor(context.getColor(R.color.fader_light_odd));
         } else {
-            if (position % 2 == 0)
+            if (holder.getAdapterPosition() % 2 == 0)
                 holder.faderBackground.setBackgroundColor(context.getColor(R.color.fader_dark_even));
             else
                 holder.faderBackground.setBackgroundColor(context.getColor(R.color.fader_dark_odd));
