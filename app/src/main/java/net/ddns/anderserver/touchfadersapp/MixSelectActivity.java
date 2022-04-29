@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MixSelectActivity extends AppCompatActivity implements MixSelectRecyclerViewAdapter.MixButtonClickListener {
 
@@ -32,8 +33,10 @@ public class MixSelectActivity extends AppCompatActivity implements MixSelectRec
                 connectionService.deselectMix();
 
             // Generate mix names
-            ArrayList<String> mixNames = new ArrayList<>();
-            for (int i = 1; i <= connectionService.mixes(); i++) mixNames.add("Mix " + i);
+//            ArrayList<String> mixNames = new ArrayList<>();
+//            for (int i = 1; i <= connectionService.mixes(); i++) mixNames.add("Mix " + i);
+
+            List<String> mixNames = connectionService.mixNames();
 
             // Assign mix colours
             ArrayList<Integer> mixColours = new ArrayList<>();

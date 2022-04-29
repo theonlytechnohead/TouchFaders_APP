@@ -11,7 +11,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import net.ddns.anderserver.touchfadersapp.StartupActivity.Companion.toHexString
 import java.io.IOException
 import java.net.*
 
@@ -98,22 +97,38 @@ class ConnectionService : Service() {
                 val byteArrayReceive = ByteArray(socket.receiveBufferSize)
                 val bytesRead =
                     socket.getInputStream().read(byteArrayReceive, 0, socket.receiveBufferSize)
-                Log.i("TCP", byteArrayReceive.toHexString(bytesRead))
+//                Log.i("TCP", byteArrayReceive.toHexString(bytesRead))
                 socket.close()
 
                 state = states.CONNECTED
 
+                // OSC port to recieve on
                 receivePort = byteArrayReceive[0].toInt()
+                // OSC port to send on
                 sendPort = byteArrayReceive[1].toInt()
+                // number of channels
                 channels = byteArrayReceive[2].toInt()
                 // get channel colours
                 for (i: Int in 0 until channels()) {
                     channelColours().add(byteArrayReceive[3 + i].toInt())
                 }
                 // offset mixes by number of channels
+                // number of mixes
                 mixes = byteArrayReceive[3 + channels()].toInt()
+                // get mix colours
                 for (i: Int in 0 until mixes()) {
                     mixColours().add(byteArrayReceive[4 + channels() + i].toInt())
+                }
+                val base = 4 + channels() + mixes()
+                for (i: Int in 0 until mixes()) {
+                    var mixName = ""
+                    for (c: Int in 0 until 6) {
+                        val byte = byteArrayReceive[base + (i * 6) + c]
+                        if (byte != 0.toByte()) {
+                            mixName += byte.toChar()
+                        }
+                    }
+                    mixNames().add(mixName)
                 }
 
                 launch(Dispatchers.Default) {
@@ -151,6 +166,9 @@ class ConnectionService : Service() {
 
     private var mixColours: MutableList<Int> = mutableListOf()
     fun mixColours(): MutableList<Int> = mixColours
+
+    private var mixNames: MutableList<String> = mutableListOf()
+    fun mixNames(): MutableList<String> = mixNames
 
     private var selectedMix: Int? = null
     fun selectedMix(): Int = selectedMix ?: 0

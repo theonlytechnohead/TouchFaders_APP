@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
                 numChannels = connectionService.channels();
                 channelColours = new ArrayList<>(connectionService.channelColours());
                 currentMix = connectionService.selectedMix();
-                mixName.setText("MIX" + currentMix);
+                mixName.setText(connectionService.mixNames().get(currentMix - 1).replace(" ", " \n"));
                 mixColour = connectionService.mixColours().get(currentMix - 1);
                 mixInfo.setBackgroundColor(getResources().getIntArray(R.array.mixer_colours)[mixColour]);
 
@@ -223,7 +223,7 @@ public class MainActivity extends AppCompatActivity {
             channelColours.add(0);
             channelColours.add(0);
             currentMix = 1;
-            mixColour = 4;
+            mixColour = 1;
         }
     }
 
@@ -261,7 +261,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (demo) {
             mixInfo.setBackgroundColor(getResources().getIntArray(R.array.mixer_colours)[mixColour]);
-            mixName.setText("MIX1");
+            mixName.setText("MIX \n1");
         }
 
         runUDP = true;
