@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.Nullable;
@@ -29,6 +30,7 @@ public class MixSelectActivity extends AppCompatActivity implements MixSelectRec
             connectionService = ((ConnectionService.ConnectionBinder) iBinder).getService();
             bound = true;
 
+            Log.i("MIX", "Service connected");
             if (connectionService.state() == ConnectionService.states.RUNNING)
                 connectionService.deselectMix();
 
@@ -114,6 +116,11 @@ public class MixSelectActivity extends AppCompatActivity implements MixSelectRec
                         | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                         | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         // Fullscreen done!
+
+        if (connectionService != null) {
+            if (connectionService.state() == ConnectionService.states.RUNNING)
+                connectionService.deselectMix();
+        }
     }
 
     @Override

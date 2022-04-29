@@ -36,6 +36,13 @@ class DeviceSelectRecyclerViewAdapter internal constructor(context: Context?, pr
         }
     }
 
+    fun clear() {
+        for (device in deviceNames) {
+            this.notifyItemRemoved(deviceNames.indexOf(device))
+        }
+        deviceNames.clear()
+    }
+
     override fun getItemCount(): Int {
         return deviceNames.size
     }

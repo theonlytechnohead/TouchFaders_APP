@@ -149,11 +149,14 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
                 or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
         // Fullscreen done!
         launch(Dispatchers.IO) {
+            listenUDP = true
             UDPListener();
         }
         launch(Dispatchers.IO) {
             checkNetwork()
         }
+        devices.clear()
+        deviceNames.clear()
         adapter.notifyDataSetChanged()
 
         registerReceiver(broadcastReceiver, IntentFilter(START_MIX_ACTIVITY))
@@ -255,7 +258,7 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
                 val length = packet.length
                 val senderIP = packet.address.hostAddress;
                 val senderName = String(recvBuf.copyOfRange(3, length - 1))
-                //Log.i("UDP", senderName)
+//                Log.i("UDP", senderName)
                 handler.post { adapter.addDevice(senderName) }
                 if (!devices.containsKey(senderName)) {
                     devices[senderName] = InetAddress.getByName(senderIP)

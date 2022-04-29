@@ -208,10 +208,17 @@ class ConnectionService : Service() {
                 } catch (e: IOException) {
                     e.printStackTrace()
                 }
-                channelColours = mutableListOf()
-                mixColours = mutableListOf()
+                reset()
             }
         }
+    }
+
+    private fun reset() {
+        channels = 0
+        channelColours = mutableListOf()
+        mixes = 0
+        mixColours = mutableListOf()
+        mixNames = mutableListOf()
     }
 
     override fun onDestroy() {
