@@ -7,6 +7,10 @@ import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
+import com.illposed.osc.*
+import com.illposed.osc.argument.handler.Activator
+import com.illposed.osc.transport.OSCPortIn
+import com.illposed.osc.transport.OSCPortOut
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -181,6 +185,52 @@ class ConnectionService : Service() {
                 MainActivity::class.java
             )
         )
+        // Open and send OSC
+        CoroutineScope(Dispatchers.Default).launch {
+            async(Dispatchers.IO) {
+                // Workaround for java.awt.Color missing
+                val serializer = OSCSerializerAndParserBuilder()
+                serializer.setUsingDefaultHandlers(false)
+                val defaultParserTypes = Activator.createSerializerTypes()
+                defaultParserTypes.removeAt(16)
+                var typeChar = 'a'
+                for (argumentHandler in defaultParserTypes) {
+                    serializer.registerArgumentHandler(argumentHandler, typeChar)
+                    typeChar++
+                }
+                oscPortOut = OSCPortOut(serializer, InetSocketAddress("192.168.1.50", 8001))
+                oscPortOut.send(OSCMessage("/test", mutableListOf(1)))
+                oscPortIn = OSCPortIn(InetSocketAddress("192.168.1.160", 9001))
+                oscPortIn.dispatcher.isAlwaysDispatchingImmediately = true
+            }
+        }
+    }
+
+    lateinit var oscPortOut: OSCPortOut
+    lateinit var oscPortIn: OSCPortIn
+
+    fun send (message: OSCMessage) {
+        CoroutineScope(Dispatchers.Default).launch {
+            async(Dispatchers.IO) {
+                oscPortOut.send(message)
+            }
+        }
+    }
+
+    fun addListener (messageSelector: MessageSelector, listener: OSCMessageListener) {
+        oscPortIn.dispatcher.addListener(messageSelector, listener)
+    }
+
+    fun startListening () {
+        oscPortIn.startListening()
+    }
+
+    fun stopListening () {
+        oscPortIn.stopListening()
+    }
+
+    fun removeListener (messageSelector: MessageSelector, listener: OSCMessageListener) {
+        oscPortIn.dispatcher.removeListener(messageSelector, listener)
     }
 
     fun deselectMix() {
@@ -193,6 +243,13 @@ class ConnectionService : Service() {
                 }"
             )
         )
+        // close OSC
+        CoroutineScope(Dispatchers.Default).launch {
+            async(Dispatchers.IO) {
+                oscPortOut.close()
+                oscPortIn.close()
+            }
+        }
     }
 
     fun Disconnect() {

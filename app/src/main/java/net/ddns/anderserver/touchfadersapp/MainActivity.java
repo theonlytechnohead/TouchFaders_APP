@@ -17,34 +17,24 @@ import android.view.DisplayCutout;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.illposed.osc.OSCBadDataEvent;
-import com.illposed.osc.OSCBundle;
 import com.illposed.osc.OSCMessage;
-import com.illposed.osc.OSCPacket;
-import com.illposed.osc.OSCPacketEvent;
-import com.illposed.osc.OSCPacketListener;
-import com.illposed.osc.transport.udp.OSCPortIn;
-import com.illposed.osc.transport.udp.OSCPortOut;
+import com.illposed.osc.OSCMessageEvent;
+import com.illposed.osc.OSCMessageListener;
+import com.illposed.osc.messageselector.OSCPatternAddressMessageSelector;
+import com.illposed.osc.transport.OSCPortIn;
+import com.illposed.osc.transport.OSCPortOut;
 
 import java.io.IOException;
-import java.net.BindException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -52,14 +42,9 @@ import java.util.List;
  */
 public class MainActivity extends AppCompatActivity {
 
-    SharedPreferences sharedPreferences;
-
-    OSCPortOut oscPortOut;
-    OSCPortIn oscPortIn;
     Thread udpListenerThread;
     boolean runUDP = true;
 
-    ArrayList<BoxedVertical> faders = new ArrayList<>();
     RecyclerView recyclerView;
     FaderStripRecyclerViewAdapter adapter;
     Context instanceContext;
@@ -69,9 +54,6 @@ public class MainActivity extends AppCompatActivity {
     TextView mixNumber;
 
     private Boolean demo;
-    private String ipAddress;
-    private int receivePort;
-    private int sendPort;
     private int numChannels;
     private ArrayList<Integer> channelColours;
     private int currentMix;
@@ -87,9 +69,6 @@ public class MainActivity extends AppCompatActivity {
 
             // grab variables and setup stuffs
             if (!demo) {
-                ipAddress = connectionService.address();
-                receivePort = connectionService.receivePort();
-                sendPort = connectionService.sendPort();
                 numChannels = connectionService.channels();
                 channelColours = new ArrayList<>(connectionService.channelColours());
                 currentMix = connectionService.selectedMix();
@@ -98,74 +77,73 @@ public class MainActivity extends AppCompatActivity {
                 mixNumber.setTextColor(getResources().getIntArray(R.array.mixer_colours_lighter)[connectionService.mixColours().get(currentMix - 1)]);
                 mixColour = connectionService.mixColours().get(currentMix - 1);
                 mixInfo.setBackgroundColor(getResources().getIntArray(R.array.mixer_colours)[mixColour]);
-
-                AsyncTask.execute(MainActivity.this::OpenOSCPortIn);
-                AsyncTask.execute(MainActivity.this::OpenOSCPortOut);
             }
 
             adapter = new FaderStripRecyclerViewAdapter(instanceContext, numChannels, channelColours);
             adapter.setValuesChangeListener((view, index, boxedVertical, points) -> SendOSCFaderValue(index + 1, points));
             recyclerView = findViewById(R.id.faderRecyclerView);
             recyclerView.setAdapter(adapter);
+
+//            connectionService.addListener(new OSCPatternAddressMessageSelector("/tes?/*"), event -> Log.i("OSC", "Got OSC!"));
+            connectionService.addListener(faderPattern, faderListener);
+            connectionService.addListener(labelPattern, labelListener);
+            connectionService.addListener(patchPattern, patchListener);
+            connectionService.startListening();
+
+            SendOSCGetMix(currentMix);
         }
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
             bound = false;
+
+            connectionService.stopListening();
+//            connectionService.removeListener(new OSCPatternAddressMessageSelector("/tes?/*"), event -> Log.i("OSC", "Got OSC!"));
+            connectionService.removeListener(faderPattern, faderListener);
+            connectionService.removeListener(labelPattern, labelListener);
+            connectionService.removeListener(patchPattern, patchListener);
         }
     };
 
-    OSCPacketListener packetListener = new OSCPacketListener() {
+    OSCPatternAddressMessageSelector faderPattern = new OSCPatternAddressMessageSelector("/mix*/fader*");
+    OSCMessageListener faderListener = new OSCMessageListener() {
         @Override
-        public void handlePacket(OSCPacketEvent event) {
-            OSCPacket packet = event.getPacket();
-            if (packet instanceof OSCMessage) {
-                OSCMessage message = (OSCMessage) packet;
-                if (message.getAddress().contains("/mix" + currentMix + "/fader")) {
-                    String[] segments = message.getAddress().split("/");
-                    int faderIndex = Integer.parseInt(segments[2].replaceAll("\\D+", "")) - 1; // extract only digits via RegEx
-                    if (0 <= faderIndex && faderIndex < adapter.getItemCount()) {
-                        adapter.setFaderLevel(faderIndex, (int) message.getArguments().get(0));
-                        Handler handler = new Handler(getMainLooper());
-                        handler.post(() -> adapter.notifyDataSetChanged());
-                    }
-                }
-                if (message.getAddress().contains("/label")) {
-                    String[] segments = message.getAddress().split("/");
-                    int channelIndex = Integer.parseInt(segments[2].replaceAll("\\D+", "")) - 1;
-                    if (0 <= channelIndex && channelIndex < adapter.getItemCount()) {
-                        Handler handler = new Handler(getMainLooper());
-                        adapter.setChannelName(channelIndex, (String) message.getArguments().get(0));
-                        handler.post(() -> {
-                            adapter.notifyDataSetChanged();
-                        });
-                    }
-                }
-                if (message.getAddress().contains("/patch")) {
-                    String[] segments = message.getAddress().split("/");
-                    int channelIndex = Integer.parseInt(segments[2].replaceAll("\\D+", "")) - 1;
-                    if (0 <= channelIndex && channelIndex < adapter.getItemCount()) {
-                        Handler handler = new Handler(getMainLooper());
-                        adapter.setChannelPatchIn(channelIndex, (String) message.getArguments().get(0));
-                        handler.post(() -> {
-                            adapter.notifyDataSetChanged();
-                        });
-                    }
-                }
-            }
-            if (packet instanceof OSCBundle) {
-                OSCBundle bundle = (OSCBundle) packet;
-                List<OSCPacket> packetList = bundle.getPackets();
-                for (OSCPacket pack : packetList) {
-                    OSCMessage message = (OSCMessage) pack;
-                    Log.i("OSC message", message.getAddress() + " : " + message.getArguments().get(0).toString());
-                }
+        public void acceptMessage(OSCMessageEvent event) {
+            String[] segments = event.getMessage().getAddress().split("/");
+            int faderIndex = Integer.parseInt(segments[2].replaceAll("\\D+", "")) - 1; // extract only digits via RegEx
+            if (0 <= faderIndex && faderIndex < adapter.getItemCount()) {
+                adapter.setFaderLevel(faderIndex, (int) event.getMessage().getArguments().get(0));
+                Handler handler = new Handler(getMainLooper());
+                handler.post(() -> adapter.notifyDataSetChanged());
             }
         }
+    };
 
+    OSCPatternAddressMessageSelector labelPattern = new OSCPatternAddressMessageSelector("/label?");
+    OSCMessageListener labelListener = new OSCMessageListener() {
         @Override
-        public void handleBadData(OSCBadDataEvent event) {
-            Log.d("OSC message", "Bad packet received");
+        public void acceptMessage(OSCMessageEvent event) {
+            String[] segments = event.getMessage().getAddress().split("/");
+            int channelIndex = Integer.parseInt(segments[2].replaceAll("\\D+", "")) - 1;
+            if (0 <= channelIndex && channelIndex < adapter.getItemCount()) {
+                Handler handler = new Handler(getMainLooper());
+                adapter.setChannelName(channelIndex, (String) event.getMessage().getArguments().get(0));
+                handler.post(() -> adapter.notifyDataSetChanged());
+            }
+        }
+    };
+
+    OSCPatternAddressMessageSelector patchPattern = new OSCPatternAddressMessageSelector("/patch?");
+    OSCMessageListener patchListener = new OSCMessageListener() {
+        @Override
+        public void acceptMessage(OSCMessageEvent event) {
+            String[] segments = event.getMessage().getAddress().split("/");
+            int channelIndex = Integer.parseInt(segments[2].replaceAll("\\D+", "")) - 1;
+            if (0 <= channelIndex && channelIndex < adapter.getItemCount()) {
+                Handler handler = new Handler(getMainLooper());
+                adapter.setChannelPatchIn(channelIndex, (String) event.getMessage().getArguments().get(0));
+                handler.post(() -> adapter.notifyDataSetChanged());
+            }
         }
     };
 
@@ -280,8 +258,6 @@ public class MainActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
             frameLayout.addOnLayoutChangeListener((v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
                 DisplayCutout cutout = getWindow().getDecorView().getRootWindowInsets().getDisplayCutout();
-                //RecyclerView faderLayoutView = findViewById(R.id.faderRecyclerView);
-                //RecyclerView faderLayoutView = recyclerView;
                 BoxedVertical meter = findViewById(R.id.mixMeter);
                 ConstraintLayout mixInfo = findViewById(R.id.mix_info_layout);
                 ViewGroup.LayoutParams meterParams = meter.getLayoutParams();
@@ -306,21 +282,8 @@ public class MainActivity extends AppCompatActivity {
                         handler.post(() -> mixInfo.setLayoutParams(mixInfoParams));
                     }
                 }
-
-//                Log.i("CUTOUT", "safeLeft: " + cutout.getSafeInsetLeft() + "  safeRight: " + cutout.getSafeInsetRight());
             });
         }
-        AsyncTask.execute(() -> {
-            boolean ready = false;
-            while (!ready) {
-                if (oscPortIn != null && oscPortOut != null) {
-                    ready = oscPortIn.isListening() && oscPortOut.isConnected();
-                } else {
-                    ready = false;
-                }
-            }
-            SendOSCGetMix(currentMix);
-        });
     }
 
     @Override
@@ -334,109 +297,21 @@ public class MainActivity extends AppCompatActivity {
         super.onStop();
         if (bound)
             unbindService(connection);
-        try {
-            if (oscPortIn != null) oscPortIn.close();
-            if (oscPortOut != null) oscPortOut.close();
-        } catch (IOException exception) {
-            exception.printStackTrace();
-        }
-    }
-
-    private String GetLocalIP() {
-        try {
-            String localAddress = "";
-            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements(); ) {
-                NetworkInterface networkInterface = en.nextElement();
-                for (Enumeration<InetAddress> enumIpAddr = networkInterface.getInetAddresses(); enumIpAddr.hasMoreElements(); ) {
-                    InetAddress inetAddress = enumIpAddr.nextElement();
-                    if (!inetAddress.isLinkLocalAddress()) {
-                        if (!inetAddress.toString().contains(":"))
-                            localAddress = inetAddress.getHostAddress();
-                    }
-                }
-            }
-            return localAddress;
-        } catch (SocketException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    private void OpenOSCPortIn() {
-        try {
-            oscPortIn = new OSCPortIn(new InetSocketAddress(GetLocalIP(), 9000 + receivePort));
-        } catch (BindException e) {
-            Handler handler = new Handler(Looper.getMainLooper());
-            handler.post(() -> Toast.makeText(getApplicationContext(), "Failed to bind IP to OSC!", Toast.LENGTH_SHORT).show());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        while (true) {
-            if (oscPortIn != null) {
-                oscPortIn.getDispatcher().setAlwaysDispatchingImmediately(true);
-                oscPortIn.addPacketListener(packetListener);
-                break;
-            } else {
-                try {
-                    Thread.sleep(10);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    break;
-                }
-            }
-        }
-        oscPortIn.startListening();
-    }
-
-    private void OpenOSCPortOut() {
-        try {
-            oscPortOut = new OSCPortOut(new InetSocketAddress(InetAddress.getByName(ipAddress), 8000 + sendPort));
-            oscPortOut.connect();
-        } catch (Exception e) {
-            Handler handler = new Handler(Looper.getMainLooper());
-            handler.post(() -> Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show());
-        }
     }
 
     public void SendOSCFaderValue(int fader, int faderValue) {
-        AsyncTask.execute(() -> {
-            Handler handler = new Handler(Looper.getMainLooper());
-
-            if (oscPortOut != null) {
-                ArrayList<Object> arguments = new ArrayList<>();
-                arguments.add(faderValue);
-                OSCMessage message = new OSCMessage("/mix" + currentMix + "/fader" + fader, arguments);
-
-                try {
-                    oscPortOut.send(message);
-                    Thread.sleep(5);
-                    handler.post(() -> Log.i("OSC message", message.getAddress() + " : " + message.getArguments().get(0).toString()));
-                } catch (Exception e) {
-                    handler.post(() -> Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_SHORT).show());
-                }
-            }
-        });
+        ArrayList<Object> arguments = new ArrayList<>();
+        arguments.add(faderValue);
+        OSCMessage message = new OSCMessage("/mix" + currentMix + "/fader" + fader, arguments);
+        Log.i("OSC", message.getAddress() + " " + message.getArguments().get(0).toString());
+        connectionService.send(message);
     }
 
     public void SendOSCGetMix(int mix) {
-        AsyncTask.execute(() -> {
-            Handler handler = new Handler(Looper.getMainLooper());
-
-            if (oscPortOut != null) {
-                ArrayList<Object> arguments = new ArrayList<>();
-                arguments.add(1);
-                OSCMessage message = new OSCMessage("/mix" + mix, arguments);
-
-                try {
-                    oscPortOut.send(message);
-                    //handler.post(() -> Log.i("OSC message", ipAddress.toString() + ":" + sendPort + " " + message.getAddress() + " : " + message.getArguments().get(0).toString()));
-                } catch (Exception e) {
-                    //handler.post(() -> Log.e("OSC mix error", e.toString()));
-                    handler.post(() -> Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_SHORT).show());
-                }
-            }
-        });
+        ArrayList<Object> arguments = new ArrayList<>();
+        arguments.add(1);
+        OSCMessage message = new OSCMessage("/mix" + mix, arguments);
+        connectionService.send(message);
     }
 
     public class ClientListen implements Runnable {
