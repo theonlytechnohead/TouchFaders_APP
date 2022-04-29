@@ -92,7 +92,9 @@ public class MainActivity extends AppCompatActivity {
                 numChannels = connectionService.channels();
                 channelColours = new ArrayList<>(connectionService.channelColours());
                 currentMix = connectionService.selectedMix();
+                mixName.setText("MIX" + currentMix);
                 mixColour = connectionService.mixColours().get(currentMix - 1);
+                mixInfo.setBackgroundColor(getResources().getIntArray(R.array.mixer_colours)[mixColour]);
 
                 AsyncTask.execute(MainActivity.this::OpenOSCPortIn);
                 AsyncTask.execute(MainActivity.this::OpenOSCPortOut);
@@ -257,8 +259,10 @@ public class MainActivity extends AppCompatActivity {
                         | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         // Fullscreen done!
 
-        mixInfo.setBackgroundColor(getResources().getIntArray(R.array.mixer_colours)[mixColour]);
-        mixName.setText("MIX" + currentMix);
+        if (demo) {
+            mixInfo.setBackgroundColor(getResources().getIntArray(R.array.mixer_colours)[1]);
+            mixName.setText("MIX1");
+        }
 
         runUDP = true;
         if (!demo) {

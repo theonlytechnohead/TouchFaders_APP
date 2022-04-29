@@ -30,11 +30,16 @@ public class MixSelectRecyclerViewAdapter extends RecyclerView.Adapter<MixSelect
     }
 
     @Override
+    public int getItemViewType(int position) {
+        return position;
+    }
+
+    @Override
     public void onBindViewHolder(@NonNull MixSelectRecyclerViewAdapter.ViewHolder holder, int position) {
-        holder.mixSelectButton.setText(mixNames.get(position));
+        holder.mixSelectButton.setText(mixNames.get(holder.getAdapterPosition()));
         holder.mixSelectButton.setEnabled(true);
-        holder.mixSelectButton.setBackgroundColor(mixColours.get(position));
-        holder.position = position;
+        holder.mixSelectButton.setBackgroundColor(mixColours.get(holder.getAdapterPosition()));
+        holder.position = holder.getAdapterPosition();
     }
 
     @Override
@@ -54,7 +59,7 @@ public class MixSelectRecyclerViewAdapter extends RecyclerView.Adapter<MixSelect
             //mixTextView.setOnClickListener(this);
             mixSelectButton = itemView.findViewById(R.id.mix_select_button);
             mixSelectButton.setOnClickListener(view -> {
-                mixSelectButton.setEnabled(false);
+//                mixSelectButton.setEnabled(false);
                 onItemClick(view, position);
             });
         }
