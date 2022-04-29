@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
                 AsyncTask.execute(MainActivity.this::OpenOSCPortOut);
             }
 
-            adapter = new FaderStripRecyclerViewAdapter(instanceContext, numChannels, channelColours, mixColour);
+            adapter = new FaderStripRecyclerViewAdapter(instanceContext, numChannels, channelColours);
             adapter.setValuesChangeListener((view, index, boxedVertical, points) -> SendOSCFaderValue(index + 1, points));
             recyclerView = findViewById(R.id.faderRecyclerView);
             recyclerView.setAdapter(adapter);
@@ -234,7 +234,7 @@ public class MainActivity extends AppCompatActivity {
             Intent serviceIntent = new Intent(this, ConnectionService.class);
             bindService(serviceIntent, connection, 0);
         } else {
-            adapter = new FaderStripRecyclerViewAdapter(instanceContext, numChannels, channelColours, mixColour);
+            adapter = new FaderStripRecyclerViewAdapter(instanceContext, numChannels, channelColours);
             adapter.setValuesChangeListener((view, index, boxedVertical, points) -> SendOSCFaderValue(index + 1, points));
             recyclerView = findViewById(R.id.faderRecyclerView);
             recyclerView.setAdapter(adapter);
@@ -260,7 +260,7 @@ public class MainActivity extends AppCompatActivity {
         // Fullscreen done!
 
         if (demo) {
-            mixInfo.setBackgroundColor(getResources().getIntArray(R.array.mixer_colours)[1]);
+            mixInfo.setBackgroundColor(getResources().getIntArray(R.array.mixer_colours)[mixColour]);
             mixName.setText("MIX1");
         }
 
