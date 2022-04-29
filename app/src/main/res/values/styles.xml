@@ -20,7 +20,7 @@
 		<item name="gradientEnd">@color/white</item>
 		<item name="backgroundColor">@color/color_background</item>
 		<item name="corner">15</item>
-		<item name="textSize">15sp</item>
+		<item name="textSize">12sp</item>
 		<item name="textColor">@color/black</item>
 		<item name="android:layout_marginStart">5dp</item>
 		<item name="android:layout_marginEnd">5dp</item>

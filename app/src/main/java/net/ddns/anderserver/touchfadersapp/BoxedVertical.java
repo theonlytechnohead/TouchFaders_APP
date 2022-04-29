@@ -112,6 +112,8 @@ public class BoxedVertical extends View{
     private int touchStarted_X;
     private int touchStarted_Y;
 
+    private String[] textValues;
+
     public BoxedVertical(Context context) {
         super(context);
         init(context, null);
@@ -170,6 +172,8 @@ public class BoxedVertical extends View{
             mEnabled = a.getBoolean(R.styleable.BoxedVertical_enabled, mEnabled);
             mTouchDisabled = a.getBoolean(R.styleable.BoxedVertical_touchDisabled, mTouchDisabled);
             mTextEnabled = a.getBoolean(R.styleable.BoxedVertical_textEnabled, mTextEnabled);
+
+            textValues = getResources().getStringArray(R.array.fader_db);
 
             mPoints = mDefaultValue;
 
@@ -247,8 +251,8 @@ public class BoxedVertical extends View{
         else{
             //If image is disabled and text is enabled show text
             if (mTextEnabled){
-                String strPoint = String.valueOf(mPoints);
-                drawText(canvas, mTextPaint, strPoint);
+//                String strPoint = String.valueOf(mPoints);
+                drawText(canvas, mTextPaint, textValues[mPoints]);
             }
         }
         lastProgressSweep = mProgressSweep;
