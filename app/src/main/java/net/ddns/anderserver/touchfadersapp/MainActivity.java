@@ -286,24 +286,25 @@ public class MainActivity extends AppCompatActivity {
                 ConstraintLayout mixInfo = findViewById(R.id.mix_info_layout);
                 ViewGroup.LayoutParams meterParams = meter.getLayoutParams();
                 ViewGroup.LayoutParams mixInfoParams = mixInfo.getLayoutParams();
-                assert cutout != null;
-                final float scale = getApplicationContext().getResources().getDisplayMetrics().density;
-                int pixels = (int) (35 * scale + 0.5f);
-                Handler handler = new Handler(Looper.getMainLooper());
-                if (cutout.getSafeInsetLeft() != meterParams.width) {
-                    meterParams.width = cutout.getSafeInsetLeft();
-                    if (meterParams.width == 0) {
-                        meterParams.width = pixels;
+                if (cutout != null) {
+                    final float scale = getApplicationContext().getResources().getDisplayMetrics().density;
+                    int pixels = (int) (35 * scale + 0.5f);
+                    Handler handler = new Handler(Looper.getMainLooper());
+                    if (cutout.getSafeInsetLeft() != meterParams.width) {
+                        meterParams.width = cutout.getSafeInsetLeft();
+                        if (meterParams.width == 0) {
+                            meterParams.width = pixels;
+                        }
+                        handler.post(() -> meter.setLayoutParams(meterParams));
                     }
-                    handler.post(() -> meter.setLayoutParams(meterParams));
-                }
-                if (cutout.getSafeInsetRight() != mixInfoParams.width + pixels) {
-                    mixInfoParams.width = cutout.getSafeInsetRight() + pixels;
-                    if (mixInfoParams.width == 0) {
-                        mixInfoParams.width = pixels;
+                    if (cutout.getSafeInsetRight() != mixInfoParams.width + pixels) {
+                        mixInfoParams.width = cutout.getSafeInsetRight() + pixels;
+                        if (mixInfoParams.width == 0) {
+                            mixInfoParams.width = pixels;
+                        }
+                        mixInfo.setPadding(0, 0, cutout.getSafeInsetRight(), 0);
+                        handler.post(() -> mixInfo.setLayoutParams(mixInfoParams));
                     }
-                    mixInfo.setPadding(0, 0, cutout.getSafeInsetRight(), 0);
-                    handler.post(() -> mixInfo.setLayoutParams(mixInfoParams));
                 }
 
 //                Log.i("CUTOUT", "safeLeft: " + cutout.getSafeInsetLeft() + "  safeRight: " + cutout.getSafeInsetRight());
