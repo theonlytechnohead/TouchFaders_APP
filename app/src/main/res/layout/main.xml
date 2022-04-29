@@ -1,22 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-	xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:tools="http://schemas.android.com/tools"
-	android:layout_width="match_parent"
-	android:layout_height="match_parent"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:id="@+id/fullscreen_frame"
+	android:layout_width="match_parent"
 
-	android:orientation="vertical"
+	android:layout_height="match_parent"
 	android:background="?attr/fullscreenBackgroundColor"
+	android:orientation="vertical"
 	android:theme="@style/ThemeOverlay.TouchFaders.FullscreenContainer"
-	tools:context=".MainActivity"
-	android:id="@+id/fullscreen_frame">
+	tools:context=".MainActivity">
 
 
 	<net.ddns.anderserver.touchfadersapp.BoxedVertical
 		android:id="@+id/mixMeter"
 		android:layout_width="35dp"
 		android:layout_height="0dp"
+		app:gradientEnd="@color/meter_end"
+		app:gradientStart="@color/meter_start"
 		app:layout_constraintBottom_toBottomOf="parent"
 		app:layout_constraintEnd_toStartOf="@+id/faderRecyclerView"
 		app:layout_constraintStart_toStartOf="parent"
@@ -24,9 +25,7 @@
 		app:max="127"
 		app:startValue="103"
 		app:textEnabled="false"
-		app:touchDisabled="true"
-		app:gradientStart="@color/meter_start"
-		app:gradientEnd="@color/meter_end"/>
+		app:touchDisabled="true" />
 
 	<androidx.recyclerview.widget.RecyclerView
 		android:id="@+id/faderRecyclerView"
@@ -34,10 +33,36 @@
 		android:layout_height="0dp"
 		android:orientation="horizontal"
 		app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+		app:layout_constraintBottom_toBottomOf="parent"
+		app:layout_constraintEnd_toStartOf="@id/mix_info_layout"
+		app:layout_constraintStart_toEndOf="@id/mixMeter"
 		app:layout_constraintTop_toTopOf="parent"
+		tools:listitem="@layout/recyclerview_fader_strip" />
+
+	<androidx.constraintlayout.widget.ConstraintLayout
+		android:id="@+id/mix_info_layout"
+		android:layout_width="35dp"
+		android:layout_height="0dp"
 		app:layout_constraintBottom_toBottomOf="parent"
 		app:layout_constraintEnd_toEndOf="parent"
-		app:layout_constraintStart_toEndOf="@id/mixMeter"
-		tools:listitem="@layout/recyclerview_fader_strip" />
+		app:layout_constraintTop_toTopOf="parent">
+
+		<TextView
+			android:id="@+id/mix_name"
+			android:layout_width="0dp"
+			android:layout_height="0dp"
+			tools:text="MIX1"
+			android:textAllCaps="true"
+			android:textAlignment="center"
+			android:gravity="center"
+			android:fontFamily="monospace"
+			android:textSize="35sp"
+			android:textColor="@color/white"
+			app:layout_constraintBottom_toBottomOf="parent"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toTopOf="parent" />
+
+	</androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

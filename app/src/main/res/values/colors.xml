@@ -21,7 +21,7 @@
 	<color name="meter_start">#00A500</color>
 	<color name="meter_end">#00D600</color>
 
-	<!-- Channel colours -->
+	<!-- Mixer colours -->
 	<color name="mixer_blue">#0101FD</color>
 	<color name="mixer_orange">#FF6601</color>
 	<color name="mixer_brown">#996601</color>
@@ -30,6 +30,16 @@
 	<color name="mixer_pink">#FF6699</color>
 	<color name="mixer_bergundy">#660101</color>
 	<color name="mixer_green">#016633</color>
+
+	<!-- Mixer colours transparent -->
+	<color name="mixer_blue_lighter">#8080FF</color>
+	<color name="mixer_orange_lighter">#FFB380</color>
+	<color name="mixer_brown_lighter">#FFD580</color>
+	<color name="mixer_purple_lighter">#D580FF</color>
+	<color name="mixer_cyan_lighter">#80CCFF</color>
+	<color name="mixer_pink_lighter">#FFB3CF</color>
+	<color name="mixer_bergundy_lighter">#CC6666</color>
+	<color name="mixer_green_lighter">#66CC88</color>
 
 	<array name="mixer_colours">
 		<item>@color/mixer_blue</item>
@@ -42,9 +52,20 @@
 		<item>@color/mixer_green</item>
 	</array>
 
+	<array name="mixer_colours_lighter">
+		<item>@color/mixer_blue_lighter</item>
+		<item>@color/mixer_orange_lighter</item>
+		<item>@color/mixer_brown_lighter</item>
+		<item>@color/mixer_purple_lighter</item>
+		<item>@color/mixer_cyan_lighter</item>
+		<item>@color/mixer_pink_lighter</item>
+		<item>@color/mixer_bergundy_lighter</item>
+		<item>@color/mixer_green_lighter</item>
+	</array>
+
 	<!-- VerticalSeekBar -->
 	<color name="color_progress">#fbfbfb</color>
-	<color name="color_background">#4b4b4b</color>
+	<color name="color_background">#CC4D4D4D</color>
 	<color name="color_text">#00B7FF</color>
 
 	<color name="fader_light_even">#33000000</color>

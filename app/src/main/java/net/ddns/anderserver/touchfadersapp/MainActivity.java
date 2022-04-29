@@ -16,10 +16,12 @@ import android.util.Log;
 import android.view.DisplayCutout;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.illposed.osc.OSCBadDataEvent;
@@ -62,6 +64,8 @@ public class MainActivity extends AppCompatActivity {
     FaderStripRecyclerViewAdapter adapter;
     Context instanceContext;
     BoxedVertical mixMeter;
+    ConstraintLayout mixInfo;
+    TextView mixName;
 
     private Boolean demo;
     private String ipAddress;
@@ -174,6 +178,9 @@ public class MainActivity extends AppCompatActivity {
         mixMeter = findViewById(R.id.mixMeter);
         mixMeter.setValue(0);
 
+        mixInfo = findViewById(R.id.mix_info_layout);
+        mixName = findViewById(R.id.mix_name);
+
         instanceContext = this;
 
         if (!demo) {
@@ -213,7 +220,6 @@ public class MainActivity extends AppCompatActivity {
             channelColours.add(0);
             channelColours.add(0);
             channelColours.add(0);
-//            channelColours.set(23, 3);
             currentMix = 1;
             mixColour = 4;
         }
@@ -251,6 +257,8 @@ public class MainActivity extends AppCompatActivity {
                         | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         // Fullscreen done!
 
+        mixInfo.setBackgroundColor(getResources().getIntArray(R.array.mixer_colours)[mixColour]);
+        mixName.setText("MIX" + currentMix);
 
         runUDP = true;
         if (!demo) {
@@ -265,18 +273,30 @@ public class MainActivity extends AppCompatActivity {
                 //RecyclerView faderLayoutView = findViewById(R.id.faderRecyclerView);
                 //RecyclerView faderLayoutView = recyclerView;
                 BoxedVertical meter = findViewById(R.id.mixMeter);
+                ConstraintLayout mixInfo = findViewById(R.id.mix_info_layout);
                 ViewGroup.LayoutParams meterParams = meter.getLayoutParams();
+                ViewGroup.LayoutParams mixInfoParams = mixInfo.getLayoutParams();
                 assert cutout != null;
                 final float scale = getApplicationContext().getResources().getDisplayMetrics().density;
                 int pixels = (int) (35 * scale + 0.5f);
-                if (cutout.getSafeInsetLeft() == meterParams.width) return;
-                meterParams.width = cutout.getSafeInsetLeft();
-                if (meterParams.width == 0) {
-                    meterParams.width = pixels;
-                }
                 Handler handler = new Handler(Looper.getMainLooper());
-                handler.post(() -> meter.setLayoutParams(meterParams));
-                //Log.i("CUTOUT", "safeLeft: " + cutout.getSafeInsetLeft() + "  safeRight: " + cutout.getSafeInsetRight());
+                if (cutout.getSafeInsetLeft() != meterParams.width) {
+                    meterParams.width = cutout.getSafeInsetLeft();
+                    if (meterParams.width == 0) {
+                        meterParams.width = pixels;
+                    }
+                    handler.post(() -> meter.setLayoutParams(meterParams));
+                }
+                if (cutout.getSafeInsetRight() != mixInfoParams.width + pixels) {
+                    mixInfoParams.width = cutout.getSafeInsetRight() + pixels;
+                    if (mixInfoParams.width == 0) {
+                        mixInfoParams.width = pixels;
+                    }
+                    mixInfo.setPadding(0, 0, cutout.getSafeInsetRight(), 0);
+                    handler.post(() -> mixInfo.setLayoutParams(mixInfoParams));
+                }
+
+//                Log.i("CUTOUT", "safeLeft: " + cutout.getSafeInsetLeft() + "  safeRight: " + cutout.getSafeInsetRight());
             });
         }
         AsyncTask.execute(() -> {
