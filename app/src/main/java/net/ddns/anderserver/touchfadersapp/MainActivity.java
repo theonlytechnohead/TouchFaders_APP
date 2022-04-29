@@ -66,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
     BoxedVertical mixMeter;
     ConstraintLayout mixInfo;
     TextView mixName;
+    TextView mixNumber;
 
     private Boolean demo;
     private String ipAddress;
@@ -93,6 +94,8 @@ public class MainActivity extends AppCompatActivity {
                 channelColours = new ArrayList<>(connectionService.channelColours());
                 currentMix = connectionService.selectedMix();
                 mixName.setText(connectionService.mixNames().get(currentMix - 1).replace(" ", " \n"));
+                mixNumber.setText("" + currentMix);
+                mixNumber.setTextColor(getResources().getIntArray(R.array.mixer_colours_lighter)[connectionService.mixColours().get(currentMix - 1)]);
                 mixColour = connectionService.mixColours().get(currentMix - 1);
                 mixInfo.setBackgroundColor(getResources().getIntArray(R.array.mixer_colours)[mixColour]);
 
@@ -182,6 +185,7 @@ public class MainActivity extends AppCompatActivity {
 
         mixInfo = findViewById(R.id.mix_info_layout);
         mixName = findViewById(R.id.mix_name);
+        mixNumber = findViewById(R.id.mix_number);
 
         instanceContext = this;
 
@@ -262,6 +266,8 @@ public class MainActivity extends AppCompatActivity {
         if (demo) {
             mixInfo.setBackgroundColor(getResources().getIntArray(R.array.mixer_colours)[mixColour]);
             mixName.setText("MIX \n1");
+            mixNumber.setText("1");
+            mixNumber.setTextColor(getResources().getIntArray(R.array.mixer_colours_lighter)[currentMix]);
         }
 
         runUDP = true;
