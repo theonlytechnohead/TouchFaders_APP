@@ -216,7 +216,7 @@ public class BoxedVertical extends View{
                 nearClipGradient = new LinearGradient(0, mProgressSweep, 0, getHeight(), ContextCompat.getColor(getContext(), R.color.red), gradientStart, Shader.TileMode.MIRROR);
             }
             drawPaint.setShader(nearClipGradient);
-        } else if (0.8f * mMax <= mPoints && mPoints < 0.95f * mMax) {
+        } else if (0.805f * mMax <= mPoints && mPoints < 0.95f * mMax) {
             if (overUnityGradient == null || lastProgressSweep != mProgressSweep) {
                 overUnityGradient = new LinearGradient(0, mProgressSweep, 0, getHeight(), ContextCompat.getColor(getContext(), R.color.yellow), gradientStart, Shader.TileMode.MIRROR);
             }
