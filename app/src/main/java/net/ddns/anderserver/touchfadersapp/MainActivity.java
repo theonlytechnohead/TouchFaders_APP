@@ -217,7 +217,7 @@ public class MainActivity extends AppCompatActivity {
             bindService(serviceIntent, connection, 0);
         } else {
             adapter = new FaderStripRecyclerViewAdapter(instanceContext, numChannels, channelColours);
-            adapter.setValuesChangeListener((view, index, boxedVertical, points) -> SendOSCFaderValue(index + 1, points));
+            adapter.setValuesChangeListener((view, index, boxedVertical, points) -> {});
             recyclerView = findViewById(R.id.faderRecyclerView);
             recyclerView.setAdapter(adapter);
         }
