@@ -30,9 +30,10 @@ public class MixSelectActivity extends AppCompatActivity implements MixSelectRec
             connectionService = ((ConnectionService.ConnectionBinder) iBinder).getService();
             bound = true;
 
-            Log.i("MIX", "Service connected");
+//            Log.i("MIX", "Service connected");
             if (connectionService.state() == ConnectionService.states.RUNNING)
                 connectionService.deselectMix();
+            if (connectionService.state() == ConnectionService.states.WAITING) finish();
 
             // Generate mix names
 //            ArrayList<String> mixNames = new ArrayList<>();
@@ -120,6 +121,7 @@ public class MixSelectActivity extends AppCompatActivity implements MixSelectRec
         if (connectionService != null) {
             if (connectionService.state() == ConnectionService.states.RUNNING)
                 connectionService.deselectMix();
+            if (connectionService.state() == ConnectionService.states.WAITING) finish();
         }
     }
 

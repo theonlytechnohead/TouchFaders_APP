@@ -88,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
             connectionService.addListener(faderPattern, faderListener);
             connectionService.addListener(labelPattern, labelListener);
             connectionService.addListener(patchPattern, patchListener);
+            connectionService.addListener(disconnectPattern, disconnectListener);
             connectionService.startListening();
 
             SendOSCGetMix(currentMix);
@@ -102,6 +103,7 @@ public class MainActivity extends AppCompatActivity {
             connectionService.removeListener(faderPattern, faderListener);
             connectionService.removeListener(labelPattern, labelListener);
             connectionService.removeListener(patchPattern, patchListener);
+            connectionService.removeListener(disconnectPattern, disconnectListener);
         }
     };
 
@@ -119,12 +121,12 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    OSCPatternAddressMessageSelector labelPattern = new OSCPatternAddressMessageSelector("/label?");
+    OSCPatternAddressMessageSelector labelPattern = new OSCPatternAddressMessageSelector("/label*");
     OSCMessageListener labelListener = new OSCMessageListener() {
         @Override
         public void acceptMessage(OSCMessageEvent event) {
             String[] segments = event.getMessage().getAddress().split("/");
-            int channelIndex = Integer.parseInt(segments[2].replaceAll("\\D+", "")) - 1;
+            int channelIndex = Integer.parseInt(segments[1].replaceAll("\\D+", "")) - 1;
             if (0 <= channelIndex && channelIndex < adapter.getItemCount()) {
                 Handler handler = new Handler(getMainLooper());
                 adapter.setChannelName(channelIndex, (String) event.getMessage().getArguments().get(0));
@@ -133,17 +135,26 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    OSCPatternAddressMessageSelector patchPattern = new OSCPatternAddressMessageSelector("/patch?");
+    OSCPatternAddressMessageSelector patchPattern = new OSCPatternAddressMessageSelector("/patch*");
     OSCMessageListener patchListener = new OSCMessageListener() {
         @Override
         public void acceptMessage(OSCMessageEvent event) {
             String[] segments = event.getMessage().getAddress().split("/");
-            int channelIndex = Integer.parseInt(segments[2].replaceAll("\\D+", "")) - 1;
+            int channelIndex = Integer.parseInt(segments[1].replaceAll("\\D+", "")) - 1;
             if (0 <= channelIndex && channelIndex < adapter.getItemCount()) {
                 Handler handler = new Handler(getMainLooper());
                 adapter.setChannelPatchIn(channelIndex, (String) event.getMessage().getArguments().get(0));
                 handler.post(() -> adapter.notifyDataSetChanged());
             }
+        }
+    };
+
+    OSCPatternAddressMessageSelector disconnectPattern = new OSCPatternAddressMessageSelector("/disconnect");
+    OSCMessageListener disconnectListener = new OSCMessageListener() {
+        @Override
+        public void acceptMessage(OSCMessageEvent event) {
+            connectionService.Disconnect();
+            finish();
         }
     };
 

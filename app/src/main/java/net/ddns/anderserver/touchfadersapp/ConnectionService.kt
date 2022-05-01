@@ -253,6 +253,9 @@ class ConnectionService : Service() {
     }
 
     fun Disconnect() {
+        state = states.WAITING
+        val newNotification = buildNotification("Pending connection")
+        updateNotification(newNotification)
         // disconnects via TCP
         CoroutineScope(Dispatchers.Default).launch {
             async(Dispatchers.IO) {
