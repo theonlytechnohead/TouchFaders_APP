@@ -4,7 +4,6 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
@@ -14,6 +13,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.TouchFaders">
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false"
+            android:label="@string/title_activity_settings"
+            android:screenOrientation="sensorLandscape"
+            android:theme="@style/Theme.TouchFaders.Fullscreen"/>
+
         <service
             android:name=".ConnectionService"
             android:enabled="true" />
@@ -21,10 +27,9 @@
         <activity
             android:name=".StartupActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/app_name"
+            android:exported="true"
             android:screenOrientation="sensorLandscape"
-            android:theme="@style/Theme.TouchFaders.Fullscreen"
-            android:exported="true">
+            android:theme="@style/Theme.TouchFaders.Fullscreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -35,16 +40,15 @@
             android:name=".MixSelectActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="TouchFaders"
+            android:launchMode="singleTask"
             android:screenOrientation="sensorLandscape"
-            android:theme="@style/Theme.TouchFaders.Fullscreen"
-            android:launchMode="singleTask" />
+            android:theme="@style/Theme.TouchFaders.Fullscreen" />
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/app_name"
+            android:launchMode="singleTask"
             android:screenOrientation="sensorLandscape"
-            android:theme="@style/Theme.TouchFaders.Fullscreen"
-            android:launchMode="singleTask" />
+            android:theme="@style/Theme.TouchFaders.Fullscreen" />
     </application>
 
 </manifest>

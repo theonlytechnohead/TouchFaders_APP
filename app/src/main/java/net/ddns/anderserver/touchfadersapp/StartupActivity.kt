@@ -87,6 +87,10 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
             startActivity(intent)
         }
 
+        binding.settingsButton.setOnClickListener {
+            startActivity(Intent(it.context, SettingsActivity::class.java))
+        }
+
         binding.ipEditText.setText(sharedPreferences?.getString("ipAddress", "192.168.1.2"))
         binding.ipEditText.setOnEditorActionListener { _: TextView?, actionId: Int, _: KeyEvent? ->
             if (actionId == EditorInfo.IME_ACTION_GO) {

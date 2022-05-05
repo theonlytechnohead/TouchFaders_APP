@@ -258,7 +258,7 @@ public class MainActivity extends AppCompatActivity {
             mixNumber.setText("1");
             mixNumber.setTextColor(getResources().getIntArray(R.array.mixer_colours_lighter)[currentMix]);
         }
-        
+
         findViewById(R.id.back_button).setOnClickListener((view) -> {
             finish();
         });

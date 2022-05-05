@@ -118,6 +118,10 @@ public class MixSelectActivity extends AppCompatActivity implements MixSelectRec
                         | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         // Fullscreen done!
 
+        findViewById(R.id.back_button).setOnClickListener((view) -> {
+            finish();
+        });
+
         if (connectionService != null) {
             if (connectionService.state() == ConnectionService.states.RUNNING)
                 connectionService.deselectMix();

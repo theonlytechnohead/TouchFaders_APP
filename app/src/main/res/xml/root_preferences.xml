@@ -1,0 +1,15 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="Faders">
+
+        <ListPreference
+            app:defaultValue="narrow"
+            app:entries="@array/fader_width_entries"
+            app:entryValues="@array/fader_width_values"
+            app:key="width"
+            app:title="Width"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
