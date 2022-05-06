@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.DisplayCutout;
 import android.view.View;
@@ -79,7 +80,9 @@ public class MainActivity extends AppCompatActivity {
                 mixInfo.setBackgroundColor(getResources().getIntArray(R.array.mixer_colours)[mixColour]);
             }
 
-            adapter = new FaderStripRecyclerViewAdapter(instanceContext, numChannels, channelColours);
+            boolean wide = !PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getResources().getString(R.string.fader_width), "narrow").equals("narrow");
+
+            adapter = new FaderStripRecyclerViewAdapter(instanceContext, numChannels, channelColours, wide);
             adapter.setValuesChangeListener((view, index, boxedVertical, points) -> SendOSCFaderValue(index + 1, points));
             recyclerView = findViewById(R.id.faderRecyclerView);
             recyclerView.setAdapter(adapter);
@@ -227,7 +230,8 @@ public class MainActivity extends AppCompatActivity {
             Intent serviceIntent = new Intent(this, ConnectionService.class);
             bindService(serviceIntent, connection, 0);
         } else {
-            adapter = new FaderStripRecyclerViewAdapter(instanceContext, numChannels, channelColours);
+            boolean wide = !PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getResources().getString(R.string.fader_width), "narrow").equals("narrow");
+            adapter = new FaderStripRecyclerViewAdapter(instanceContext, numChannels, channelColours, wide);
             adapter.setValuesChangeListener((view, index, boxedVertical, points) -> {});
             recyclerView = findViewById(R.id.faderRecyclerView);
             recyclerView.setAdapter(adapter);

@@ -1039,6 +1039,7 @@
         <item>10.0</item>
     </string-array>
     <string name="title_activity_settings">SettingsActivity</string>
+    <string name="fader_width">width</string>
 
     <array name="fader_width_entries">
         <item>Narrow</item>

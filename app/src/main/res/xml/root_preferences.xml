@@ -6,7 +6,7 @@
             app:defaultValue="narrow"
             app:entries="@array/fader_width_entries"
             app:entryValues="@array/fader_width_values"
-            app:key="width"
+            app:key="@string/fader_width"
             app:title="Width"
             app:useSimpleSummaryProvider="true" />
 
