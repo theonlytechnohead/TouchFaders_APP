@@ -51,10 +51,14 @@
 			android:id="@+id/back_button"
 			android:layout_width="0dp"
 			android:layout_height="wrap_content"
+			app:iconGravity="textStart"
+			app:iconPadding="0dp"
 			android:padding="0dp"
 			android:minWidth="0dp"
 			android:minHeight="0dp"
 			android:insetTop="0dp"
+			android:insetLeft="0dp"
+			android:insetRight="0dp"
 			android:insetBottom="0dp"
 			android:backgroundTint="@color/red"
 			android:stateListAnimator="@null"
@@ -65,7 +69,7 @@
 
 		<TextView
 			android:id="@+id/mix_name"
-			android:layout_width="0dp"
+			android:layout_width="35dp"
 			android:layout_height="0dp"
 			android:fontFamily="monospace"
 			android:gravity="center"

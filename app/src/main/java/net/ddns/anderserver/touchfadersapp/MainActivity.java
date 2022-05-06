@@ -5,8 +5,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,6 +12,7 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.DisplayCutout;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,12 +23,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.button.MaterialButton;
 import com.illposed.osc.OSCMessage;
 import com.illposed.osc.OSCMessageEvent;
 import com.illposed.osc.OSCMessageListener;
 import com.illposed.osc.messageselector.OSCPatternAddressMessageSelector;
-import com.illposed.osc.transport.OSCPortIn;
-import com.illposed.osc.transport.OSCPortOut;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -59,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<Integer> channelColours;
     private int currentMix;
     private Integer mixColour;
+    private float width;
 
     ConnectionService connectionService;
     Boolean bound = false;
@@ -80,9 +79,9 @@ public class MainActivity extends AppCompatActivity {
                 mixInfo.setBackgroundColor(getResources().getIntArray(R.array.mixer_colours)[mixColour]);
             }
 
-            float wide = Float.parseFloat(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getResources().getString(R.string.setting_fader_width), "35"));
+            width = Float.parseFloat(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getResources().getString(R.string.setting_fader_width), "35"));
 
-            adapter = new FaderStripRecyclerViewAdapter(instanceContext, numChannels, channelColours, wide);
+            adapter = new FaderStripRecyclerViewAdapter(instanceContext, numChannels, channelColours, width);
             adapter.setValuesChangeListener((view, index, boxedVertical, points) -> SendOSCFaderValue(index + 1, points));
             recyclerView = findViewById(R.id.faderRecyclerView);
             recyclerView.setAdapter(adapter);
@@ -230,8 +229,8 @@ public class MainActivity extends AppCompatActivity {
             Intent serviceIntent = new Intent(this, ConnectionService.class);
             bindService(serviceIntent, connection, 0);
         } else {
-            float wide = Float.parseFloat(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getResources().getString(R.string.setting_fader_width), "35"));
-            adapter = new FaderStripRecyclerViewAdapter(instanceContext, numChannels, channelColours, wide);
+            width = Float.parseFloat(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getResources().getString(R.string.setting_fader_width), "35"));
+            adapter = new FaderStripRecyclerViewAdapter(instanceContext, numChannels, channelColours, width);
             adapter.setValuesChangeListener((view, index, boxedVertical, points) -> {});
             recyclerView = findViewById(R.id.faderRecyclerView);
             recyclerView.setAdapter(adapter);
@@ -283,7 +282,7 @@ public class MainActivity extends AppCompatActivity {
                 ViewGroup.LayoutParams mixInfoParams = mixInfo.getLayoutParams();
                 if (cutout != null) {
                     final float scale = getApplicationContext().getResources().getDisplayMetrics().density;
-                    int pixels = (int) (35 * scale + 0.5f);
+                    int pixels = (int) (width * scale + 0.5f);
                     Handler handler = new Handler(Looper.getMainLooper());
                     if (cutout.getSafeInsetLeft() != meterParams.width) {
                         meterParams.width = cutout.getSafeInsetLeft();
@@ -293,10 +292,12 @@ public class MainActivity extends AppCompatActivity {
                         handler.post(() -> meter.setLayoutParams(meterParams));
                     }
                     if (cutout.getSafeInsetRight() != mixInfoParams.width + pixels) {
+                        MaterialButton closeButton = findViewById(R.id.back_button);
                         mixInfoParams.width = cutout.getSafeInsetRight() + pixels;
                         if (mixInfoParams.width == 0) {
                             mixInfoParams.width = pixels;
                         }
+                        closeButton.setHeight(pixels);
                         mixInfo.setPadding(0, 0, cutout.getSafeInsetRight(), 0);
                         handler.post(() -> mixInfo.setLayoutParams(mixInfoParams));
                     }
