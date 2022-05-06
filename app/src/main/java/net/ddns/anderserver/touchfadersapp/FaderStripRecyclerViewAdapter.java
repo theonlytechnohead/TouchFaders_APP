@@ -34,16 +34,16 @@ public class FaderStripRecyclerViewAdapter extends RecyclerView.Adapter<FaderStr
     private final ArrayList<String> channelPatchIn = new ArrayList<>();
     private FaderValueChangedListener faderValueChangedListener;
 
-    private boolean wide;
+    private float width;
 
     int[] colourArray;
     int[] colourArrayLighter;
 
-    public FaderStripRecyclerViewAdapter(Context context, int numChannels, ArrayList<Integer> channelColours, boolean wide) {
+    public FaderStripRecyclerViewAdapter(Context context, int numChannels, ArrayList<Integer> channelColours, float width) {
         this.context = context;
         colourArray = context.getResources().getIntArray(R.array.mixer_colours);
         colourArrayLighter = context.getResources().getIntArray(R.array.mixer_colours_lighter);
-        this.wide = wide;
+        this.width = width;
         TypedArray array = context.obtainStyledAttributes(R.style.Widget_Theme_TouchFaders_BoxedVerticalSeekBar, new int[]{R.attr.startValue});
         for (int channel = 0; channel < numChannels; channel++ ){
             faderLevels.add(array.getInt(0, 623));
@@ -75,9 +75,9 @@ public class FaderStripRecyclerViewAdapter extends RecyclerView.Adapter<FaderStr
         holder.fader.setGradientEnd(faderColours.get(holder.getAdapterPosition()));
         holder.fader.setGradientStart(faderColoursLighter.get(holder.getAdapterPosition()));
         final float scale = context.getResources().getDisplayMetrics().density;
-        int pixels = (int) (35 * scale + 0.5f);
+        int pixels = (int) (width * scale + 0.5f);
         ViewGroup.LayoutParams faderParams = holder.fader.getLayoutParams();
-        faderParams.width = wide ? pixels * 2 : pixels;
+        faderParams.width = pixels;
         holder.fader.setLayoutParams(faderParams);
         String number = String.valueOf((holder.getAdapterPosition() + 1));
         holder.channelNumber.setText(number);

@@ -3,12 +3,12 @@
     <PreferenceCategory app:title="Faders">
 
         <ListPreference
-            app:defaultValue="narrow"
+            app:defaultValue="35"
             app:entries="@array/fader_width_entries"
             app:entryValues="@array/fader_width_values"
-            app:key="@string/fader_width"
+            app:key="@string/setting_fader_width"
             app:title="Width"
-            app:useSimpleSummaryProvider="true" />
+            app:useSimpleSummaryProvider="true"/>
 
     </PreferenceCategory>
 

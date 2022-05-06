@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
                 mixInfo.setBackgroundColor(getResources().getIntArray(R.array.mixer_colours)[mixColour]);
             }
 
-            boolean wide = !PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getResources().getString(R.string.fader_width), "narrow").equals("narrow");
+            float wide = Float.parseFloat(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getResources().getString(R.string.setting_fader_width), "35"));
 
             adapter = new FaderStripRecyclerViewAdapter(instanceContext, numChannels, channelColours, wide);
             adapter.setValuesChangeListener((view, index, boxedVertical, points) -> SendOSCFaderValue(index + 1, points));
@@ -230,7 +230,7 @@ public class MainActivity extends AppCompatActivity {
             Intent serviceIntent = new Intent(this, ConnectionService.class);
             bindService(serviceIntent, connection, 0);
         } else {
-            boolean wide = !PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getResources().getString(R.string.fader_width), "narrow").equals("narrow");
+            float wide = Float.parseFloat(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getResources().getString(R.string.setting_fader_width), "35"));
             adapter = new FaderStripRecyclerViewAdapter(instanceContext, numChannels, channelColours, wide);
             adapter.setValuesChangeListener((view, index, boxedVertical, points) -> {});
             recyclerView = findViewById(R.id.faderRecyclerView);

@@ -1039,15 +1039,17 @@
         <item>10.0</item>
     </string-array>
     <string name="title_activity_settings">SettingsActivity</string>
-    <string name="fader_width">width</string>
+    <string name="setting_fader_width">fader_width</string>
 
     <array name="fader_width_entries">
-        <item>Narrow</item>
+        <item>Normal</item>
         <item>Wide</item>
+        <item>Widest</item>
     </array>
 
     <array name="fader_width_values">
-        <item>narrow</item>
-        <item>wide</item>
+        <item>"35"</item>
+        <item>"52.5"</item>
+        <item>"70"</item>
     </array>
 </resources>

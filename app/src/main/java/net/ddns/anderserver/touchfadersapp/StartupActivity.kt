@@ -52,6 +52,9 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
         setContentView(view)
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        sharedPreferences?.run {
+//            this.edit().putString(resources.getString(R.string.setting_fader_width), "52.5").apply();
+        }
 
         /*
         InputFilter[] filters = new InputFilter[1];
