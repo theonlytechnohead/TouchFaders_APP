@@ -23,6 +23,7 @@
 
 		<attr name="clockwise" format="boolean" />
 		<attr name="enabled" format="boolean" />
+		<attr name="muted" format="boolean" />
 		<attr name="touchDisabled" format="boolean" />
 		<attr name="textEnabled" format="boolean" />
 		<attr name="imageEnabled" format="boolean" />

@@ -31,55 +31,20 @@ public class BoxedVertical extends View {
     private static final int MAX = 1023;
     private static final int MIN = 0;
 
-    /**
-     * The min value of progress value.
-     */
-    private int mMin = MIN;
+    private int min = MIN;
+    private int max = MAX;
+    private int step = 1;
 
-    /**
-     * The Maximum value that this SeekArc can be set to
-     */
-    private int mMax = MAX;
-
-    /**
-     * The increment/decrement value for each movement of progress.
-     */
-    private int mStep = 1;
-
-    /**
-     * The corner radius of the view.
-     */
-    private int mCornerRadius = 10;
-
-    /**
-     * Text size in SP.
-     */
-    private float mTextSize = 26;
-
-    /**
-     * Text bottom padding in pixel.
-     */
-    private int mtextBottomPadding = 20;
+    private int cornerRadius = 10;
+    private float textSize = 26;
+    private int textBottomPadding = 20;
 
     private int mPoints;
 
-    private boolean mEnabled = true;
-    /**
-     * Enable or disable text .
-     */
-    private boolean mTextEnabled = true;
-
-    /**
-     * Enable or disable image .
-     */
-    private boolean mImageEnabled = false;
-
-    /**
-     * mTouchDisabled touches will not move the slider
-     * only swipe motion will activate it
-     */
-    private boolean mTouchDisabled = true;
-
+    private boolean enabled = true;
+    private boolean muted = false;
+    private boolean textEnabled = true;
+    private boolean touchDisabled = true;
     private boolean touchAllowed = true;
 
     private float mProgressSweep = 0;
@@ -88,6 +53,7 @@ public class BoxedVertical extends View {
     private final Paint drawPaint = new Paint();
     private final Path clippingPath = new Path();
     private final RectF boundingRect = new RectF();
+    private LinearGradient mutedGradient;
     private LinearGradient nearClipGradient;
     private LinearGradient overUnityGradient;
     private LinearGradient normalGradient;
@@ -126,43 +92,44 @@ public class BoxedVertical extends View {
         backgroundColor = ContextCompat.getColor(context, R.color.color_background);
 
         int textColor = ContextCompat.getColor(context, R.color.color_text);
-        mTextSize = (int) (mTextSize * density);
+        textSize = (int) (textSize * density);
         mDefaultValue = 823;
 
         if (attrs != null) {
-            final TypedArray a = context.obtainStyledAttributes(attrs,
+            final TypedArray attributes = context.obtainStyledAttributes(attrs,
                     R.styleable.BoxedVertical, 0, 0);
 
-            mPoints = a.getInteger(R.styleable.BoxedVertical_points, mPoints);
-            mMax = a.getInteger(R.styleable.BoxedVertical_max, mMax);
-            mMin = a.getInteger(R.styleable.BoxedVertical_min, mMin);
-            mStep = a.getInteger(R.styleable.BoxedVertical_step, mStep);
-            mDefaultValue = a.getInteger(R.styleable.BoxedVertical_startValue, mDefaultValue);
-            mCornerRadius = a.getInteger(R.styleable.BoxedVertical_corner, mCornerRadius);
-            mtextBottomPadding = a.getInteger(R.styleable.BoxedVertical_textBottomPadding, mtextBottomPadding);
+            mPoints = attributes.getInteger(R.styleable.BoxedVertical_points, mPoints);
+            max = attributes.getInteger(R.styleable.BoxedVertical_max, max);
+            min = attributes.getInteger(R.styleable.BoxedVertical_min, min);
+            step = attributes.getInteger(R.styleable.BoxedVertical_step, step);
+            mDefaultValue = attributes.getInteger(R.styleable.BoxedVertical_startValue, mDefaultValue);
+            cornerRadius = attributes.getInteger(R.styleable.BoxedVertical_corner, cornerRadius);
+            textBottomPadding = attributes.getInteger(R.styleable.BoxedVertical_textBottomPadding, textBottomPadding);
 
-            progressColor = a.getColor(R.styleable.BoxedVertical_progressColor, progressColor);
-            gradientStart = a.getColor(R.styleable.BoxedVertical_gradientStart, progressColor);
-            gradientEnd = a.getColor(R.styleable.BoxedVertical_gradientEnd, progressColor);
-            backgroundColor = a.getColor(R.styleable.BoxedVertical_backgroundColor, backgroundColor);
+            progressColor = attributes.getColor(R.styleable.BoxedVertical_progressColor, progressColor);
+            gradientStart = attributes.getColor(R.styleable.BoxedVertical_gradientStart, progressColor);
+            gradientEnd = attributes.getColor(R.styleable.BoxedVertical_gradientEnd, progressColor);
+            backgroundColor = attributes.getColor(R.styleable.BoxedVertical_backgroundColor, backgroundColor);
 
-            mTextSize = (int) a.getDimension(R.styleable.BoxedVertical_textSize, mTextSize);
-            textColor = a.getColor(R.styleable.BoxedVertical_textColor, textColor);
+            textSize = (int) attributes.getDimension(R.styleable.BoxedVertical_textSize, textSize);
+            textColor = attributes.getColor(R.styleable.BoxedVertical_textColor, textColor);
 
-            mEnabled = a.getBoolean(R.styleable.BoxedVertical_enabled, mEnabled);
-            mTouchDisabled = a.getBoolean(R.styleable.BoxedVertical_touchDisabled, mTouchDisabled);
-            mTextEnabled = a.getBoolean(R.styleable.BoxedVertical_textEnabled, mTextEnabled);
+            enabled = attributes.getBoolean(R.styleable.BoxedVertical_enabled, enabled);
+            muted = attributes.getBoolean(R.styleable.BoxedVertical_muted, muted);
+            touchDisabled = attributes.getBoolean(R.styleable.BoxedVertical_touchDisabled, touchDisabled);
+            textEnabled = attributes.getBoolean(R.styleable.BoxedVertical_textEnabled, textEnabled);
 
             textValues = getResources().getStringArray(R.array.fader_db);
 
             mPoints = mDefaultValue;
 
-            a.recycle();
+            attributes.recycle();
         }
 
         // range check
-        mPoints = Math.min(mPoints, mMax);
-        mPoints = Math.max(mPoints, mMin);
+        mPoints = Math.min(mPoints, max);
+        mPoints = Math.max(mPoints, min);
 
         //mProgressPaint = new Paint();
         //mProgressPaint.setColor(progressColor);
@@ -173,7 +140,7 @@ public class BoxedVertical extends View {
         mTextPaint.setColor(textColor);
         mTextPaint.setAntiAlias(true);
         mTextPaint.setStyle(Paint.Style.FILL);
-        mTextPaint.setTextSize(mTextSize);
+        mTextPaint.setTextSize(textSize);
     }
 
     @Override
@@ -186,27 +153,32 @@ public class BoxedVertical extends View {
         boundingRect.bottom = getHeight();
         boundingRect.right = getWidth();
         clippingPath.reset();
-        clippingPath.addRoundRect(boundingRect, mCornerRadius, mCornerRadius, Path.Direction.CCW);
+        clippingPath.addRoundRect(boundingRect, cornerRadius, cornerRadius, Path.Direction.CCW);
         canvas.clipPath(clippingPath, Region.Op.INTERSECT);
         drawPaint.setColor(backgroundColor);
         drawPaint.setAntiAlias(true);
         canvas.drawRect(0, 0, getWidth(), getHeight(), drawPaint);
 
-        if (923 <= mPoints) {
-            if (nearClipGradient == null || lastProgressSweep != mProgressSweep) {
-                nearClipGradient = new LinearGradient(0, mProgressSweep, 0, getHeight(), ContextCompat.getColor(getContext(), R.color.red), gradientStart, Shader.TileMode.MIRROR);
-            }
-            drawPaint.setShader(nearClipGradient);
-        } else if (824 < mPoints) {
-            if (overUnityGradient == null || lastProgressSweep != mProgressSweep) {
-                overUnityGradient = new LinearGradient(0, mProgressSweep, 0, getHeight(), ContextCompat.getColor(getContext(), R.color.yellow), gradientStart, Shader.TileMode.MIRROR);
-            }
-            drawPaint.setShader(overUnityGradient);
+        if (muted) {
+            mutedGradient = new LinearGradient(0, mProgressSweep, 0, getHeight(), ContextCompat.getColor(getContext(), R.color.grey), gradientStart, Shader.TileMode.MIRROR);
+            drawPaint.setShader(mutedGradient);
         } else {
-            if (normalGradient == null || lastProgressSweep != mProgressSweep) {
-                normalGradient = new LinearGradient(0, mProgressSweep, 0, getHeight(), gradientEnd, gradientStart, Shader.TileMode.MIRROR);
+            if (923 <= mPoints) {
+                if (nearClipGradient == null || lastProgressSweep != mProgressSweep) {
+                    nearClipGradient = new LinearGradient(0, mProgressSweep, 0, getHeight(), ContextCompat.getColor(getContext(), R.color.red), gradientStart, Shader.TileMode.MIRROR);
+                }
+                drawPaint.setShader(nearClipGradient);
+            } else if (824 < mPoints) {
+                if (overUnityGradient == null || lastProgressSweep != mProgressSweep) {
+                    overUnityGradient = new LinearGradient(0, mProgressSweep, 0, getHeight(), ContextCompat.getColor(getContext(), R.color.yellow), gradientStart, Shader.TileMode.MIRROR);
+                }
+                drawPaint.setShader(overUnityGradient);
+            } else {
+                if (normalGradient == null || lastProgressSweep != mProgressSweep) {
+                    normalGradient = new LinearGradient(0, mProgressSweep, 0, getHeight(), gradientEnd, gradientStart, Shader.TileMode.MIRROR);
+                }
+                drawPaint.setShader(normalGradient);
             }
-            drawPaint.setShader(normalGradient);
         }
         canvas.drawRect(0, mProgressSweep, getWidth(), getHeight(), drawPaint);
 
@@ -217,7 +189,7 @@ public class BoxedVertical extends View {
         canvas.drawRect(getWidth() * 0.35f, getHeight() * 0.582f, getWidth() * 0.65f, getHeight() * 0.590f, drawPaint); // -20dB
         canvas.drawRect(getWidth() * 0.35f, getHeight() * 0.778f, getWidth() * 0.65f, getHeight() * 0.786f, drawPaint); // -40dB
 
-        if (mTextEnabled) {
+        if (textEnabled) {
             drawText(canvas, mTextPaint, textValues[mPoints]);
         }
 
@@ -240,13 +212,13 @@ public class BoxedVertical extends View {
         canvas.save();
         canvas.clipRect(r_black);
         paint.setColor(Color.WHITE);
-        canvas.drawText(text, x, canvas.getHeight() - mtextBottomPadding, paint);
+        canvas.drawText(text, x, canvas.getHeight() - textBottomPadding, paint);
         canvas.restore();
 
         canvas.save();
         canvas.clipRect(r_white);
         paint.setColor(textColor);
-        canvas.drawText(text, x, canvas.getHeight() - mtextBottomPadding, paint);
+        canvas.drawText(text, x, canvas.getHeight() - textBottomPadding, paint);
         canvas.restore();
 
         canvas.restore();
@@ -254,7 +226,7 @@ public class BoxedVertical extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (mEnabled) {
+        if (enabled) {
 
             this.getParent().requestDisallowInterceptTouchEvent(true);
 
@@ -263,8 +235,7 @@ public class BoxedVertical extends View {
                     touchAllowed = true;
                     touchStarted_X = (int) event.getAxisValue(MotionEvent.AXIS_X);
                     touchStarted_Y = (int) event.getAxisValue(MotionEvent.AXIS_Y);
-                    //if (mOnValuesChangeListener != null) mOnValuesChangeListener.onStartTrackingTouch(this);
-                    if (!mTouchDisabled) updateOnTouch(event);
+                    if (!touchDisabled) updateOnTouch(event);
                     progressOffset = (int) (Math.round(event.getY()) - mProgressSweep);
                     break;
                 case MotionEvent.ACTION_MOVE:
@@ -275,13 +246,12 @@ public class BoxedVertical extends View {
                     int difference_Y = abs((int) event.getAxisValue(MotionEvent.AXIS_Y) - touchStarted_Y);
                     if (15 <= difference_Y) {
                         touchAllowed = false;
-                        touchStarted_Y = mMax;
+                        touchStarted_Y = max;
                         updateOnTouch(event);
                     }
                     break;
                 case MotionEvent.ACTION_UP:
                 case MotionEvent.ACTION_CANCEL:
-                    //if (mOnValuesChangeListener != null) mOnValuesChangeListener.onStopTrackingTouch(this);
                     setPressed(false);
                     this.getParent().requestDisallowInterceptTouchEvent(false);
                     break;
@@ -298,7 +268,6 @@ public class BoxedVertical extends View {
      */
     private void updateOnTouch(MotionEvent event) {
         setPressed(true);
-        //double mTouch = convertTouchEventPoint(event.getY());
         double mTouch = event.getY();
         int progress = (int) Math.round(mTouch);
         updateProgress(progress);
@@ -310,12 +279,12 @@ public class BoxedVertical extends View {
         adjustedProgress = Math.max(adjustedProgress, 0);
 
         // convert progress to min-max range
-        mPoints = (int) (adjustedProgress * (mMax - mMin) / (float) getHeight() + mMin);
+        mPoints = (int) (adjustedProgress * (max - min) / (float) getHeight() + min);
         //reverse value because progress is descending
-        mPoints = mMax + mMin - mPoints;
+        mPoints = max + min - mPoints;
         // if value is not max or min, apply step
-        if (mPoints != mMax && mPoints != mMin) {
-            mPoints = mPoints - (mPoints % mStep) + (mMin % mStep);
+        if (mPoints != max && mPoints != min) {
+            mPoints = mPoints - (mPoints % step) + (min % step);
         }
 
         mProgressSweep = adjustedProgress;
@@ -335,18 +304,13 @@ public class BoxedVertical extends View {
     private void updateProgressByValue(int value) {
         mPoints = value;
 
-        mPoints = Math.min(mPoints, mMax);
-        mPoints = Math.max(mPoints, mMin);
+        mPoints = Math.min(mPoints, max);
+        mPoints = Math.max(mPoints, min);
 
         //convert min-max range to progress
-        mProgressSweep = (mPoints - mMin) * getHeight() / (float) (mMax - mMin);
+        mProgressSweep = (mPoints - min) * getHeight() / (float) (max - min);
         //reverse value because progress is descending
         mProgressSweep = getHeight() - mProgressSweep;
-
-        if (mOnValuesChangeListener != null) {
-            // Avoid OSC loopback stuff
-            //mOnValuesChangeListener.onPointsChanged(this, mPoints);
-        }
 
         invalidate();
     }
@@ -359,13 +323,11 @@ public class BoxedVertical extends View {
          * @param points      The current point value.
          */
         void onPointsChanged(BoxedVertical boxedPoints, int points);
-        //void onStartTrackingTouch(BoxedVertical boxedPoints);
-        //void onStopTrackingTouch(BoxedVertical boxedPoints);
     }
 
     public void setValue(int points) {
-        points = Math.min(points, mMax);
-        points = Math.max(points, mMin);
+        points = Math.min(points, max);
+        points = Math.max(points, min);
 
         updateProgressByValue(points);
     }
@@ -375,25 +337,25 @@ public class BoxedVertical extends View {
     }
 
     public boolean isEnabled() {
-        return mEnabled;
+        return enabled;
     }
 
     public void setEnabled(boolean enabled) {
-        this.mEnabled = enabled;
+        this.enabled = enabled;
     }
 
     public int getMax() {
-        return mMax;
+        return max;
     }
 
     public void setMax(int mMax) {
-        if (mMax <= mMin)
+        if (mMax <= min)
             throw new IllegalArgumentException("Max should not be less than min");
-        this.mMax = mMax;
+        this.max = mMax;
     }
 
     public void setCornerRadius(int mRadius) {
-        this.mCornerRadius = mRadius;
+        this.cornerRadius = mRadius;
         invalidate();
     }
 
@@ -408,7 +370,7 @@ public class BoxedVertical extends View {
     }
 
     public int getCornerRadius() {
-        return mCornerRadius;
+        return cornerRadius;
     }
 
     public int getDefaultValue() {
@@ -416,26 +378,18 @@ public class BoxedVertical extends View {
     }
 
     public void setDefaultValue(int mDefaultValue) {
-        if (mDefaultValue > mMax)
+        if (mDefaultValue > max)
             throw new IllegalArgumentException("Default value should not be bigger than max value.");
         this.mDefaultValue = mDefaultValue;
 
     }
 
     public int getStep() {
-        return mStep;
+        return step;
     }
 
     public void setStep(int step) {
-        mStep = step;
-    }
-
-    public boolean isImageEnabled() {
-        return mImageEnabled;
-    }
-
-    public void setImageEnabled(boolean mImageEnabled) {
-        this.mImageEnabled = mImageEnabled;
+        this.step = step;
     }
 
     public void setOnBoxedPointsChangeListener(OnValuesChangeListener onValuesChangeListener) {
