@@ -284,5 +284,7 @@ class ConnectionService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         Disconnect()
+        val notificationService = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationService.cancel(ONGOING_NOTIFICATION_ID)
     }
 }
