@@ -6,34 +6,29 @@ package net.ddns.anderserver.touchfadersapp;
  * Modified by Craig Anderson @theonlytechnohead on 25/11/2020.
  */
 
+import static java.lang.Math.abs;
+
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Region;
 import android.graphics.Shader;
-import android.graphics.drawable.BitmapDrawable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
 import androidx.core.content.ContextCompat;
 
-import org.junit.Assert;
-
-import static java.lang.Math.abs;
-
-public class BoxedVertical extends View{
+public class BoxedVertical extends View {
     private static final String TAG = BoxedVertical.class.getSimpleName();
 
-    private static final int MAX = 100;
+    private static final int MAX = 1023;
     private static final int MIN = 0;
 
     /**
@@ -49,7 +44,7 @@ public class BoxedVertical extends View{
     /**
      * The increment/decrement value for each movement of progress.
      */
-    private int mStep = 10;
+    private int mStep = 1;
 
     /**
      * The corner radius of the view.
@@ -103,9 +98,6 @@ public class BoxedVertical extends View{
     private int gradientEnd;
     private int backgroundColor;
     private int mDefaultValue;
-    private Bitmap mDefaultImage;
-    private Bitmap mMinImage;
-    private Bitmap mMaxImage;
     private final Rect dRect = new Rect();
     private boolean firstRun = true;
     private int progressOffset;
@@ -135,7 +127,7 @@ public class BoxedVertical extends View{
 
         int textColor = ContextCompat.getColor(context, R.color.color_text);
         mTextSize = (int) (mTextSize * density);
-        mDefaultValue = mMax/2;
+        mDefaultValue = 823;
 
         if (attrs != null) {
             final TypedArray a = context.obtainStyledAttributes(attrs,
@@ -148,18 +140,6 @@ public class BoxedVertical extends View{
             mDefaultValue = a.getInteger(R.styleable.BoxedVertical_startValue, mDefaultValue);
             mCornerRadius = a.getInteger(R.styleable.BoxedVertical_corner, mCornerRadius);
             mtextBottomPadding = a.getInteger(R.styleable.BoxedVertical_textBottomPadding, mtextBottomPadding);
-            //Images
-            mImageEnabled = a.getBoolean(R.styleable.BoxedVertical_imageEnabled, mImageEnabled);
-
-            if (mImageEnabled){
-                Assert.assertNotNull("When images are enabled, defaultImage can not be null. Please assign a drawable in the layout XML file", a.getDrawable(R.styleable.BoxedVertical_defaultImage));
-                Assert.assertNotNull("When images are enabled, minImage can not be null. Please assign a drawable in the layout XML file", a.getDrawable(R.styleable.BoxedVertical_minImage));
-                Assert.assertNotNull("When images are enabled, maxImage can not be null. Please assign a drawable in the layout XML file", a.getDrawable(R.styleable.BoxedVertical_maxImage));
-
-                mDefaultImage = ((BitmapDrawable) a.getDrawable(R.styleable.BoxedVertical_defaultImage)).getBitmap();
-                mMinImage = ((BitmapDrawable) a.getDrawable(R.styleable.BoxedVertical_minImage)).getBitmap();
-                mMaxImage = ((BitmapDrawable) a.getDrawable(R.styleable.BoxedVertical_maxImage)).getBitmap();
-            }
 
             progressColor = a.getColor(R.styleable.BoxedVertical_progressColor, progressColor);
             gradientStart = a.getColor(R.styleable.BoxedVertical_gradientStart, progressColor);
@@ -198,25 +178,26 @@ public class BoxedVertical extends View{
 
     @Override
     protected void onDraw(Canvas canvas) {
-        if (firstRun){
+        if (firstRun) {
             setValue(mPoints);
             firstRun = false;
         }
 
         boundingRect.bottom = getHeight();
         boundingRect.right = getWidth();
+        clippingPath.reset();
         clippingPath.addRoundRect(boundingRect, mCornerRadius, mCornerRadius, Path.Direction.CCW);
         canvas.clipPath(clippingPath, Region.Op.INTERSECT);
         drawPaint.setColor(backgroundColor);
         drawPaint.setAntiAlias(true);
         canvas.drawRect(0, 0, getWidth(), getHeight(), drawPaint);
 
-        if (mPoints >= 0.95f * mMax) {
+        if (923 <= mPoints) {
             if (nearClipGradient == null || lastProgressSweep != mProgressSweep) {
                 nearClipGradient = new LinearGradient(0, mProgressSweep, 0, getHeight(), ContextCompat.getColor(getContext(), R.color.red), gradientStart, Shader.TileMode.MIRROR);
             }
             drawPaint.setShader(nearClipGradient);
-        } else if (0.805f * mMax <= mPoints && mPoints < 0.95f * mMax) {
+        } else if (824 < mPoints) {
             if (overUnityGradient == null || lastProgressSweep != mProgressSweep) {
                 overUnityGradient = new LinearGradient(0, mProgressSweep, 0, getHeight(), ContextCompat.getColor(getContext(), R.color.yellow), gradientStart, Shader.TileMode.MIRROR);
             }
@@ -231,30 +212,15 @@ public class BoxedVertical extends View{
 
         drawPaint.reset();
         drawPaint.setColor(ContextCompat.getColor(getContext(), R.color.grey));
-        canvas.drawRect(getWidth()*0.1f, getHeight()*0.190f, getWidth()*0.9f, getHeight()*0.202f, drawPaint); // 0dB
-        canvas.drawRect(getWidth()*0.175f, getHeight()*0.387f, getWidth()*0.825f, getHeight()*0.395f, drawPaint); // -10dB
-        canvas.drawRect(getWidth()*0.35f, getHeight()*0.582f, getWidth()*0.65f, getHeight()*0.590f, drawPaint); // -20dB
-        canvas.drawRect(getWidth()*0.35f, getHeight()*0.778f, getWidth()*0.65f, getHeight()*0.786f, drawPaint); // -40dB
+        canvas.drawRect(getWidth() * 0.1f, getHeight() * 0.190f, getWidth() * 0.9f, getHeight() * 0.202f, drawPaint); // 0dB
+        canvas.drawRect(getWidth() * 0.175f, getHeight() * 0.387f, getWidth() * 0.825f, getHeight() * 0.395f, drawPaint); // -10dB
+        canvas.drawRect(getWidth() * 0.35f, getHeight() * 0.582f, getWidth() * 0.65f, getHeight() * 0.590f, drawPaint); // -20dB
+        canvas.drawRect(getWidth() * 0.35f, getHeight() * 0.778f, getWidth() * 0.65f, getHeight() * 0.786f, drawPaint); // -40dB
 
-        if (mImageEnabled && mDefaultImage != null && mMinImage != null && mMaxImage != null){
-            //If image is enabled, text will not be shown
-            if (mPoints == mMax){
-                drawIcon(mMaxImage, canvas);
-            }
-            else if (mPoints == mMin){
-                drawIcon(mMinImage, canvas);
-            }
-            else{
-                drawIcon(mDefaultImage, canvas);
-            }
+        if (mTextEnabled) {
+            drawText(canvas, mTextPaint, textValues[mPoints]);
         }
-        else{
-            //If image is disabled and text is enabled show text
-            if (mTextEnabled){
-//                String strPoint = String.valueOf(mPoints);
-                drawText(canvas, mTextPaint, textValues[mPoints]);
-            }
-        }
+
         lastProgressSweep = mProgressSweep;
     }
 
@@ -286,25 +252,6 @@ public class BoxedVertical extends View{
         canvas.restore();
     }
 
-    private void drawIcon(Bitmap bitmap, Canvas canvas){
-        bitmap = getResizedBitmap(bitmap,canvas.getWidth()/2, canvas.getWidth()/2);
-        canvas.drawBitmap(bitmap, null, new RectF((canvas.getWidth()/2f)-(bitmap.getWidth()/2f), canvas.getHeight()-bitmap.getHeight(), (canvas.getWidth()/3)+bitmap.getWidth(), canvas.getHeight()), null);
-    }
-
-    private Bitmap getResizedBitmap(Bitmap bm, int newHeight, int newWidth) {
-        //Thanks Piyush
-        int width = bm.getWidth();
-        int height = bm.getHeight();
-        float scaleWidth = ((float) newWidth) / width;
-        float scaleHeight = ((float) newHeight) / height;
-        // create a matrix for the manipulation
-        Matrix matrix = new Matrix();
-        // resize the bit map
-        matrix.postScale(scaleWidth, scaleHeight);
-        // recreate the new Bitmap
-        return Bitmap.createBitmap(bm, 0, 0, width, height, matrix, false);
-    }
-
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (mEnabled) {
@@ -333,10 +280,6 @@ public class BoxedVertical extends View{
                     }
                     break;
                 case MotionEvent.ACTION_UP:
-                    //if (mOnValuesChangeListener != null) mOnValuesChangeListener.onStopTrackingTouch(this);
-                    setPressed(false);
-                    this.getParent().requestDisallowInterceptTouchEvent(false);
-                    break;
                 case MotionEvent.ACTION_CANCEL:
                     //if (mOnValuesChangeListener != null) mOnValuesChangeListener.onStopTrackingTouch(this);
                     setPressed(false);
@@ -359,23 +302,6 @@ public class BoxedVertical extends View{
         double mTouch = event.getY();
         int progress = (int) Math.round(mTouch);
         updateProgress(progress);
-    }
-
-    private double convertTouchEventPoint(float yPos) {
-        float wReturn;
-
-        if (yPos > (getHeight() *2)) {
-            wReturn = getHeight() *2;
-            return wReturn;
-        }
-        else if(yPos < 0){
-            wReturn = 0;
-        }
-        else {
-            wReturn =  yPos;
-        }
-
-        return wReturn;
     }
 
     private void updateProgress(int progress) {
@@ -403,6 +329,7 @@ public class BoxedVertical extends View{
 
     /**
      * Gets a value, converts it to progress for the seekBar and updates it.
+     *
      * @param value The value given
      */
     private void updateProgressByValue(int value) {
@@ -412,7 +339,7 @@ public class BoxedVertical extends View{
         mPoints = Math.max(mPoints, mMin);
 
         //convert min-max range to progress
-        mProgressSweep = (mPoints - mMin) * getHeight() / (float)(mMax - mMin);
+        mProgressSweep = (mPoints - mMin) * getHeight() / (float) (mMax - mMin);
         //reverse value because progress is descending
         mProgressSweep = getHeight() - mProgressSweep;
 
@@ -429,7 +356,7 @@ public class BoxedVertical extends View{
          * Notification that the point value has changed.
          *
          * @param boxedPoints The SwagPoints view whose value has changed
-         * @param points     The current point value.
+         * @param points      The current point value.
          */
         void onPointsChanged(BoxedVertical boxedPoints, int points);
         //void onStartTrackingTouch(BoxedVertical boxedPoints);
