@@ -187,14 +187,22 @@ public class FaderStripRecyclerViewAdapter extends RecyclerView.Adapter<FaderStr
 
     void setFaderLevel (int index, int level) {
         faderLevels.set(index, level);
+        notifyItemChanged(index);
     }
 
     void setChannelPatchIn (int index, String patchIn) {
         channelPatchIn.set(index, patchIn);
+        notifyItemChanged(index);
     }
 
     void setChannelName (int index, String name) {
         channelNames.set(index, name);
+        notifyItemChanged(index);
+    }
+
+    void setChannelMute (int index, boolean state) {
+        muted.set(index, state);
+        notifyItemChanged(index);
     }
 
     void setValuesChangeListener (FaderValueChangedListener listener) {

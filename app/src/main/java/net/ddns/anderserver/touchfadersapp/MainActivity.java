@@ -85,6 +85,8 @@ public class MainActivity extends AppCompatActivity {
                 mutes.add(false);
             }
 
+            // TODO: hook up some OSC mute stuff
+
             width = Float.parseFloat(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getResources().getString(R.string.setting_fader_width), "35"));
 
             adapter = new FaderStripRecyclerViewAdapter(instanceContext, numChannels, channelColours, mutes, width);
@@ -124,8 +126,6 @@ public class MainActivity extends AppCompatActivity {
             int faderIndex = Integer.parseInt(segments[2].replaceAll("\\D+", "")) - 1; // extract only digits via RegEx
             if (0 <= faderIndex && faderIndex < adapter.getItemCount()) {
                 adapter.setFaderLevel(faderIndex, (int) event.getMessage().getArguments().get(0));
-                Handler handler = new Handler(getMainLooper());
-                handler.post(() -> adapter.notifyDataSetChanged());
             }
         }
     };
@@ -137,9 +137,7 @@ public class MainActivity extends AppCompatActivity {
             String[] segments = event.getMessage().getAddress().split("/");
             int channelIndex = Integer.parseInt(segments[1].replaceAll("\\D+", "")) - 1;
             if (0 <= channelIndex && channelIndex < adapter.getItemCount()) {
-                Handler handler = new Handler(getMainLooper());
                 adapter.setChannelName(channelIndex, (String) event.getMessage().getArguments().get(0));
-                handler.post(() -> adapter.notifyDataSetChanged());
             }
         }
     };
@@ -151,9 +149,7 @@ public class MainActivity extends AppCompatActivity {
             String[] segments = event.getMessage().getAddress().split("/");
             int channelIndex = Integer.parseInt(segments[1].replaceAll("\\D+", "")) - 1;
             if (0 <= channelIndex && channelIndex < adapter.getItemCount()) {
-                Handler handler = new Handler(getMainLooper());
                 adapter.setChannelPatchIn(channelIndex, (String) event.getMessage().getArguments().get(0));
-                handler.post(() -> adapter.notifyDataSetChanged());
             }
         }
     };
