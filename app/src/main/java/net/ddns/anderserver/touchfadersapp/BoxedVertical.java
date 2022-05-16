@@ -392,6 +392,14 @@ public class BoxedVertical extends View {
         this.step = step;
     }
 
+    public boolean getMute() {
+        return muted;
+    }
+
+    public void setMute(boolean state) {
+        muted = state;
+    }
+
     public void setOnBoxedPointsChangeListener(OnValuesChangeListener onValuesChangeListener) {
         mOnValuesChangeListener = onValuesChangeListener;
     }

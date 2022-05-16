@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
     private Boolean demo;
     private int numChannels;
     private ArrayList<Integer> channelColours;
+    ArrayList<Boolean> mutes = new ArrayList<>();
     private int currentMix;
     private Integer mixColour;
     private float width;
@@ -79,10 +80,16 @@ public class MainActivity extends AppCompatActivity {
                 mixInfo.setBackgroundColor(getResources().getIntArray(R.array.mixer_colours)[mixColour]);
             }
 
+            // TODO: fetch from service
+            for (int i = 0; i < numChannels; i++) {
+                mutes.add(false);
+            }
+
             width = Float.parseFloat(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getResources().getString(R.string.setting_fader_width), "35"));
 
-            adapter = new FaderStripRecyclerViewAdapter(instanceContext, numChannels, channelColours, width);
+            adapter = new FaderStripRecyclerViewAdapter(instanceContext, numChannels, channelColours, mutes, width);
             adapter.setValuesChangeListener((view, index, boxedVertical, points) -> SendOSCFaderValue(index + 1, points));
+            adapter.setFaderMuteListener(((view, index, muted) -> {}));
             recyclerView = findViewById(R.id.faderRecyclerView);
             recyclerView.setAdapter(adapter);
 
@@ -217,6 +224,9 @@ public class MainActivity extends AppCompatActivity {
             channelColours.add(0);
             channelColours.add(0);
             channelColours.add(0);
+            for (int i = 0; i < numChannels; i++) {
+                mutes.add(false);
+            }
             currentMix = 1;
             mixColour = 1;
         }
@@ -230,8 +240,9 @@ public class MainActivity extends AppCompatActivity {
             bindService(serviceIntent, connection, 0);
         } else {
             width = Float.parseFloat(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getResources().getString(R.string.setting_fader_width), "35"));
-            adapter = new FaderStripRecyclerViewAdapter(instanceContext, numChannels, channelColours, width);
+            adapter = new FaderStripRecyclerViewAdapter(instanceContext, numChannels, channelColours, mutes, width);
             adapter.setValuesChangeListener((view, index, boxedVertical, points) -> {});
+            adapter.setFaderMuteListener(((view, index, muted) -> {}));
             recyclerView = findViewById(R.id.faderRecyclerView);
             recyclerView.setAdapter(adapter);
         }
