@@ -18,6 +18,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<ChannelStripRecyclerViewAdapter.ChannelStripViewHolder> implements ItemMoveCallback.ItemTouchHelperContract {
 
@@ -69,9 +70,10 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
         return new ChannelStripViewHolder(view);
     }
 
+    // https://stackoverflow.com/questions/5300962/getviewtypecount-and-getitemviewtype-methods-of-arrayadapter
     @Override
     public int getItemViewType(int position) {
-        return position;
+        return 1;
     }
 
     // Gets called every time a ViewHolder is reused (with a new position)
@@ -79,6 +81,7 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
     public void onBindViewHolder(@NonNull ChannelStripViewHolder holder, int position) {
         holder.position = holder.getAdapterPosition();
         if (holder.channel == -1) holder.channel = holder.getAdapterPosition();
+//        holder.channel = holder.getAdapterPosition();
         holder.fader.setValue(faderLevels.get(holder.channel));
         holder.fader.setGradientEnd(faderColours.get(holder.channel));
         holder.fader.setGradientStart(faderColoursLighter.get(holder.channel));
@@ -139,6 +142,28 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
     @Override
     public void onChannelMoved(int fromPosition, int toPosition) {
         // everybody do the swap!
+        if (fromPosition < toPosition) {
+            for (int i = fromPosition; i < toPosition; i++) {
+//                Collections.swap(data, i, i + 1);
+//                swapChannel(i, i + 1);
+            }
+        } else {
+            for (int i = fromPosition; i > toPosition; i--) {
+//                Collections.swap(data, i, i - 1);
+//                swapChannel(i, i - 1);
+            }
+        }
+        notifyItemMoved(fromPosition, toPosition);
+    }
+
+    void swapChannel(int from, int to) {
+        // do I actually need to do anything?
+        Collections.swap(faderLevels, from, to);
+        Collections.swap(channelNames, from, to);
+        Collections.swap(faderColours, from, to);
+        Collections.swap(faderColoursLighter, from, to);
+        Collections.swap(muted, from, to);
+        Collections.swap(channelPatchIn, from, to);
     }
 
     @Override
