@@ -304,7 +304,7 @@ public class MainActivity extends AppCompatActivity {
                         if (mixInfoParams.width == 0) {
                             mixInfoParams.width = pixels;
                         }
-                        closeButton.setHeight(pixels);
+                        handler.post(() -> closeButton.setHeight(pixels));
                         mixInfo.setPadding(0, 0, cutout.getSafeInsetRight(), 0);
                         handler.post(() -> mixInfo.setLayoutParams(mixInfoParams));
                     }
