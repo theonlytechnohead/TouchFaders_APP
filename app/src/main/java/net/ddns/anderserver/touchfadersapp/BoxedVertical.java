@@ -8,6 +8,7 @@ package net.ddns.anderserver.touchfadersapp;
 
 import static java.lang.Math.abs;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -224,6 +225,7 @@ public class BoxedVertical extends View {
         canvas.restore();
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (enabled) {

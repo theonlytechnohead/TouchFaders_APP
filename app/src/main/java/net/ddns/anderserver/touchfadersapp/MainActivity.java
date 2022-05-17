@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
                 channelColours = new ArrayList<>(connectionService.channelColours());
                 currentMix = connectionService.selectedMix();
                 mixName.setText(connectionService.mixNames().get(currentMix - 1).replace(" ", " \n"));
-                mixNumber.setText("" + currentMix);
+                mixNumber.setText(String.valueOf(currentMix));
                 mixNumber.setTextColor(getResources().getIntArray(R.array.mixer_colours_lighter)[connectionService.mixColours().get(currentMix - 1)]);
                 mixColour = connectionService.mixColours().get(currentMix - 1);
                 mixInfo.setBackgroundColor(getResources().getIntArray(R.array.mixer_colours)[mixColour]);
