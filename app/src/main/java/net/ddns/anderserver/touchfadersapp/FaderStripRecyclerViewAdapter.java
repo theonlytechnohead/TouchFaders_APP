@@ -79,20 +79,21 @@ public class FaderStripRecyclerViewAdapter extends RecyclerView.Adapter<FaderStr
     @Override
     public void onBindViewHolder(@NonNull FaderStripViewHolder holder, int position) {
         holder.position = holder.getAdapterPosition();
-        holder.fader.setValue(faderLevels.get(holder.getAdapterPosition()));
-        holder.fader.setGradientEnd(faderColours.get(holder.getAdapterPosition()));
-        holder.fader.setGradientStart(faderColoursLighter.get(holder.getAdapterPosition()));
-        holder.fader.setMute(muted.get(holder.position));
+        if (holder.channel == -1) holder.channel = holder.getAdapterPosition();
+        holder.fader.setValue(faderLevels.get(holder.channel));
+        holder.fader.setGradientEnd(faderColours.get(holder.channel));
+        holder.fader.setGradientStart(faderColoursLighter.get(holder.channel));
+        holder.fader.setMute(muted.get(holder.channel));
         final float scale = context.getResources().getDisplayMetrics().density;
         int pixels = (int) (width * scale + 0.5f);
         ViewGroup.LayoutParams faderParams = holder.fader.getLayoutParams();
         faderParams.width = pixels;
         holder.fader.setLayoutParams(faderParams);
-        String number = String.valueOf((holder.getAdapterPosition() + 1));
+        String number = String.valueOf((holder.channel + 1));
         holder.channelNumber.setText(number);
-        holder.channelPatch.setText(channelPatchIn.get(holder.getAdapterPosition()));
-        holder.channelName.setText(channelNames.get(holder.getAdapterPosition()));
-        holder.channelName.setBackgroundColor(faderColours.get(holder.getAdapterPosition()));
+        holder.channelPatch.setText(channelPatchIn.get(holder.channel));
+        holder.channelName.setText(channelNames.get(holder.channel));
+        holder.channelName.setBackgroundColor(faderColours.get(holder.channel));
         if ((holder.getAdapterPosition() / 8) % 2 == 0) {
             if (holder.getAdapterPosition() % 2 == 0)
                 holder.faderBackground.setBackgroundColor(context.getColor(R.color.fader_light_even));
@@ -139,6 +140,7 @@ public class FaderStripRecyclerViewAdapter extends RecyclerView.Adapter<FaderStr
     public class FaderStripViewHolder extends RecyclerView.ViewHolder implements FaderStripRecyclerViewAdapter.FaderValueChangedListener {
 
         int position;
+        int channel = -1;
         ConstraintLayout faderBackground;
         ConstraintLayout channelBackground;
         BoxedVertical fader;
