@@ -1,9 +1,7 @@
 package net.ddns.anderserver.touchfadersapp;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.res.TypedArray;
 import android.util.TypedValue;
 import android.view.GestureDetector;
@@ -202,14 +200,17 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
                         faderMuteListener.onFaderMuteChange(itemView, position, muted.get(position));
                         return super.onDoubleTap(e);
                     }
+
+                    @Override
+                    public void onLongPress(MotionEvent e) {
+                        startDragListener.requestDrag(holder);
+                        super.onLongPress(e);
+                    }
                 });
 
                 @Override
                 public boolean onTouch(View view, MotionEvent motionEvent) {
                     gestureDetector.onTouchEvent(motionEvent);
-                    if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                        startDragListener.requestDrag(holder);
-                    }
                     return true;
                 }
             });
