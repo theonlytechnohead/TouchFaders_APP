@@ -15,7 +15,7 @@ public class ItemMoveCallback extends ItemTouchHelper.Callback {
 
     @Override
     public boolean isLongPressDragEnabled() {
-        return true;
+        return false;
     }
 
     @Override
@@ -61,6 +61,10 @@ public class ItemMoveCallback extends ItemTouchHelper.Callback {
             ChannelStripRecyclerViewAdapter.ChannelStripViewHolder channelStripViewHolder = (ChannelStripRecyclerViewAdapter.ChannelStripViewHolder) viewHolder;
             adapter.onChannelClear(channelStripViewHolder);
         }
+    }
+
+    public interface StartDragListener {
+        void requestDrag(ChannelStripRecyclerViewAdapter.ChannelStripViewHolder channelStripViewHolder);
     }
 
     public interface ItemTouchHelperContract {

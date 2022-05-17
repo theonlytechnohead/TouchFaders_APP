@@ -24,14 +24,6 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
 
     private final Context context;
 
-    public static Activity getActivity(Context context) {
-        if (context == null) return null;
-        if (context instanceof Activity) return (Activity) context;
-        if (context instanceof ContextWrapper)
-            return getActivity(((ContextWrapper) context).getBaseContext());
-        return null;
-    }
-
     private final ArrayList<Integer> faderLevels = new ArrayList<>();
     private final ArrayList<String> channelNames = new ArrayList<>();
     private final ArrayList<Integer> faderColours = new ArrayList<>();
@@ -40,14 +32,16 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
     private final ArrayList<String> channelPatchIn = new ArrayList<>();
     private FaderValueChangedListener faderValueChangedListener;
     private FaderMuteListener faderMuteListener;
+    private final ItemMoveCallback.StartDragListener startDragListener;
 
     private final float width;
 
     int[] colourArray;
     int[] colourArrayLighter;
 
-    public ChannelStripRecyclerViewAdapter(Context context, int numChannels, ArrayList<Integer> channelColours, ArrayList<Boolean> muted, float width) {
+    public ChannelStripRecyclerViewAdapter(ItemMoveCallback.StartDragListener startDragListener, Context context, int numChannels, ArrayList<Integer> channelColours, ArrayList<Boolean> muted, float width) {
         this.context = context;
+        this.startDragListener = startDragListener;
         colourArray = context.getResources().getIntArray(R.array.mixer_colours);
         colourArrayLighter = context.getResources().getIntArray(R.array.mixer_colours_lighter);
         this.muted = muted;
@@ -59,6 +53,7 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
             faderColours.add(colourArray[channelColours.get(channel)]);
             faderColoursLighter.add(colourArrayLighter[channelColours.get(channel)]);
             channelPatchIn.add(String.format("IN %02d", channel + 1));
+            notifyItemInserted(channel);
         }
         array.recycle();
     }
@@ -80,8 +75,8 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
     @Override
     public void onBindViewHolder(@NonNull ChannelStripViewHolder holder, int position) {
         holder.position = holder.getAdapterPosition();
-        if (holder.channel == -1) holder.channel = holder.getAdapterPosition();
-//        holder.channel = holder.getAdapterPosition();
+//        if (holder.channel == -1) holder.channel = holder.getAdapterPosition();
+        holder.channel = holder.getAdapterPosition();
         holder.fader.setValue(faderLevels.get(holder.channel));
         holder.fader.setGradientEnd(faderColours.get(holder.channel));
         holder.fader.setGradientStart(faderColoursLighter.get(holder.channel));
@@ -121,17 +116,6 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
         if (holder.channelName.getText().length() == 6) {
             holder.channelName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
         }
-
-//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
-//            ViewGroup.MarginLayoutParams marginLayoutParams = (ViewGroup.MarginLayoutParams) holder.itemView.getLayoutParams();
-//            if (holder.getAdapterPosition() == faderLevels.size() - 1) {
-//                DisplayCutout cutout = getActivity(context).getWindow().getDecorView().getRootWindowInsets().getDisplayCutout();
-//                if (cutout != null) marginLayoutParams.rightMargin = cutout.getSafeInsetRight();
-//            } else {
-//                marginLayoutParams.rightMargin = 0;
-//            }
-//            holder.itemView.setLayoutParams(marginLayoutParams);
-//        }
     }
 
     @Override
@@ -200,6 +184,7 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
         @SuppressLint("ClickableViewAccessibility")
         ChannelStripViewHolder(View itemView) {
             super(itemView);
+            ChannelStripViewHolder holder = this;
             faderBackground = itemView.findViewById(R.id.faderBackground);
             channelBackground = itemView.findViewById(R.id.stripLayout);
             fader = itemView.findViewById(R.id.fader);
@@ -222,6 +207,9 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
                 @Override
                 public boolean onTouch(View view, MotionEvent motionEvent) {
                     gestureDetector.onTouchEvent(motionEvent);
+                    if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                        startDragListener.requestDrag(holder);
+                    }
                     return true;
                 }
             });

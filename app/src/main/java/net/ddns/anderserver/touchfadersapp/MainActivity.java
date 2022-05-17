@@ -39,13 +39,15 @@ import java.util.ArrayList;
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ItemMoveCallback.StartDragListener {
 
     Thread udpListenerThread;
     boolean runUDP = true;
 
     RecyclerView recyclerView;
     ChannelStripRecyclerViewAdapter adapter;
+    ItemTouchHelper touchHelper;
+
     Context instanceContext;
     BoxedVertical mixMeter;
     ConstraintLayout mixInfo;
@@ -89,7 +91,8 @@ public class MainActivity extends AppCompatActivity {
 
             width = Float.parseFloat(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getResources().getString(R.string.setting_fader_width), "35"));
 
-            adapter = new ChannelStripRecyclerViewAdapter(instanceContext, numChannels, channelColours, mutes, width);
+            // TODO: handle the dragging / moving channel strips
+            adapter = new ChannelStripRecyclerViewAdapter(MainActivity.this, instanceContext, numChannels, channelColours, mutes, width);
             adapter.setValuesChangeListener((view, index, boxedVertical, points) -> SendOSCFaderValue(index + 1, points));
             adapter.setFaderMuteListener(((view, index, muted) -> {
             }));
@@ -230,6 +233,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    public void requestDrag(ChannelStripRecyclerViewAdapter.ChannelStripViewHolder channelStripViewHolder) {
+        touchHelper.startDrag(channelStripViewHolder);
+    }
+
+    @Override
     protected void onStart() {
         super.onStart();
         if (!demo) {
@@ -237,15 +245,15 @@ public class MainActivity extends AppCompatActivity {
             bindService(serviceIntent, connection, 0);
         } else {
             width = Float.parseFloat(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getResources().getString(R.string.setting_fader_width), "35"));
-            adapter = new ChannelStripRecyclerViewAdapter(instanceContext, numChannels, channelColours, mutes, width);
+            adapter = new ChannelStripRecyclerViewAdapter(this, instanceContext, numChannels, channelColours, mutes, width);
             adapter.setValuesChangeListener((view, index, boxedVertical, points) -> {
             });
             adapter.setFaderMuteListener(((view, index, muted) -> {
             }));
             recyclerView = findViewById(R.id.faderRecyclerView);
-
             ItemTouchHelper.Callback callback = new ItemMoveCallback(adapter);
-            ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
+            touchHelper = new ItemTouchHelper(callback);
+
             touchHelper.attachToRecyclerView(recyclerView);
 
             recyclerView.setAdapter(adapter);
