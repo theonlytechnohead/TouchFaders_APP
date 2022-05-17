@@ -37,7 +37,7 @@
 		app:layout_constraintEnd_toStartOf="@id/mix_info_layout"
 		app:layout_constraintStart_toEndOf="@id/mixMeter"
 		app:layout_constraintTop_toTopOf="parent"
-		tools:listitem="@layout/recyclerview_fader_strip" />
+		tools:listitem="@layout/recyclerview_channel_strip" />
 
 	<androidx.constraintlayout.widget.ConstraintLayout
 		android:id="@+id/mix_info_layout"

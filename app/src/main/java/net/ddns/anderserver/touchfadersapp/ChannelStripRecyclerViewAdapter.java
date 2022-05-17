@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.res.TypedArray;
 import android.util.TypedValue;
-import android.view.DisplayCutout;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -18,17 +17,17 @@ import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
-import junit.framework.Test;
-
 import java.util.ArrayList;
 
-public class FaderStripRecyclerViewAdapter extends RecyclerView.Adapter<FaderStripRecyclerViewAdapter.FaderStripViewHolder> {
+public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<ChannelStripRecyclerViewAdapter.ChannelStripViewHolder> implements ItemMoveCallback.ItemTouchHelperContract {
 
     private final Context context;
+
     public static Activity getActivity(Context context) {
         if (context == null) return null;
         if (context instanceof Activity) return (Activity) context;
-        if (context instanceof ContextWrapper) return getActivity(((ContextWrapper)context).getBaseContext());
+        if (context instanceof ContextWrapper)
+            return getActivity(((ContextWrapper) context).getBaseContext());
         return null;
     }
 
@@ -46,14 +45,14 @@ public class FaderStripRecyclerViewAdapter extends RecyclerView.Adapter<FaderStr
     int[] colourArray;
     int[] colourArrayLighter;
 
-    public FaderStripRecyclerViewAdapter(Context context, int numChannels, ArrayList<Integer> channelColours, ArrayList<Boolean> muted, float width) {
+    public ChannelStripRecyclerViewAdapter(Context context, int numChannels, ArrayList<Integer> channelColours, ArrayList<Boolean> muted, float width) {
         this.context = context;
         colourArray = context.getResources().getIntArray(R.array.mixer_colours);
         colourArrayLighter = context.getResources().getIntArray(R.array.mixer_colours_lighter);
         this.muted = muted;
         this.width = width;
         TypedArray array = context.obtainStyledAttributes(R.style.Widget_Theme_TouchFaders_BoxedVerticalSeekBar, new int[]{R.attr.startValue});
-        for (int channel = 0; channel < numChannels; channel++ ){
+        for (int channel = 0; channel < numChannels; channel++) {
             faderLevels.add(array.getInt(0, 623));
             channelNames.add("CH " + (channel + 1));
             faderColours.add(colourArray[channelColours.get(channel)]);
@@ -65,9 +64,9 @@ public class FaderStripRecyclerViewAdapter extends RecyclerView.Adapter<FaderStr
 
     @NonNull
     @Override
-    public FaderStripViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recyclerview_fader_strip, parent, false);
-        return new FaderStripViewHolder(view);
+    public ChannelStripViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recyclerview_channel_strip, parent, false);
+        return new ChannelStripViewHolder(view);
     }
 
     @Override
@@ -77,7 +76,7 @@ public class FaderStripRecyclerViewAdapter extends RecyclerView.Adapter<FaderStr
 
     // Gets called every time a ViewHolder is reused (with a new position)
     @Override
-    public void onBindViewHolder(@NonNull FaderStripViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ChannelStripViewHolder holder, int position) {
         holder.position = holder.getAdapterPosition();
         if (holder.channel == -1) holder.channel = holder.getAdapterPosition();
         holder.fader.setValue(faderLevels.get(holder.channel));
@@ -137,7 +136,32 @@ public class FaderStripRecyclerViewAdapter extends RecyclerView.Adapter<FaderStr
         return faderLevels.size();
     }
 
-    public class FaderStripViewHolder extends RecyclerView.ViewHolder implements FaderStripRecyclerViewAdapter.FaderValueChangedListener {
+    @Override
+    public void onChannelMoved(int fromPosition, int toPosition) {
+        // everybody do the swap!
+    }
+
+    @Override
+    public void onChannelSelected(ChannelStripViewHolder channelStripViewHolder) {
+        channelStripViewHolder.faderBackground.setBackgroundColor(faderColours.get(channelStripViewHolder.channel));
+    }
+
+    @Override
+    public void onChannelClear(ChannelStripViewHolder channelStripViewHolder) {
+        if ((channelStripViewHolder.getAdapterPosition() / 8) % 2 == 0) {
+            if (channelStripViewHolder.getAdapterPosition() % 2 == 0)
+                channelStripViewHolder.faderBackground.setBackgroundColor(context.getColor(R.color.fader_light_even));
+            else
+                channelStripViewHolder.faderBackground.setBackgroundColor(context.getColor(R.color.fader_light_odd));
+        } else {
+            if (channelStripViewHolder.getAdapterPosition() % 2 == 0)
+                channelStripViewHolder.faderBackground.setBackgroundColor(context.getColor(R.color.fader_dark_even));
+            else
+                channelStripViewHolder.faderBackground.setBackgroundColor(context.getColor(R.color.fader_dark_odd));
+        }
+    }
+
+    public class ChannelStripViewHolder extends RecyclerView.ViewHolder implements ChannelStripRecyclerViewAdapter.FaderValueChangedListener {
 
         int position;
         int channel = -1;
@@ -149,7 +173,7 @@ public class FaderStripRecyclerViewAdapter extends RecyclerView.Adapter<FaderStr
         TextView channelName;
 
         @SuppressLint("ClickableViewAccessibility")
-        FaderStripViewHolder(View itemView) {
+        ChannelStripViewHolder(View itemView) {
             super(itemView);
             faderBackground = itemView.findViewById(R.id.faderBackground);
             channelBackground = itemView.findViewById(R.id.stripLayout);
@@ -159,7 +183,7 @@ public class FaderStripRecyclerViewAdapter extends RecyclerView.Adapter<FaderStr
                 faderValueChangedListener.onValueChanged(boxedPoints.getRootView(), position, boxedPoints, points);
             });
             channelBackground.setOnTouchListener(new View.OnTouchListener() {
-                private final GestureDetector gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener(){
+                private final GestureDetector gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
                     @Override
                     public boolean onDoubleTap(MotionEvent e) {
                         muted.set(position, !muted.get(position));
@@ -183,31 +207,32 @@ public class FaderStripRecyclerViewAdapter extends RecyclerView.Adapter<FaderStr
 
         @Override
         public void onValueChanged(View view, int index, BoxedVertical boxedVertical, int points) {
-            if (faderValueChangedListener != null) faderValueChangedListener.onValueChanged(view, index, boxedVertical, points);
+            if (faderValueChangedListener != null)
+                faderValueChangedListener.onValueChanged(view, index, boxedVertical, points);
         }
     }
 
-    void setFaderLevel (int index, int level) {
+    void setFaderLevel(int index, int level) {
         faderLevels.set(index, level);
         notifyItemChanged(index);
     }
 
-    void setChannelPatchIn (int index, String patchIn) {
+    void setChannelPatchIn(int index, String patchIn) {
         channelPatchIn.set(index, patchIn);
         notifyItemChanged(index);
     }
 
-    void setChannelName (int index, String name) {
+    void setChannelName(int index, String name) {
         channelNames.set(index, name);
         notifyItemChanged(index);
     }
 
-    void setChannelMute (int index, boolean state) {
+    void setChannelMute(int index, boolean state) {
         muted.set(index, state);
         notifyItemChanged(index);
     }
 
-    void setValuesChangeListener (FaderValueChangedListener listener) {
+    void setValuesChangeListener(FaderValueChangedListener listener) {
         faderValueChangedListener = listener;
     }
 
@@ -215,7 +240,7 @@ public class FaderStripRecyclerViewAdapter extends RecyclerView.Adapter<FaderStr
         void onValueChanged(View view, int index, BoxedVertical boxedVertical, int points);
     }
 
-    void setFaderMuteListener (FaderMuteListener listener) {
+    void setFaderMuteListener(FaderMuteListener listener) {
         faderMuteListener = listener;
     }
 

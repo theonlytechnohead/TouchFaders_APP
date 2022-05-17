@@ -12,7 +12,6 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.DisplayCutout;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +20,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.button.MaterialButton;
@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
     boolean runUDP = true;
 
     RecyclerView recyclerView;
-    FaderStripRecyclerViewAdapter adapter;
+    ChannelStripRecyclerViewAdapter adapter;
     Context instanceContext;
     BoxedVertical mixMeter;
     ConstraintLayout mixInfo;
@@ -89,9 +89,10 @@ public class MainActivity extends AppCompatActivity {
 
             width = Float.parseFloat(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getResources().getString(R.string.setting_fader_width), "35"));
 
-            adapter = new FaderStripRecyclerViewAdapter(instanceContext, numChannels, channelColours, mutes, width);
+            adapter = new ChannelStripRecyclerViewAdapter(instanceContext, numChannels, channelColours, mutes, width);
             adapter.setValuesChangeListener((view, index, boxedVertical, points) -> SendOSCFaderValue(index + 1, points));
-            adapter.setFaderMuteListener(((view, index, muted) -> {}));
+            adapter.setFaderMuteListener(((view, index, muted) -> {
+            }));
             recyclerView = findViewById(R.id.faderRecyclerView);
             recyclerView.setAdapter(adapter);
 
@@ -236,10 +237,17 @@ public class MainActivity extends AppCompatActivity {
             bindService(serviceIntent, connection, 0);
         } else {
             width = Float.parseFloat(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getResources().getString(R.string.setting_fader_width), "35"));
-            adapter = new FaderStripRecyclerViewAdapter(instanceContext, numChannels, channelColours, mutes, width);
-            adapter.setValuesChangeListener((view, index, boxedVertical, points) -> {});
-            adapter.setFaderMuteListener(((view, index, muted) -> {}));
+            adapter = new ChannelStripRecyclerViewAdapter(instanceContext, numChannels, channelColours, mutes, width);
+            adapter.setValuesChangeListener((view, index, boxedVertical, points) -> {
+            });
+            adapter.setFaderMuteListener(((view, index, muted) -> {
+            }));
             recyclerView = findViewById(R.id.faderRecyclerView);
+
+            ItemTouchHelper.Callback callback = new ItemMoveCallback(adapter);
+            ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
+            touchHelper.attachToRecyclerView(recyclerView);
+
             recyclerView.setAdapter(adapter);
         }
     }
