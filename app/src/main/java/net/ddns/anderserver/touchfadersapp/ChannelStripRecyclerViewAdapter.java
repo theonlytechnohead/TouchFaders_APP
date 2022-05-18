@@ -298,13 +298,13 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
 
     public HashMap<Integer, Integer> getChannelMap() {
         HashMap<Integer, Integer> channelMap = new HashMap<>();
-        for (int i = 0; i < channels.size(); i++) {
-            ChannelStrip channelStrip = channels.get(i);
-            channelMap.put(channelStrip.index, i);
-        }
+        ArrayList<ChannelStrip> allChannels = channels;
         for (Map.Entry<Integer, ChannelStrip> entry : hiddenChannels.entrySet()) {
-            int i = entry.getKey();
             ChannelStrip channelStrip = entry.getValue();
+            allChannels.add(entry.getKey(), channelStrip);
+        }
+        for (int i = 0; i < allChannels.size(); i++) {
+            ChannelStrip channelStrip = allChannels.get(i);
             channelMap.put(channelStrip.index, i);
         }
         return channelMap;
