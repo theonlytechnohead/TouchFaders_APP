@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeMap;
 
 public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<ChannelStripRecyclerViewAdapter.ChannelStripViewHolder> implements ItemMoveCallback.ItemTouchHelperContract {
@@ -239,25 +240,56 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
         }
     }
 
-    // TODO: might need to use `channels`' position/index here
+    int getIndex(int channelIndex) {
+        if (hiddenChannels.containsKey(channelIndex)) {
+            return -channelIndex;
+        }
+        for (int i = 0; i < channels.size(); i++) {
+            if (channels.get(i).index == channelIndex) {
+                return i;
+            }
+        }
+        return 0;
+    }
+
     void setFaderLevel(int index, int level) {
-        channels.get(index).level = level;
-        notifyItemChanged(index);
+        int channelIndex = getIndex(index);
+        if (channelIndex < 0) {
+            Objects.requireNonNull(hiddenChannels.get(index)).level = level;
+        } else {
+            channels.get(channelIndex).level = level;
+            notifyItemChanged(channelIndex);
+        }
     }
 
     void setChannelPatchIn(int index, String patchIn) {
-        channels.get(index).patch = patchIn;
-        notifyItemChanged(index);
+        int channelIndex = getIndex(index);
+        if (channelIndex < 0) {
+            Objects.requireNonNull(hiddenChannels.get(index)).patch = patchIn;
+        } else {
+            channels.get(channelIndex).patch = patchIn;
+            notifyItemChanged(channelIndex);
+        }
     }
 
     void setChannelName(int index, String name) {
-        channels.get(index).name = name;
-        notifyItemChanged(index);
+        int channelIndex = getIndex(index);
+        if (channelIndex < 0) {
+            Objects.requireNonNull(hiddenChannels.get(index)).name = name;
+        } else {
+            channels.get(channelIndex).name = name;
+            notifyItemChanged(channelIndex);
+        }
     }
 
     void setChannelMute(int index, boolean muted) {
-        channels.get(index).muted = muted;
-        notifyItemChanged(index);
+        int channelIndex = getIndex(index);
+        if (channelIndex < 0) {
+            Objects.requireNonNull(hiddenChannels.get(index)).muted = muted;
+        } else {
+            channels.get(channelIndex).muted = muted;
+            notifyItemChanged(channelIndex);
+        }
     }
 
     public boolean getHidden() {
