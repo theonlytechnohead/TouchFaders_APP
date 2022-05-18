@@ -16,7 +16,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<ChannelStripRecyclerViewAdapter.ChannelStripViewHolder> implements ItemMoveCallback.ItemTouchHelperContract {
@@ -50,7 +49,7 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
             channel.level = 623;
             channel.muted = muted.get(i);
             channel.name = "CH " + (i + 1);
-            channel.patch = String.format(Locale.ENGLISH, "IN %02d", i + 1);
+            channel.patch = "IN " + (i + 1);
             channel.colour = colourArray[channelColours.get(i)];
             channel.colourLighter = colourArrayLighter[channelColours.get(i)];
 

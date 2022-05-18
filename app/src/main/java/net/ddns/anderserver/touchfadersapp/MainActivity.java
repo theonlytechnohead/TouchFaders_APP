@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.DisplayCutout;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.TextView;
 
 import androidx.appcompat.app.ActionBar;
@@ -97,7 +98,17 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
             adapter.setFaderMuteListener(((view, index, muted) -> {
             }));
             recyclerView = findViewById(R.id.faderRecyclerView);
+            ItemTouchHelper.Callback callback = new ItemMoveCallback(adapter);
+            touchHelper = new ItemTouchHelper(callback);
+            touchHelper.attachToRecyclerView(recyclerView);
             recyclerView.setAdapter(adapter);
+            recyclerView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    SendOSCGetMix(currentMix);
+                    recyclerView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                }
+            });
 
 //            connectionService.addListener(new OSCPatternAddressMessageSelector("/tes?/*"), event -> Log.i("OSC", "Got OSC!"));
             connectionService.addListener(faderPattern, faderListener);
@@ -105,8 +116,6 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
             connectionService.addListener(patchPattern, patchListener);
             connectionService.addListener(disconnectPattern, disconnectListener);
             connectionService.startListening();
-
-            SendOSCGetMix(currentMix);
         }
 
         @Override
@@ -129,7 +138,8 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
             String[] segments = event.getMessage().getAddress().split("/");
             int faderIndex = Integer.parseInt(segments[2].replaceAll("\\D+", "")) - 1; // extract only digits via RegEx
             if (0 <= faderIndex && faderIndex < adapter.getItemCount()) {
-                adapter.setFaderLevel(faderIndex, (int) event.getMessage().getArguments().get(0));
+                Handler handler = new Handler(Looper.getMainLooper());
+                handler.post(() -> adapter.setFaderLevel(faderIndex, (int) event.getMessage().getArguments().get(0)));
             }
         }
     };
@@ -141,7 +151,8 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
             String[] segments = event.getMessage().getAddress().split("/");
             int channelIndex = Integer.parseInt(segments[1].replaceAll("\\D+", "")) - 1;
             if (0 <= channelIndex && channelIndex < adapter.getItemCount()) {
-                adapter.setChannelName(channelIndex, (String) event.getMessage().getArguments().get(0));
+                Handler handler = new Handler(Looper.getMainLooper());
+                handler.post(() -> adapter.setChannelName(channelIndex, (String) event.getMessage().getArguments().get(0)));
             }
         }
     };
@@ -153,7 +164,8 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
             String[] segments = event.getMessage().getAddress().split("/");
             int channelIndex = Integer.parseInt(segments[1].replaceAll("\\D+", "")) - 1;
             if (0 <= channelIndex && channelIndex < adapter.getItemCount()) {
-                adapter.setChannelPatchIn(channelIndex, (String) event.getMessage().getArguments().get(0));
+                Handler handler = new Handler(Looper.getMainLooper());
+                handler.post(() -> adapter.setChannelPatchIn(channelIndex, (String) event.getMessage().getArguments().get(0)));
             }
         }
     };
@@ -162,8 +174,11 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
     OSCMessageListener disconnectListener = new OSCMessageListener() {
         @Override
         public void acceptMessage(OSCMessageEvent event) {
-            connectionService.Disconnect();
-            finish();
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(() -> {
+                connectionService.Disconnect();
+                finish();
+            });
         }
     };
 
@@ -253,9 +268,7 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
             recyclerView = findViewById(R.id.faderRecyclerView);
             ItemTouchHelper.Callback callback = new ItemMoveCallback(adapter);
             touchHelper = new ItemTouchHelper(callback);
-
             touchHelper.attachToRecyclerView(recyclerView);
-
             recyclerView.setAdapter(adapter);
         }
     }
