@@ -81,11 +81,6 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
         holder.fader.setGradientEnd(faderColours.get(channels.get(holder.getAdapterPosition())));
         holder.fader.setGradientStart(faderColoursLighter.get(channels.get(holder.getAdapterPosition())));
         holder.fader.setMute(muted.get(channels.get(holder.getAdapterPosition())));
-        final float scale = context.getResources().getDisplayMetrics().density;
-        int pixels = (int) (width * scale + 0.5f);
-        ViewGroup.LayoutParams faderParams = holder.fader.getLayoutParams();
-        faderParams.width = pixels;
-        holder.fader.setLayoutParams(faderParams);
         String number = String.valueOf((channels.get(holder.getAdapterPosition()) + 1));
         holder.channelNumber.setText(number);
         holder.channelPatch.setText(channelPatchIn.get(channels.get(holder.getAdapterPosition())));
@@ -140,6 +135,7 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
 
     void swapChannel(int from, int to) {
         Collections.swap(channels, from, to);
+//        Log.i("SWAP", "Swapped " + from + " to " + to);
 //        Collections.swap(faderLevels, from, to);
 //        Collections.swap(channelNames, from, to);
 //        Collections.swap(faderColours, from, to);
@@ -150,7 +146,7 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
 
     @Override
     public void onChannelSelected(ChannelStripViewHolder channelStripViewHolder) {
-        channelStripViewHolder.faderBackground.setBackgroundColor(faderColours.get(channelStripViewHolder.getAdapterPosition()));
+        channelStripViewHolder.faderBackground.setBackgroundColor(faderColours.get(channels.get(channelStripViewHolder.getAdapterPosition())));
     }
 
     @Override
@@ -186,17 +182,19 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
             channelBackground = itemView.findViewById(R.id.stripLayout);
             fader = itemView.findViewById(R.id.fader);
             fader.setOnBoxedPointsChangeListener((boxedPoints, points) -> {
-                faderLevels.set(position, points);
-                faderValueChangedListener.onValueChanged(boxedPoints.getRootView(), position, boxedPoints, points);
+                int index = channels.get(holder.getAdapterPosition());
+                faderLevels.set(index, points);
+                faderValueChangedListener.onValueChanged(boxedPoints.getRootView(), index, boxedPoints, index);
             });
             channelBackground.setOnTouchListener(new View.OnTouchListener() {
                 private final GestureDetector gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
                     @Override
                     public boolean onDoubleTap(MotionEvent e) {
-                        muted.set(position, !muted.get(position));
-                        fader.setMute(muted.get(position));
-                        notifyItemChanged(position);
-                        faderMuteListener.onFaderMuteChange(itemView, position, muted.get(position));
+                        int index = channels.get(holder.getAdapterPosition());
+                        muted.set(index, !muted.get(index));
+                        fader.setMute(muted.get(index));
+                        notifyItemChanged(holder.getAdapterPosition());
+                        faderMuteListener.onFaderMuteChange(itemView, index, muted.get(index));
                         return super.onDoubleTap(e);
                     }
 

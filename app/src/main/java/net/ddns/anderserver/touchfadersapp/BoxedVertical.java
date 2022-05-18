@@ -83,6 +83,13 @@ public class BoxedVertical extends View {
         init(context, attrs);
     }
 
+    private void resetGradients() {
+        mutedGradient = null;
+        nearClipGradient = null;
+        overUnityGradient = null;
+        normalGradient = null;
+    }
+
     private void init(Context context, AttributeSet attrs) {
         //System.out.println("INIT");
         float density = getResources().getDisplayMetrics().density;
@@ -161,7 +168,9 @@ public class BoxedVertical extends View {
         canvas.drawRect(0, 0, getWidth(), getHeight(), drawPaint);
 
         if (muted) {
-            mutedGradient = new LinearGradient(0, mProgressSweep, 0, getHeight(), ContextCompat.getColor(getContext(), R.color.grey), gradientStart, Shader.TileMode.MIRROR);
+            if (mutedGradient == null || lastProgressSweep != mProgressSweep) {
+                mutedGradient = new LinearGradient(0, mProgressSweep, 0, getHeight(), ContextCompat.getColor(getContext(), R.color.grey), gradientStart, Shader.TileMode.MIRROR);
+            }
             drawPaint.setShader(mutedGradient);
         } else {
             if (923 <= mPoints) {
@@ -363,12 +372,12 @@ public class BoxedVertical extends View {
 
     public void setGradientStart(int colour) {
         gradientStart = colour;
-        invalidate();
+        resetGradients();
     }
 
     public void setGradientEnd(int colour) {
         gradientEnd = colour;
-        invalidate();
+        resetGradients();
     }
 
     public int getCornerRadius() {
@@ -400,6 +409,7 @@ public class BoxedVertical extends View {
 
     public void setMute(boolean state) {
         muted = state;
+        resetGradients();
     }
 
     public void setOnBoxedPointsChangeListener(OnValuesChangeListener onValuesChangeListener) {
