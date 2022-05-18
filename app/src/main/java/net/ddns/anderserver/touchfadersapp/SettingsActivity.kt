@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.PreferenceManager
 import net.ddns.anderserver.touchfadersapp.databinding.SettingsBinding
 
 class SettingsActivity : AppCompatActivity() {
@@ -36,6 +37,12 @@ class SettingsActivity : AppCompatActivity() {
                 or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                 or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
         // Fullscreen done!
+
+        binding.resetLayoutButton.setOnClickListener {
+            PreferenceManager.getDefaultSharedPreferences(applicationContext).edit()
+                .remove("channel_layer").apply();
+            finish()
+        }
     }
 
     class SettingsFragment : PreferenceFragmentCompat() {

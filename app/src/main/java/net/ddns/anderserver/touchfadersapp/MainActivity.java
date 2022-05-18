@@ -5,6 +5,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -30,11 +31,17 @@ import com.illposed.osc.OSCMessageEvent;
 import com.illposed.osc.OSCMessageListener;
 import com.illposed.osc.messageselector.OSCPatternAddressMessageSelector;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -58,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
     private Boolean demo;
     private int numChannels;
     private ArrayList<Integer> channelColours;
+    private HashMap<Integer, Integer> channelLayer;
     private int currentMix;
     private Integer mixColour;
     private float width;
@@ -87,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
             width = Float.parseFloat(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getResources().getString(R.string.setting_fader_width), "35"));
 
             // TODO: handle the dragging / moving channel strips
-            adapter = new ChannelStripRecyclerViewAdapter(MainActivity.this, instanceContext, numChannels, channelColours, width);
+            adapter = new ChannelStripRecyclerViewAdapter(MainActivity.this, instanceContext, numChannels, channelLayer, channelColours, width);
             adapter.setValuesChangeListener((view, index, boxedVertical, points) -> SendOSCFaderValue(index + 1, points));
             adapter.setFaderMuteListener(((view, index, muted) -> {
             }));
@@ -251,7 +259,8 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
             bindService(serviceIntent, connection, 0);
         } else {
             width = Float.parseFloat(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getResources().getString(R.string.setting_fader_width), "35"));
-            adapter = new ChannelStripRecyclerViewAdapter(this, instanceContext, numChannels, channelColours, width);
+            channelLayer = loadMap();
+            adapter = new ChannelStripRecyclerViewAdapter(this, instanceContext, numChannels, channelLayer, channelColours, width);
             adapter.setValuesChangeListener((view, index, boxedVertical, points) -> {
             });
             adapter.setFaderMuteListener(((view, index, muted) -> {
@@ -346,6 +355,8 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
     protected void onPause() {
         super.onPause();
         runUDP = false;
+        channelLayer = adapter.getChannelMap();
+        saveMap(channelLayer);
     }
 
     @Override
@@ -405,6 +416,47 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
             }
             if (socket != null) socket.close();
         }
+    }
+
+    private void saveMap(HashMap<Integer, Integer> inputMap) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        if (preferences != null) {
+            JSONObject jsonObject = new JSONObject();
+            for (Map.Entry<Integer, Integer> inputEntry : inputMap.entrySet()) {
+                try {
+                    jsonObject.put(inputEntry.getKey().toString(), inputEntry.getValue());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            String jsonString = jsonObject.toString();
+            preferences.edit()
+                    .remove("channel_layer")
+                    .putString("channel_layer", jsonString)
+                    .apply();
+        }
+    }
+
+    private HashMap<Integer, Integer> loadMap() {
+        HashMap<Integer, Integer> outputMap = new HashMap<>();
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        try {
+            if (preferences != null) {
+                String jsonString = preferences.getString("channel_layer", (new JSONObject()).toString());
+                if (jsonString != null) {
+                    JSONObject jsonObject = new JSONObject(jsonString);
+                    Iterator<String> keys = jsonObject.keys();
+                    while (keys.hasNext()) {
+                        String key = keys.next();
+                        Integer value = jsonObject.getInt(key);
+                        outputMap.put(Integer.valueOf(key), value);
+                    }
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return outputMap;
     }
 
 }

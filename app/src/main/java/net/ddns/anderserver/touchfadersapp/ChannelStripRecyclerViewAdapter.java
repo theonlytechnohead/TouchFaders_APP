@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<ChannelStripRecyclerViewAdapter.ChannelStripViewHolder> implements ItemMoveCallback.ItemTouchHelperContract {
 
@@ -28,17 +29,18 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
     private final float width;
 
     private FaderValueChangedListener faderValueChangedListener;
-    private FaderMuteListener faderMuteListener;
+    private ChannelMuteListener channelMuteListener;
     private final ItemMoveCallback.StartDragListener startDragListener;
 
 
-    public ChannelStripRecyclerViewAdapter(ItemMoveCallback.StartDragListener startDragListener, Context context, int numChannels, ArrayList<Integer> channelColours, float width) {
+    public ChannelStripRecyclerViewAdapter(ItemMoveCallback.StartDragListener startDragListener, Context context, int numChannels, HashMap<Integer, Integer> channelLayer, ArrayList<Integer> channelColours, float width) {
         this.context = context;
         this.startDragListener = startDragListener;
         int[] colourArray = context.getResources().getIntArray(R.array.mixer_colours);
         int[] colourArrayLighter = context.getResources().getIntArray(R.array.mixer_colours_lighter);
         this.hidden = false;
         this.width = width;
+        TreeMap<Integer, ChannelStrip> channelLayout = new TreeMap<>();
         for (int i = 0; i < numChannels; i++) {
             ChannelStrip channel = new ChannelStrip();
             channel.index = i;
@@ -50,8 +52,11 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
             channel.colour = colourArray[channelColours.get(i)];
             channel.colourLighter = colourArrayLighter[channelColours.get(i)];
 
-            channels.add(channel);
-            notifyItemInserted(i);
+            channelLayout.put(channelLayer.getOrDefault(i, i), channel);
+        }
+        for (Map.Entry<Integer, ChannelStrip> entry : channelLayout.entrySet()) {
+            channels.add(entry.getValue());
+            notifyItemInserted(entry.getKey());
         }
     }
 
@@ -106,16 +111,16 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
     }
 
     @Override
-    public void onChannelMoved(int fromPosition, int toPosition) {
+    public void onChannelMoved(int from, int to) {
         // everybody do the swap!
-        if (fromPosition < toPosition) {
-            for (int i = fromPosition; i < toPosition; i++) {
+        if (from < to) {
+            for (int i = from; i < to; i++) {
                 swapChannel(i, i + 1);
                 notifyItemMoved(i, i + 1);
                 notifyItemChanged(i);
             }
         } else {
-            for (int i = fromPosition; i > toPosition; i--) {
+            for (int i = from; i > to; i--) {
                 swapChannel(i, i - 1);
                 notifyItemMoved(i, i - 1);
                 notifyItemChanged(i);
@@ -178,7 +183,7 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
                         channels.get(holder.getAdapterPosition()).muted = !channelStrip.muted;
                         fader.setMute(channelStrip.muted);
                         notifyItemChanged(holder.getAdapterPosition());
-                        faderMuteListener.onFaderMuteChange(itemView, index, channelStrip.muted);
+                        channelMuteListener.onChannelMuteChange(itemView, index, channelStrip.muted);
                         return super.onDoubleTap(e);
                     }
 
@@ -259,6 +264,20 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
         return hidden;
     }
 
+    public HashMap<Integer, Integer> getChannelMap() {
+        HashMap<Integer, Integer> channelMap = new HashMap<>();
+        for (int i = 0; i < channels.size(); i++) {
+            ChannelStrip channelStrip = channels.get(i);
+            channelMap.put(channelStrip.index, i);
+        }
+        for (Map.Entry<Integer, ChannelStrip> entry : hiddenChannels.entrySet()) {
+            int i = entry.getKey();
+            ChannelStrip channelStrip = entry.getValue();
+            channelMap.put(channelStrip.index, i);
+        }
+        return channelMap;
+    }
+
     void setValuesChangeListener(FaderValueChangedListener listener) {
         faderValueChangedListener = listener;
     }
@@ -267,11 +286,11 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
         void onValueChanged(View view, int index, BoxedVertical boxedVertical, int points);
     }
 
-    void setFaderMuteListener(FaderMuteListener listener) {
-        faderMuteListener = listener;
+    void setFaderMuteListener(ChannelMuteListener listener) {
+        channelMuteListener = listener;
     }
 
-    public interface FaderMuteListener {
-        void onFaderMuteChange(View view, int index, boolean muted);
+    public interface ChannelMuteListener {
+        void onChannelMuteChange(View view, int index, boolean muted);
     }
 }
