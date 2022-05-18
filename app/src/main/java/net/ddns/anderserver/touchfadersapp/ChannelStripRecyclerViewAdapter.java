@@ -81,6 +81,11 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
         holder.fader.setGradientEnd(faderColours.get(channels.get(holder.getAdapterPosition())));
         holder.fader.setGradientStart(faderColoursLighter.get(channels.get(holder.getAdapterPosition())));
         holder.fader.setMute(muted.get(channels.get(holder.getAdapterPosition())));
+        final float scale = context.getResources().getDisplayMetrics().density;
+        int pixels = (int) (width * scale + 0.5f);
+        ViewGroup.LayoutParams faderParams = holder.fader.getLayoutParams();
+        faderParams.width = pixels;
+        holder.fader.setLayoutParams(faderParams);
         String number = String.valueOf((channels.get(holder.getAdapterPosition()) + 1));
         holder.channelNumber.setText(number);
         holder.channelPatch.setText(channelPatchIn.get(channels.get(holder.getAdapterPosition())));
