@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
 
             width = Float.parseFloat(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getResources().getString(R.string.setting_fader_width), "35"));
 
-            // TODO: handle the dragging / moving channel strips
+            channelLayer = loadMap();
             adapter = new ChannelStripRecyclerViewAdapter(MainActivity.this, instanceContext, numChannels, channelLayer, channelColours, width);
             adapter.setValuesChangeListener((view, index, boxedVertical, points) -> SendOSCFaderValue(index + 1, points));
             adapter.setFaderMuteListener(((view, index, muted) -> {
