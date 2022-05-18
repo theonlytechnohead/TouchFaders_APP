@@ -141,18 +141,11 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
 
     void swapChannel(int from, int to) {
         Collections.swap(channels, from, to);
-//        Log.i("SWAP", "Swapped " + from + " to " + to);
-//        Collections.swap(faderLevels, from, to);
-//        Collections.swap(channelNames, from, to);
-//        Collections.swap(faderColours, from, to);
-//        Collections.swap(faderColoursLighter, from, to);
-//        Collections.swap(muted, from, to);
-//        Collections.swap(channelPatchIn, from, to);
     }
 
     @Override
     public void onChannelSelected(ChannelStripViewHolder channelStripViewHolder) {
-        channelStripViewHolder.faderBackground.setBackgroundColor(faderColours.get(channels.get(channelStripViewHolder.getAdapterPosition())));
+        channelStripViewHolder.faderBackground.setBackgroundColor(faderColoursLighter.get(channels.get(channelStripViewHolder.getAdapterPosition())));
     }
 
     @Override
