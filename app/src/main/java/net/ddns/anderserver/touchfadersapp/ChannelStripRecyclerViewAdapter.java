@@ -147,7 +147,7 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
             fader.setOnBoxedPointsChangeListener((boxedPoints, points) -> {
                 int index = channels.get(holder.getAdapterPosition()).index;
                 channels.get(holder.getAdapterPosition()).level = points;
-                faderValueChangedListener.onValueChanged(boxedPoints.getRootView(), index, boxedPoints, index);
+                faderValueChangedListener.onValueChanged(boxedPoints.getRootView(), index, boxedPoints, points);
             });
             channelBackground.setOnTouchListener(new View.OnTouchListener() {
                 private final GestureDetector gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
