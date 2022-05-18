@@ -285,7 +285,14 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
             mixNumber.setTextColor(getResources().getIntArray(R.array.mixer_colours_lighter)[currentMix]);
         }
 
-        findViewById(R.id.hide_button).setOnClickListener((view -> adapter.toggleChannelHide()));
+        findViewById(R.id.hide_button).setOnClickListener((view -> {
+            adapter.toggleChannelHide();
+            if (adapter.getHidden()) {
+                view.setBackgroundColor(getColor(R.color.grey));
+            } else {
+                view.setBackgroundColor(getColor(R.color.dark_grey));
+            }
+        }));
 
         findViewById(R.id.back_button).setOnClickListener((view) -> finish());
 

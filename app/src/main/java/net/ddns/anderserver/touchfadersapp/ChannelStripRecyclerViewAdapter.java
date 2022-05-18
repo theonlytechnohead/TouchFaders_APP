@@ -233,6 +233,10 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
         notifyItemChanged(index);
     }
 
+    public boolean getHidden() {
+        return hidden;
+    }
+
     void setValuesChangeListener(FaderValueChangedListener listener) {
         faderValueChangedListener = listener;
     }

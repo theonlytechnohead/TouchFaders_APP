@@ -33,7 +33,7 @@
 			android:insetLeft="0dp"
 			android:insetRight="0dp"
 			android:insetBottom="0dp"
-			android:backgroundTint="@color/grey"
+			android:backgroundTint="@color/dark_grey"
 			android:stateListAnimator="@null"
 			app:icon="@android:drawable/ic_menu_view"
 			app:layout_constraintEnd_toEndOf="parent"
