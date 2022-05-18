@@ -285,9 +285,9 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
             mixNumber.setTextColor(getResources().getIntArray(R.array.mixer_colours_lighter)[currentMix]);
         }
 
-        findViewById(R.id.back_button).setOnClickListener((view) -> {
-            finish();
-        });
+        findViewById(R.id.hide_button).setOnClickListener((view -> adapter.toggleChannelHide()));
+
+        findViewById(R.id.back_button).setOnClickListener((view) -> finish());
 
         runUDP = true;
         if (!demo) {
@@ -299,20 +299,22 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
             frameLayout.addOnLayoutChangeListener((v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
                 DisplayCutout cutout = getWindow().getDecorView().getRootWindowInsets().getDisplayCutout();
-                BoxedVertical meter = findViewById(R.id.mixMeter);
+                ConstraintLayout meterInfo = findViewById(R.id.mix_meter_layout);
                 ConstraintLayout mixInfo = findViewById(R.id.mix_info_layout);
-                ViewGroup.LayoutParams meterParams = meter.getLayoutParams();
+                ViewGroup.LayoutParams mixMeterParams = meterInfo.getLayoutParams();
                 ViewGroup.LayoutParams mixInfoParams = mixInfo.getLayoutParams();
                 if (cutout != null) {
                     final float scale = getApplicationContext().getResources().getDisplayMetrics().density;
                     int pixels = (int) (width * scale + 0.5f);
                     Handler handler = new Handler(Looper.getMainLooper());
-                    if (cutout.getSafeInsetLeft() != meterParams.width) {
-                        meterParams.width = cutout.getSafeInsetLeft();
-                        if (meterParams.width == 0) {
-                            meterParams.width = pixels;
+                    if (cutout.getSafeInsetLeft() != mixMeterParams.width) {
+                        MaterialButton hideButton = findViewById(R.id.hide_button);
+                        mixMeterParams.width = cutout.getSafeInsetLeft();
+                        if (mixMeterParams.width == 0) {
+                            mixMeterParams.width = pixels;
                         }
-                        handler.post(() -> meter.setLayoutParams(meterParams));
+                        handler.post(() -> hideButton.setHeight(mixMeterParams.width));
+                        handler.post(() -> meterInfo.setLayoutParams(mixMeterParams));
                     }
                     if (cutout.getSafeInsetRight() != mixInfoParams.width + pixels) {
                         MaterialButton closeButton = findViewById(R.id.back_button);

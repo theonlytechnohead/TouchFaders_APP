@@ -12,20 +12,50 @@
 	tools:context=".MainActivity">
 
 
-	<net.ddns.anderserver.touchfadersapp.BoxedVertical
-		android:id="@+id/mixMeter"
+	<androidx.constraintlayout.widget.ConstraintLayout
+		android:id="@+id/mix_meter_layout"
 		android:layout_width="35dp"
 		android:layout_height="0dp"
-		app:gradientEnd="@color/meter_end"
-		app:gradientStart="@color/meter_start"
 		app:layout_constraintBottom_toBottomOf="parent"
-		app:layout_constraintEnd_toStartOf="@+id/faderRecyclerView"
 		app:layout_constraintStart_toStartOf="parent"
-		app:layout_constraintTop_toTopOf="parent"
-		app:max="127"
-		app:startValue="103"
-		app:textEnabled="false"
-		app:touchDisabled="true" />
+		app:layout_constraintTop_toTopOf="parent">
+
+		<com.google.android.material.button.MaterialButton
+			android:id="@+id/hide_button"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			app:iconGravity="textStart"
+			app:iconPadding="0dp"
+			android:padding="0dp"
+			android:minWidth="0dp"
+			android:minHeight="0dp"
+			android:insetTop="0dp"
+			android:insetLeft="0dp"
+			android:insetRight="0dp"
+			android:insetBottom="0dp"
+			android:backgroundTint="@color/grey"
+			android:stateListAnimator="@null"
+			app:icon="@android:drawable/ic_menu_view"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toTopOf="parent"/>
+
+		<net.ddns.anderserver.touchfadersapp.BoxedVertical
+			android:id="@+id/mixMeter"
+			android:layout_width="35dp"
+			android:layout_height="0dp"
+			app:gradientEnd="@color/meter_end"
+			app:gradientStart="@color/meter_start"
+			app:layout_constraintBottom_toBottomOf="parent"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toBottomOf="@+id/hide_button"
+			app:max="127"
+			app:startValue="103"
+			app:textEnabled="false"
+			app:touchDisabled="true" />
+
+	</androidx.constraintlayout.widget.ConstraintLayout>
 
 	<androidx.recyclerview.widget.RecyclerView
 		android:id="@+id/faderRecyclerView"
@@ -35,7 +65,7 @@
 		app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
 		app:layout_constraintBottom_toBottomOf="parent"
 		app:layout_constraintEnd_toStartOf="@id/mix_info_layout"
-		app:layout_constraintStart_toEndOf="@id/mixMeter"
+		app:layout_constraintStart_toEndOf="@+id/mix_meter_layout"
 		app:layout_constraintTop_toTopOf="parent"
 		tools:listitem="@layout/recyclerview_channel_strip" />
 

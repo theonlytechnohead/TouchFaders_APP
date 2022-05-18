@@ -2,8 +2,6 @@ package net.ddns.anderserver.touchfadersapp;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.res.TypedArray;
-import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -17,19 +15,18 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<ChannelStripRecyclerViewAdapter.ChannelStripViewHolder> implements ItemMoveCallback.ItemTouchHelperContract {
 
     private final Context context;
 
-    private final ArrayList<Integer> channels = new ArrayList<>();
+    private final ArrayList<ChannelStrip> channels = new ArrayList<>();
+    private final HashMap<Integer, ChannelStrip> hiddenChannels = new HashMap<>();
+    private boolean hidden;
 
-    private final ArrayList<Integer> faderLevels = new ArrayList<>();
-    private final ArrayList<String> channelNames = new ArrayList<>();
-    private final ArrayList<Integer> faderColours = new ArrayList<>();
-    private final ArrayList<Integer> faderColoursLighter = new ArrayList<>();
-    private final ArrayList<Boolean> muted;
-    private final ArrayList<String> channelPatchIn = new ArrayList<>();
     private FaderValueChangedListener faderValueChangedListener;
     private FaderMuteListener faderMuteListener;
     private final ItemMoveCallback.StartDragListener startDragListener;
@@ -44,20 +41,22 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
         this.startDragListener = startDragListener;
         colourArray = context.getResources().getIntArray(R.array.mixer_colours);
         colourArrayLighter = context.getResources().getIntArray(R.array.mixer_colours_lighter);
-        this.muted = muted;
+        this.hidden = false;
         this.width = width;
-        TypedArray array = context.obtainStyledAttributes(R.style.Widget_Theme_TouchFaders_BoxedVerticalSeekBar, new int[]{R.attr.startValue});
-        for (int channel = 0; channel < numChannels; channel++) {
-            channels.add(channel);
+        for (int i = 0; i < numChannels; i++) {
+            ChannelStrip channel = new ChannelStrip();
+            channel.index = i;
 
-            faderLevels.add(array.getInt(0, 623));
-            channelNames.add("CH " + (channel + 1));
-            faderColours.add(colourArray[channelColours.get(channel)]);
-            faderColoursLighter.add(colourArrayLighter[channelColours.get(channel)]);
-            channelPatchIn.add(String.format("IN %02d", channel + 1));
-            notifyItemInserted(channel);
+            channel.level = 623;
+            channel.muted = muted.get(i);
+            channel.name = "CH " + (i + 1);
+            channel.patch = String.format(Locale.ENGLISH, "IN %02d", i + 1);
+            channel.colour = colourArray[channelColours.get(i)];
+            channel.colourLighter = colourArrayLighter[channelColours.get(i)];
+
+            channels.add(channel);
+            notifyItemInserted(i);
         }
-        array.recycle();
     }
 
     @NonNull
@@ -76,51 +75,28 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
     // Gets called every time a ViewHolder is reused (with a new position)
     @Override
     public void onBindViewHolder(@NonNull ChannelStripViewHolder holder, int position) {
-        holder.position = channels.get(holder.getAdapterPosition());
-        holder.fader.setValue(faderLevels.get(channels.get(holder.getAdapterPosition())));
-        holder.fader.setGradientEnd(faderColours.get(channels.get(holder.getAdapterPosition())));
-        holder.fader.setGradientStart(faderColoursLighter.get(channels.get(holder.getAdapterPosition())));
-        holder.fader.setMute(muted.get(channels.get(holder.getAdapterPosition())));
+        ChannelStrip channelStrip = channels.get(holder.getAdapterPosition());
+        holder.position = channelStrip.index;
+        holder.fader.setValue(channelStrip.level);
+        holder.fader.setGradientEnd(channelStrip.colour);
+        holder.fader.setGradientStart(channelStrip.colourLighter);
+        holder.fader.setMute(channelStrip.muted);
         final float scale = context.getResources().getDisplayMetrics().density;
         int pixels = (int) (width * scale + 0.5f);
         ViewGroup.LayoutParams faderParams = holder.fader.getLayoutParams();
         faderParams.width = pixels;
         holder.fader.setLayoutParams(faderParams);
-        String number = String.valueOf((channels.get(holder.getAdapterPosition()) + 1));
+        String number = String.valueOf(channelStrip.index + 1);
         holder.channelNumber.setText(number);
-        holder.channelPatch.setText(channelPatchIn.get(channels.get(holder.getAdapterPosition())));
-        holder.channelName.setText(channelNames.get(channels.get(holder.getAdapterPosition())));
-        holder.channelName.setBackgroundColor(faderColours.get(channels.get(holder.getAdapterPosition())));
-        if ((holder.getAdapterPosition() / 8) % 2 == 0) {
-            if (holder.getAdapterPosition() % 2 == 0)
-                holder.faderBackground.setBackgroundColor(context.getColor(R.color.fader_light_even));
-            else
-                holder.faderBackground.setBackgroundColor(context.getColor(R.color.fader_light_odd));
-        } else {
-            if (holder.getAdapterPosition() % 2 == 0)
-                holder.faderBackground.setBackgroundColor(context.getColor(R.color.fader_dark_even));
-            else
-                holder.faderBackground.setBackgroundColor(context.getColor(R.color.fader_dark_odd));
-        }
-
-        // Set channel name sizing, per channel name length
-        if (holder.channelName.getText().length() <= 3) {
-            holder.channelName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
-        }
-        if (holder.channelName.getText().length() == 4) {
-            holder.channelName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-        }
-        if (holder.channelName.getText().length() == 5) {
-            holder.channelName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-        }
-        if (holder.channelName.getText().length() == 6) {
-            holder.channelName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        }
+        holder.channelName.setText(channelStrip.name);
+        holder.channelPatch.setText(channelStrip.patch);
+        holder.channelName.setBackgroundColor(channelStrip.colour);
+        holder.faderBackground.setBackgroundColor(context.getColor(R.color.fader_light_even));
     }
 
     @Override
     public int getItemCount() {
-        return faderLevels.size();
+        return channels.size();
     }
 
     @Override
@@ -136,7 +112,6 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
             }
         }
         notifyItemMoved(fromPosition, toPosition);
-        notifyItemChanged(fromPosition);
     }
 
     void swapChannel(int from, int to) {
@@ -145,22 +120,12 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
 
     @Override
     public void onChannelSelected(ChannelStripViewHolder channelStripViewHolder) {
-        channelStripViewHolder.faderBackground.setBackgroundColor(faderColoursLighter.get(channels.get(channelStripViewHolder.getAdapterPosition())));
+        channelStripViewHolder.faderBackground.setBackgroundColor(channels.get(channelStripViewHolder.getAdapterPosition()).colourLighter);
     }
 
     @Override
     public void onChannelClear(ChannelStripViewHolder channelStripViewHolder) {
-        if ((channelStripViewHolder.getAdapterPosition() / 8) % 2 == 0) {
-            if (channelStripViewHolder.getAdapterPosition() % 2 == 0)
-                channelStripViewHolder.faderBackground.setBackgroundColor(context.getColor(R.color.fader_light_even));
-            else
-                channelStripViewHolder.faderBackground.setBackgroundColor(context.getColor(R.color.fader_light_odd));
-        } else {
-            if (channelStripViewHolder.getAdapterPosition() % 2 == 0)
-                channelStripViewHolder.faderBackground.setBackgroundColor(context.getColor(R.color.fader_dark_even));
-            else
-                channelStripViewHolder.faderBackground.setBackgroundColor(context.getColor(R.color.fader_dark_odd));
-        }
+        channelStripViewHolder.faderBackground.setBackgroundColor(context.getColor(R.color.fader_light_even));
     }
 
     public class ChannelStripViewHolder extends RecyclerView.ViewHolder implements ChannelStripRecyclerViewAdapter.FaderValueChangedListener {
@@ -181,19 +146,20 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
             channelBackground = itemView.findViewById(R.id.stripLayout);
             fader = itemView.findViewById(R.id.fader);
             fader.setOnBoxedPointsChangeListener((boxedPoints, points) -> {
-                int index = channels.get(holder.getAdapterPosition());
-                faderLevels.set(index, points);
+                int index = channels.get(holder.getAdapterPosition()).index;
+                channels.get(holder.getAdapterPosition()).level = points;
                 faderValueChangedListener.onValueChanged(boxedPoints.getRootView(), index, boxedPoints, index);
             });
             channelBackground.setOnTouchListener(new View.OnTouchListener() {
                 private final GestureDetector gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
                     @Override
                     public boolean onDoubleTap(MotionEvent e) {
-                        int index = channels.get(holder.getAdapterPosition());
-                        muted.set(index, !muted.get(index));
-                        fader.setMute(muted.get(index));
+                        ChannelStrip channelStrip = channels.get(holder.getAdapterPosition());
+                        int index = channelStrip.index;
+                        channels.get(holder.getAdapterPosition()).muted = !channelStrip.muted;
+                        fader.setMute(channelStrip.muted);
                         notifyItemChanged(holder.getAdapterPosition());
-                        faderMuteListener.onFaderMuteChange(itemView, index, muted.get(index));
+                        faderMuteListener.onFaderMuteChange(itemView, index, channelStrip.muted);
                         return super.onDoubleTap(e);
                     }
 
@@ -222,23 +188,48 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
         }
     }
 
+    public void toggleChannelHide() {
+        hidden = !hidden;
+        if (hidden) {
+            for (int i = channels.size() - 1; 0 <= i; i--) {
+                ChannelStrip channelStrip = channels.get(i);
+                if (channelStrip.level == 0) {
+                    hiddenChannels.put(i, channelStrip);
+                    channels.remove(i);
+                    notifyItemRemoved(i);
+                }
+            }
+        } else {
+            if (hiddenChannels.size() > 0) {
+                for (Map.Entry<Integer, ChannelStrip> entry : hiddenChannels.entrySet()) {
+                    int i = entry.getKey();
+                    ChannelStrip channelStrip = entry.getValue();
+                    channels.add(i, channelStrip);
+                    notifyItemInserted(channels.indexOf(channelStrip));
+                }
+                hiddenChannels.clear();
+            }
+        }
+    }
+
+    // TODO: might need to use `channels`' position/index here
     void setFaderLevel(int index, int level) {
-        faderLevels.set(index, level);
+        channels.get(index).level = level;
         notifyItemChanged(index);
     }
 
     void setChannelPatchIn(int index, String patchIn) {
-        channelPatchIn.set(index, patchIn);
+        channels.get(index).patch = patchIn;
         notifyItemChanged(index);
     }
 
     void setChannelName(int index, String name) {
-        channelNames.set(index, name);
+        channels.get(index).name = name;
         notifyItemChanged(index);
     }
 
-    void setChannelMute(int index, boolean state) {
-        muted.set(index, state);
+    void setChannelMute(int index, boolean muted) {
+        channels.get(index).muted = muted;
         notifyItemChanged(index);
     }
 

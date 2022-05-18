@@ -16,8 +16,8 @@
 		<item name="startValue">623</item> <!-- now -10dB -->
 		<item name="min">0</item>
 		<item name="step">1</item>
-		<item name="gradientStart">@color/teal_200</item>
-		<item name="gradientEnd">@color/white</item>
+		<item name="gradientEnd">@color/teal_200</item>
+		<item name="gradientStart">@color/white</item>
 		<item name="backgroundColor">@color/color_background</item>
 		<item name="corner">15</item>
 		<item name="textSize">12sp</item>
