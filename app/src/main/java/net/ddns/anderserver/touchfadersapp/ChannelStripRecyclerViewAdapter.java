@@ -136,6 +136,7 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
             }
         }
         notifyItemMoved(fromPosition, toPosition);
+        notifyItemChanged(fromPosition);
     }
 
     void swapChannel(int from, int to) {
