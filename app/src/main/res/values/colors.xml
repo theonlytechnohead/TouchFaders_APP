@@ -14,8 +14,8 @@
 	<color name="light_blue_600">#FF039BE5</color>
 	<color name="light_blue_900">#FF01579B</color>
 	<color name="light_blue_A200">#FF40C4FF</color>
-	<color name="black_overlay">#66000000</color>
-	<color name="background">#B0000000</color>
+	<color name="black_overlay">#999999</color>
+	<color name="background">#4F4F4F</color>
 	<color name="transparent">#00000000</color>
 
 	<!-- Metering colours -->
@@ -69,8 +69,8 @@
 	<color name="color_background">#CC4D4D4D</color>
 	<color name="color_text">#00B7FF</color>
 
-	<color name="fader_light_even">#33000000</color>
-	<color name="fader_light_odd">#44000000</color>
-	<color name="fader_dark_even">#99000000</color>
-	<color name="fader_dark_odd">#BB000000</color>
+	<color name="fader_light_even">#454545</color>
+	<color name="fader_light_odd">#383838</color>
+	<color name="fader_dark_even">#1F1F1F</color>
+	<color name="fader_dark_odd">#121212</color>
 </resources>

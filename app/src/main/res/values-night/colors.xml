@@ -8,22 +8,9 @@
 	<color name="light_blue_600">#FF039BE5</color>
 	<color name="light_blue_900">#FF01579B</color>
 	<color name="light_blue_A200">#FF40C4FF</color>
-	<color name="black_overlay">#66000000</color>
-	<color name="background">#B0000000</color>
+	<color name="black_overlay">#999999</color>
+	<color name="background">#4F4F4F</color>
 
-	<!-- Mix colours -->
-	<color name="mix1">#F4511E</color>
-	<color name="mix1_lighter">#FF9E80</color>
-	<color name="mix2">#4CAF50</color>
-	<color name="mix2_lighter">#CCFF90</color>
-	<color name="mix3">#039BE5</color>
-	<color name="mix3_lighter">#80D8FF</color>
-	<color name="mix4">#3949AB</color>
-	<color name="mix4_lighter">#8C9EFF</color>
-	<color name="mix5">#9C27B0</color>
-	<color name="mix5_lighter">#EA80FC</color>
-	<color name="mix6">#FFB300</color>
-	<color name="mix6_lighter">#FFE57F</color>
 
 	<!-- VerticalSeekBar -->
 	<color name="color_progress">#D8D8D8</color>

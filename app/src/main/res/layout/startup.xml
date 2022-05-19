@@ -4,7 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/startupLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="?attr/fullscreenBackgroundColor"
+    android:theme="@style/ThemeOverlay.TouchFaders.FullscreenContainer">
 
     <Button
         android:id="@+id/demoButton"
@@ -26,6 +28,7 @@
         android:imeOptions="flagNoExtractUi|actionGo"
         android:inputType="number"
         android:textSize="25sp"
+        android:textColor="@color/white"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toEndOf="@id/settingsButton"
         app:layout_constraintEnd_toStartOf="@id/startButton"
