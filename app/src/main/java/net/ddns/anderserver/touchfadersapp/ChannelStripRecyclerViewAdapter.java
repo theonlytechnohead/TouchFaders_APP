@@ -2,6 +2,8 @@ package net.ddns.anderserver.touchfadersapp;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -19,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
+import java.util.concurrent.Executors;
 
 public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<ChannelStripRecyclerViewAdapter.ChannelStripViewHolder> implements ItemMoveCallback.ItemTouchHelperContract {
 
@@ -235,9 +238,24 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
                 hiddenChannels.clear();
             }
         }
-        for (int i = 0; i < channels.size(); i++) {
-            notifyItemChanged(i);
-        }
+
+        Handler handler = new Handler(Looper.getMainLooper());
+        Executors.newSingleThreadExecutor().execute(() -> {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            for (int i = 0; i < channels.size(); i++) {
+                try {
+                    Thread.sleep(16);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                int index = i;
+                handler.post(() -> notifyItemChanged(index));
+            }
+        });
     }
 
     int getIndex(int channelIndex) {
