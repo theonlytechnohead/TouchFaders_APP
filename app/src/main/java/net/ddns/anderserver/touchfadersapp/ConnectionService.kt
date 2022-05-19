@@ -6,8 +6,10 @@ import android.content.Intent
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
-import android.util.Log
-import com.illposed.osc.*
+import com.illposed.osc.MessageSelector
+import com.illposed.osc.OSCMessage
+import com.illposed.osc.OSCMessageListener
+import com.illposed.osc.OSCSerializerAndParserBuilder
 import com.illposed.osc.argument.handler.Activator
 import com.illposed.osc.transport.OSCPortIn
 import com.illposed.osc.transport.OSCPortOut
@@ -93,16 +95,25 @@ class ConnectionService : Service() {
                 // connects via TCP
                 val socketAddress = InetSocketAddress(address, 8878)
                 val socket = Socket();
-                socket.connect(socketAddress, 100);
+                try {
+                    socket.connect(socketAddress, 100);
+                } catch (e: IOException) {
+                    return@async
+                }
                 socket.soTimeout = 100;
                 var byteArraySend = InetAddress.getByName(StartupActivity.getLocalIP()).address
                 byteArraySend += Build.MODEL.encodeToByteArray()
                 socket.getOutputStream().write(byteArraySend)
                 val byteArrayReceive = ByteArray(socket.receiveBufferSize)
-                val bytesRead =
-                    socket.getInputStream().read(byteArrayReceive, 0, socket.receiveBufferSize)
-//                Log.i("TCP", byteArrayReceive.toHexString(bytesRead))
-                socket.close()
+                val bytesRead: Int;
+                try {
+                    bytesRead =
+                        socket.getInputStream().read(byteArrayReceive, 0, socket.receiveBufferSize)
+                } catch (e: IOException) {
+                    return@async
+                } finally {
+                    socket.close()
+                }
 
                 if (bytesRead >= 4) {
                     var index = 0;
@@ -211,7 +222,7 @@ class ConnectionService : Service() {
     lateinit var oscPortOut: OSCPortOut
     lateinit var oscPortIn: OSCPortIn
 
-    fun send (message: OSCMessage) {
+    fun send(message: OSCMessage) {
         CoroutineScope(Dispatchers.Default).launch {
             async(Dispatchers.IO) {
                 oscPortOut.send(message)
@@ -219,19 +230,19 @@ class ConnectionService : Service() {
         }
     }
 
-    fun addListener (messageSelector: MessageSelector, listener: OSCMessageListener) {
+    fun addListener(messageSelector: MessageSelector, listener: OSCMessageListener) {
         oscPortIn.dispatcher.addListener(messageSelector, listener)
     }
 
-    fun startListening () {
+    fun startListening() {
         oscPortIn.startListening()
     }
 
-    fun stopListening () {
+    fun stopListening() {
         oscPortIn.stopListening()
     }
 
-    fun removeListener (messageSelector: MessageSelector, listener: OSCMessageListener) {
+    fun removeListener(messageSelector: MessageSelector, listener: OSCMessageListener) {
         oscPortIn.dispatcher.removeListener(messageSelector, listener)
     }
 
@@ -286,7 +297,8 @@ class ConnectionService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         Disconnect()
-        val notificationService = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationService =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationService.cancel(ONGOING_NOTIFICATION_ID)
     }
 }
