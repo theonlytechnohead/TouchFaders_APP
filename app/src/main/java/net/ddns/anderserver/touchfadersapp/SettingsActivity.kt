@@ -38,6 +38,8 @@ class SettingsActivity : AppCompatActivity() {
                 or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
         // Fullscreen done!
 
+        binding.backButton.setOnClickListener { finish() }
+
         binding.resetLayoutButton.setOnClickListener {
             PreferenceManager.getDefaultSharedPreferences(applicationContext).edit()
                 .remove("channel_layer").apply();
