@@ -118,9 +118,9 @@ class ConnectionService : Service() {
                 if (bytesRead >= 4) {
                     var index = 0;
                     // OSC port to recieve on
-                    receivePort = byteArrayReceive[index++].toInt()
+                    receivePort = 9000 + byteArrayReceive[index++].toInt()
                     // OSC port to send on
-                    sendPort = byteArrayReceive[index++].toInt()
+                    sendPort = 8000 + byteArrayReceive[index++].toInt()
                     // number of channels
                     channels = byteArrayReceive[index++].toInt()
                     // get channel colours
@@ -211,9 +211,10 @@ class ConnectionService : Service() {
                     serializer.registerArgumentHandler(argumentHandler, typeChar)
                     typeChar++
                 }
-                oscPortOut = OSCPortOut(serializer, InetSocketAddress("192.168.1.50", 8001))
+                oscPortOut = OSCPortOut(serializer, InetSocketAddress(address(), sendPort()))
                 oscPortOut.send(OSCMessage("/test", mutableListOf(1)))
-                oscPortIn = OSCPortIn(InetSocketAddress("192.168.1.160", 9001))
+                oscPortIn =
+                    OSCPortIn(InetSocketAddress(StartupActivity.getLocalIP(), receivePort()))
                 oscPortIn.dispatcher.isAlwaysDispatchingImmediately = true
             }
         }
