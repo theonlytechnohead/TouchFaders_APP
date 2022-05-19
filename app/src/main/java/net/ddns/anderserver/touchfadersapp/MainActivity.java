@@ -25,7 +25,6 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.button.MaterialButton;
 import com.illposed.osc.OSCMessage;
 import com.illposed.osc.OSCMessageEvent;
 import com.illposed.osc.OSCMessageListener;
@@ -328,21 +327,17 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
                     int pixels = (int) (width * scale + 0.5f);
                     Handler handler = new Handler(Looper.getMainLooper());
                     if (cutout.getSafeInsetLeft() != mixMeterParams.width) {
-                        MaterialButton hideButton = findViewById(R.id.hide_button);
                         mixMeterParams.width = cutout.getSafeInsetLeft();
                         if (mixMeterParams.width == 0) {
                             mixMeterParams.width = pixels;
                         }
-                        handler.post(() -> hideButton.setHeight(mixMeterParams.width));
                         handler.post(() -> meterInfo.setLayoutParams(mixMeterParams));
                     }
                     if (cutout.getSafeInsetRight() != mixInfoParams.width + pixels) {
-                        MaterialButton closeButton = findViewById(R.id.back_button);
                         mixInfoParams.width = cutout.getSafeInsetRight() + pixels;
                         if (mixInfoParams.width == 0) {
                             mixInfoParams.width = pixels;
                         }
-                        handler.post(() -> closeButton.setHeight(pixels));
                         mixInfo.setPadding(0, 0, cutout.getSafeInsetRight(), 0);
                         handler.post(() -> mixInfo.setLayoutParams(mixInfoParams));
                     }
