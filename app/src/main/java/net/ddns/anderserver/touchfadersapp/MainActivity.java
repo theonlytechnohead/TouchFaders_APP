@@ -96,8 +96,7 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
             channelLayer = loadMap();
             adapter = new ChannelStripRecyclerViewAdapter(MainActivity.this, instanceContext, numChannels, channelLayer, channelColours, width);
             adapter.setValuesChangeListener((view, index, boxedVertical, points) -> SendOSCFaderValue(index + 1, points));
-            adapter.setFaderMuteListener(((view, index, muted) -> {
-            }));
+            adapter.setFaderMuteListener(((view, index, muted) -> SendOSCChannelMute(index + 1, muted)));
             recyclerView = findViewById(R.id.faderRecyclerView);
             ItemTouchHelper.Callback callback = new ItemMoveCallback(adapter);
             touchHelper = new ItemTouchHelper(callback);
@@ -113,6 +112,7 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
 
 //            connectionService.addListener(new OSCPatternAddressMessageSelector("/tes?/*"), event -> Log.i("OSC", "Got OSC!"));
             connectionService.addListener(faderPattern, faderListener);
+            connectionService.addListener(mutePattern, muteListener);
             connectionService.addListener(labelPattern, labelListener);
             connectionService.addListener(patchPattern, patchListener);
             connectionService.addListener(disconnectPattern, disconnectListener);
@@ -126,6 +126,7 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
             connectionService.stopListening();
 //            connectionService.removeListener(new OSCPatternAddressMessageSelector("/tes?/*"), event -> Log.i("OSC", "Got OSC!"));
             connectionService.removeListener(faderPattern, faderListener);
+            connectionService.removeListener(mutePattern, muteListener);
             connectionService.removeListener(labelPattern, labelListener);
             connectionService.removeListener(patchPattern, patchListener);
             connectionService.removeListener(disconnectPattern, disconnectListener);
@@ -141,6 +142,20 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
             if (0 <= faderIndex && faderIndex < adapter.getItemCount()) {
                 Handler handler = new Handler(Looper.getMainLooper());
                 handler.post(() -> adapter.setFaderLevel(faderIndex, (int) event.getMessage().getArguments().get(0)));
+            }
+        }
+    };
+
+    OSCPatternAddressMessageSelector mutePattern = new OSCPatternAddressMessageSelector("/mix*/fader*/mute");
+    OSCMessageListener muteListener = new OSCMessageListener() {
+        @Override
+        public void acceptMessage(OSCMessageEvent event) {
+            String[] segments = event.getMessage().getAddress().split("/");
+            int faderIndex = Integer.parseInt(segments[2].replaceAll("\\D+", "")) - 1; // extract only digits via RegEx
+            if (0 <= faderIndex && faderIndex < adapter.getItemCount()) {
+                Handler handler = new Handler(Looper.getMainLooper());
+                boolean muted = (int) event.getMessage().getArguments().get(0) == 1;
+                handler.post(() -> adapter.setChannelMute(faderIndex, muted));
             }
         }
     };
@@ -365,6 +380,14 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
         ArrayList<Object> arguments = new ArrayList<>();
         arguments.add(faderValue);
         OSCMessage message = new OSCMessage("/mix" + currentMix + "/fader" + fader, arguments);
+        Log.i("OSC", message.getAddress() + " " + message.getArguments().get(0).toString());
+        connectionService.send(message);
+    }
+
+    public void SendOSCChannelMute(int channel, boolean muted) {
+        ArrayList<Object> arguments = new ArrayList<>();
+        arguments.add(muted ? 1 : 0);
+        OSCMessage message = new OSCMessage("/mix" + currentMix + "/fader" + channel + "/mute", arguments);
         Log.i("OSC", message.getAddress() + " " + message.getArguments().get(0).toString());
         connectionService.send(message);
     }
