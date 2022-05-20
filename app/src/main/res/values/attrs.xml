@@ -12,6 +12,7 @@
 		<attr name="textBottomPadding" format="integer" />
 		<attr name="corner" format="integer" />
 		<attr name="step" format="integer"/>
+		<attr name="meter" format="boolean"/>
 
 		<attr name="gradientStart" format="color" />
 		<attr name="gradientEnd" format="color" />

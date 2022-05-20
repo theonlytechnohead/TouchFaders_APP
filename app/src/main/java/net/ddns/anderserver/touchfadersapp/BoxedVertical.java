@@ -44,6 +44,7 @@ public class BoxedVertical extends View {
 
     private boolean enabled = true;
     private boolean muted = false;
+    private boolean meter = false;
     private boolean textEnabled = true;
     private boolean touchDisabled = true;
     private boolean touchAllowed = true;
@@ -54,6 +55,8 @@ public class BoxedVertical extends View {
     private final Paint drawPaint = new Paint();
     private final Path clippingPath = new Path();
     private final RectF boundingRect = new RectF();
+    private int nearClip = 923;
+    private int overUnity = 824;
     private LinearGradient mutedGradient;
     private LinearGradient nearClipGradient;
     private LinearGradient overUnityGradient;
@@ -125,6 +128,7 @@ public class BoxedVertical extends View {
 
             enabled = attributes.getBoolean(R.styleable.BoxedVertical_enabled, enabled);
             muted = attributes.getBoolean(R.styleable.BoxedVertical_muted, muted);
+            meter = attributes.getBoolean(R.styleable.BoxedVertical_meter, meter);
             touchDisabled = attributes.getBoolean(R.styleable.BoxedVertical_touchDisabled, touchDisabled);
             textEnabled = attributes.getBoolean(R.styleable.BoxedVertical_textEnabled, textEnabled);
 
@@ -133,6 +137,11 @@ public class BoxedVertical extends View {
             mPoints = mDefaultValue;
 
             attributes.recycle();
+        }
+
+        if (meter) {
+            nearClip = 120;
+            overUnity = 104;
         }
 
         // range check
@@ -173,12 +182,12 @@ public class BoxedVertical extends View {
             }
             drawPaint.setShader(mutedGradient);
         } else {
-            if (923 <= mPoints) {
+            if (nearClip <= mPoints) {
                 if (nearClipGradient == null || lastProgressSweep != mProgressSweep) {
                     nearClipGradient = new LinearGradient(0, mProgressSweep, 0, getHeight(), ContextCompat.getColor(getContext(), R.color.red), gradientStart, Shader.TileMode.MIRROR);
                 }
                 drawPaint.setShader(nearClipGradient);
-            } else if (824 < mPoints) {
+            } else if (overUnity < mPoints) {
                 if (overUnityGradient == null || lastProgressSweep != mProgressSweep) {
                     overUnityGradient = new LinearGradient(0, mProgressSweep, 0, getHeight(), ContextCompat.getColor(getContext(), R.color.yellow), gradientStart, Shader.TileMode.MIRROR);
                 }
@@ -341,6 +350,7 @@ public class BoxedVertical extends View {
         points = Math.max(points, min);
 
         updateProgressByValue(points);
+        resetGradients();
     }
 
     public int getValue() {

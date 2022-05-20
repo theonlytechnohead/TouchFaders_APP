@@ -48,6 +48,7 @@
 			android:layout_height="0dp"
 			app:gradientEnd="@color/meter_end"
 			app:gradientStart="@color/meter_start"
+			app:meter="true"
 			app:layout_constraintBottom_toBottomOf="parent"
 			app:layout_constraintEnd_toEndOf="parent"
 			app:layout_constraintStart_toStartOf="parent"
