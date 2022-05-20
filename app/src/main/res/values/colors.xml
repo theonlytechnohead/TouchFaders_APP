@@ -32,7 +32,7 @@
 	<color name="mixer_bergundy">#660101</color>
 	<color name="mixer_green">#016633</color>
 
-	<!-- Mixer colours transparent -->
+	<!-- Mixer colours lighter -->
 	<color name="mixer_blue_lighter">#8080FF</color>
 	<color name="mixer_orange_lighter">#FFB380</color>
 	<color name="mixer_brown_lighter">#FFD580</color>
@@ -41,6 +41,16 @@
 	<color name="mixer_pink_lighter">#FFB3CF</color>
 	<color name="mixer_bergundy_lighter">#CC6666</color>
 	<color name="mixer_green_lighter">#66CC88</color>
+
+	<!-- Mixer colours darker -->
+	<color name="mixer_blue_darker">#000099</color>
+	<color name="mixer_orange_darker">#993D00</color>
+	<color name="mixer_brown_darker">#664301</color>
+	<color name="mixer_purple_darker">#440166</color>
+	<color name="mixer_cyan_darker">#005C99</color>
+	<color name="mixer_pink_darker">#993D5C</color>
+	<color name="mixer_bergundy_darker">#4D0000</color>
+	<color name="mixer_green_darker">#014D27</color>
 
 	<array name="mixer_colours">
 		<item>@color/mixer_blue</item>
@@ -62,6 +72,17 @@
 		<item>@color/mixer_pink_lighter</item>
 		<item>@color/mixer_bergundy_lighter</item>
 		<item>@color/mixer_green_lighter</item>
+	</array>
+
+	<array name="mixer_colours_darker">
+		<item>@color/mixer_blue_darker</item>
+		<item>@color/mixer_orange_darker</item>
+		<item>@color/mixer_brown_darker</item>
+		<item>@color/mixer_purple_darker</item>
+		<item>@color/mixer_cyan_darker</item>
+		<item>@color/mixer_pink_darker</item>
+		<item>@color/mixer_bergundy_darker</item>
+		<item>@color/mixer_green_darker</item>
 	</array>
 
 	<!-- VerticalSeekBar -->
