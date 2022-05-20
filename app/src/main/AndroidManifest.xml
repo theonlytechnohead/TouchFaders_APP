@@ -12,17 +12,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.TouchFaders">
-        <activity
-            android:name=".SettingsActivity"
-            android:exported="false"
-            android:label="@string/title_activity_settings"
-            android:screenOrientation="sensorLandscape"
-            android:theme="@style/Theme.TouchFaders.Fullscreen"/>
-
         <service
             android:name=".ConnectionService"
             android:enabled="true" />
-
         <activity
             android:name=".StartupActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -31,14 +23,19 @@
             android:theme="@style/Theme.TouchFaders.Fullscreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
+            android:name=".SettingsActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_settings"
+            android:launchMode="singleTask"
+            android:screenOrientation="sensorLandscape"
+            android:theme="@style/Theme.TouchFaders.Fullscreen"/>
+        <activity
             android:name=".MixSelectActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="TouchFaders"
             android:launchMode="singleTask"
             android:screenOrientation="sensorLandscape"
             android:theme="@style/Theme.TouchFaders.Fullscreen" />

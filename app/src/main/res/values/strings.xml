@@ -1039,7 +1039,7 @@
         <item>9.9</item>
         <item>10.0</item>
     </string-array>
-    <string name="title_activity_settings">SettingsActivity</string>
+    <string name="title_activity_settings">Settings</string>
     <string name="setting_fader_width">fader_width</string>
 
     <array name="fader_width_entries">
