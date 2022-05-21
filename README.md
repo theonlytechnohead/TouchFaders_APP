@@ -1,6 +1,8 @@
 # TouchFaders app
 OSC Android app for TouchFaders MIDI, using zerOSConf
 
+![Screenshot](Screenshot.jpg)
+
 ## What's this for?
 See the main repo for this project, [TouchFaders MIDI](https://github.com/theonlytechnohead/TouchFaders_MIDI) for more details
 
