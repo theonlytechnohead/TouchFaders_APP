@@ -154,18 +154,15 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
                 if (0 <= channelIndex && channelIndex < adapter.getItemCount()) {
                     handler.post(() -> adapter.setFaderLevel(channelIndex, (int) event.getMessage().getArguments().get(0)));
                 }
-            } else if (event.getMessage().getArguments().size() == 4) {
+            } else if (event.getMessage().getArguments().size() == 5) {
                 if (0 <= channelIndex && channelIndex < adapter.getItemCount()) {
                     Handler handler = new Handler(Looper.getMainLooper());
-                    // send level
-                    handler.post(() -> adapter.setFaderLevel(channelIndex, (int) event.getMessage().getArguments().get(0)));
-                    // send mute
+                    int level = (int) event.getMessage().getArguments().get(0);
                     boolean muted = (boolean) event.getMessage().getArguments().get(1);
-                    handler.post(() -> adapter.setChannelMute(channelIndex, muted));
-                    // channel name
-                    handler.post(() -> adapter.setChannelName(channelIndex, (String) event.getMessage().getArguments().get(2)));
-                    // channel patch
-                    handler.post(() -> adapter.setChannelPatchIn(channelIndex, (String) event.getMessage().getArguments().get(3)));
+                    String name = (String) event.getMessage().getArguments().get(2);
+                    String patch = (String) event.getMessage().getArguments().get(3);
+                    int colourIndex = (int) event.getMessage().getArguments().get(4);
+                    handler.post(() -> adapter.setChannelStrip(channelIndex, level, muted, name, patch, colourIndex));
                 }
             }
         }

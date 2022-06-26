@@ -36,12 +36,14 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
     private ChannelMuteListener channelMuteListener;
     private final ItemMoveCallback.StartDragListener startDragListener;
 
+    int[] colourArray;
+    int[] colourArrayLighter;
 
     public ChannelStripRecyclerViewAdapter(ItemMoveCallback.StartDragListener startDragListener, Context context, int numChannels, HashMap<Integer, Integer> channelLayer, ArrayList<Integer> channelColours, float width) {
         this.context = context;
         this.startDragListener = startDragListener;
-        int[] colourArray = context.getResources().getIntArray(R.array.mixer_colours);
-        int[] colourArrayLighter = context.getResources().getIntArray(R.array.mixer_colours_lighter);
+        colourArray = context.getResources().getIntArray(R.array.mixer_colours);
+        colourArrayLighter = context.getResources().getIntArray(R.array.mixer_colours_lighter);
         this.hidden = false;
         this.width = width;
         TreeMap<Integer, ChannelStrip> channelLayout = new TreeMap<>();
@@ -270,6 +272,26 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
         return 0;
     }
 
+    void setChannelStrip (int index, int level, boolean muted, String name, String patch, int colourIndex) {
+        int channelIndex = getIndex(index);
+        if (channelIndex < 0) {
+            Objects.requireNonNull(hiddenChannels.get(index)).level = level;
+            Objects.requireNonNull(hiddenChannels.get(index)).muted = muted;
+            Objects.requireNonNull(hiddenChannels.get(index)).name = name;
+            Objects.requireNonNull(hiddenChannels.get(index)).patch = patch;
+            Objects.requireNonNull(hiddenChannels.get(index)).colour = colourArray[colourIndex];
+            Objects.requireNonNull(hiddenChannels.get(index)).colourLighter = colourArrayLighter[colourIndex];
+        } else {
+            channels.get(channelIndex).level = level;
+            channels.get(channelIndex).muted = muted;
+            channels.get(channelIndex).name = name;
+            channels.get(channelIndex).patch = patch;
+            channels.get(channelIndex).colour = colourArray[colourIndex];
+            channels.get(channelIndex).colourLighter = colourArrayLighter[colourIndex];
+            notifyItemChanged(channelIndex);
+        }
+    }
+
     void setFaderLevel(int index, int level) {
         int channelIndex = getIndex(index);
         if (channelIndex < 0) {
@@ -306,6 +328,18 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
             Objects.requireNonNull(hiddenChannels.get(index)).muted = muted;
         } else {
             channels.get(channelIndex).muted = muted;
+            notifyItemChanged(channelIndex);
+        }
+    }
+
+    void setChannelColour(int index, int colourIndex) {
+        int channelIndex = getIndex(index);
+        if (channelIndex < 0) {
+            Objects.requireNonNull(hiddenChannels.get(index)).colour = colourArray[colourIndex];
+            Objects.requireNonNull(hiddenChannels.get(index)).colourLighter = colourArrayLighter[colourIndex];
+        } else {
+            channels.get(channelIndex).colour = colourArray[colourIndex];
+            channels.get(channelIndex).colourLighter = colourArrayLighter[colourIndex];
             notifyItemChanged(channelIndex);
         }
     }
