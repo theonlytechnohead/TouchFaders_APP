@@ -57,6 +57,8 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
     public final String PATCH = "patch";
     public final String MUTE = "mute";
 
+    public final String COLOUR = "colour";
+
     Thread udpListenerThread;
     boolean runUDP = true;
 
@@ -117,6 +119,7 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
             connectionService.addListener(mutePattern, muteListener);
             connectionService.addListener(labelPattern, labelListener);
             connectionService.addListener(patchPattern, patchListener);
+            connectionService.addListener(colourPattern, colourListener);
             connectionService.addListener(disconnectPattern, disconnectListener);
             connectionService.startListening();
 
@@ -139,6 +142,7 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
             connectionService.removeListener(mutePattern, muteListener);
             connectionService.removeListener(labelPattern, labelListener);
             connectionService.removeListener(patchPattern, patchListener);
+            connectionService.removeListener(colourPattern, colourListener);
             connectionService.removeListener(disconnectPattern, disconnectListener);
         }
     };
@@ -204,6 +208,19 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
             if (0 <= channelIndex && channelIndex < adapter.getItemCount()) {
                 Handler handler = new Handler(Looper.getMainLooper());
                 handler.post(() -> adapter.setChannelPatchIn(channelIndex, (String) event.getMessage().getArguments().get(0)));
+            }
+        }
+    };
+
+    OSCPatternAddressMessageSelector colourPattern = new OSCPatternAddressMessageSelector("/" + CHANNEL + "*/" + COLOUR);
+    OSCMessageListener colourListener = new OSCMessageListener() {
+        @Override
+        public void acceptMessage(OSCMessageEvent event) {
+            String[] segments = event.getMessage().getAddress().split("/");
+            int channelIndex = Integer.parseInt(segments[1].replaceAll("\\D+", "")) - 1;
+            if (0 <= channelIndex && channelIndex < adapter.getItemCount()) {
+                Handler handler = new Handler(Looper.getMainLooper());
+                handler.post(() -> adapter.setChannelColour(channelIndex, (int) event.getMessage().getArguments().get(0)));
             }
         }
     };
