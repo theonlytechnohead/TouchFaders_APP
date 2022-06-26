@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
             recyclerView.setAdapter(adapter);
 
 //            connectionService.addListener(new OSCPatternAddressMessageSelector("/tes?/*"), event -> Log.i("OSC", "Got OSC!"));
-            connectionService.addListener(faderPattern, faderListener);
+            connectionService.addListener(sendPattern, sendListener);
             connectionService.addListener(mutePattern, muteListener);
             connectionService.addListener(labelPattern, labelListener);
             connectionService.addListener(patchPattern, patchListener);
@@ -135,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
 
             connectionService.stopListening();
 //            connectionService.removeListener(new OSCPatternAddressMessageSelector("/tes?/*"), event -> Log.i("OSC", "Got OSC!"));
-            connectionService.removeListener(faderPattern, faderListener);
+            connectionService.removeListener(sendPattern, sendListener);
             connectionService.removeListener(mutePattern, muteListener);
             connectionService.removeListener(labelPattern, labelListener);
             connectionService.removeListener(patchPattern, patchListener);
@@ -143,15 +143,30 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
         }
     };
 
-    OSCPatternAddressMessageSelector faderPattern = new OSCPatternAddressMessageSelector("/" + MIX + "*/" + CHANNEL + "*");
-    OSCMessageListener faderListener = new OSCMessageListener() {
+    OSCPatternAddressMessageSelector sendPattern = new OSCPatternAddressMessageSelector("/" + MIX + "*/" + CHANNEL + "*");
+    OSCMessageListener sendListener = new OSCMessageListener() {
         @Override
         public void acceptMessage(OSCMessageEvent event) {
             String[] segments = event.getMessage().getAddress().split("/");
-            int faderIndex = Integer.parseInt(segments[2].replaceAll("\\D+", "")) - 1; // extract only digits via RegEx
-            if (0 <= faderIndex && faderIndex < adapter.getItemCount()) {
+            int channelIndex = Integer.parseInt(segments[2].replaceAll("\\D+", "")) - 1; // extract only digits via RegEx
+            if (event.getMessage().getArguments().size() == 1) {
                 Handler handler = new Handler(Looper.getMainLooper());
-                handler.post(() -> adapter.setFaderLevel(faderIndex, (int) event.getMessage().getArguments().get(0)));
+                if (0 <= channelIndex && channelIndex < adapter.getItemCount()) {
+                    handler.post(() -> adapter.setFaderLevel(channelIndex, (int) event.getMessage().getArguments().get(0)));
+                }
+            } else if (event.getMessage().getArguments().size() == 4) {
+                if (0 <= channelIndex && channelIndex < adapter.getItemCount()) {
+                    Handler handler = new Handler(Looper.getMainLooper());
+                    // send level
+                    handler.post(() -> adapter.setFaderLevel(channelIndex, (int) event.getMessage().getArguments().get(0)));
+                    // send mute
+                    boolean muted = (boolean) event.getMessage().getArguments().get(1);
+                    handler.post(() -> adapter.setChannelMute(channelIndex, muted));
+                    // channel name
+                    handler.post(() -> adapter.setChannelName(channelIndex, (String) event.getMessage().getArguments().get(2)));
+                    // channel patch
+                    handler.post(() -> adapter.setChannelPatchIn(channelIndex, (String) event.getMessage().getArguments().get(3)));
+                }
             }
         }
     };
@@ -161,11 +176,11 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
         @Override
         public void acceptMessage(OSCMessageEvent event) {
             String[] segments = event.getMessage().getAddress().split("/");
-            int faderIndex = Integer.parseInt(segments[2].replaceAll("\\D+", "")) - 1; // extract only digits via RegEx
-            if (0 <= faderIndex && faderIndex < adapter.getItemCount()) {
+            int channelIndex = Integer.parseInt(segments[2].replaceAll("\\D+", "")) - 1; // extract only digits via RegEx
+            if (0 <= channelIndex && channelIndex < adapter.getItemCount()) {
                 Handler handler = new Handler(Looper.getMainLooper());
                 boolean muted = (int) event.getMessage().getArguments().get(0) == 1;
-                handler.post(() -> adapter.setChannelMute(faderIndex, muted));
+                handler.post(() -> adapter.setChannelMute(channelIndex, muted));
             }
         }
     };
