@@ -111,13 +111,6 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
             touchHelper = new ItemTouchHelper(callback);
             touchHelper.attachToRecyclerView(recyclerView);
             recyclerView.setAdapter(adapter);
-            recyclerView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                @Override
-                public void onGlobalLayout() {
-                    SendOSCGetMix(currentMix);
-                    recyclerView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                }
-            });
 
 //            connectionService.addListener(new OSCPatternAddressMessageSelector("/tes?/*"), event -> Log.i("OSC", "Got OSC!"));
             connectionService.addListener(faderPattern, faderListener);
@@ -126,6 +119,14 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
             connectionService.addListener(patchPattern, patchListener);
             connectionService.addListener(disconnectPattern, disconnectListener);
             connectionService.startListening();
+
+            recyclerView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    SendOSCGetMix(currentMix);
+                    recyclerView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                }
+            });
         }
 
         @Override
@@ -388,7 +389,7 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
     public void SendOSCFaderValue(int fader, int faderValue) {
         ArrayList<Object> arguments = new ArrayList<>();
         arguments.add(faderValue);
-        OSCMessage message = new OSCMessage("/mix" + currentMix + "/fader" + fader, arguments);
+        OSCMessage message = new OSCMessage("/" + MIX + currentMix + "/" + CHANNEL + fader, arguments);
         Log.i("OSC", message.getAddress() + " " + message.getArguments().get(0).toString());
         connectionService.send(message);
     }
@@ -396,7 +397,7 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
     public void SendOSCChannelMute(int channel, boolean muted) {
         ArrayList<Object> arguments = new ArrayList<>();
         arguments.add(muted ? 1 : 0);
-        OSCMessage message = new OSCMessage("/mix" + currentMix + "/fader" + channel + "/mute", arguments);
+        OSCMessage message = new OSCMessage("/" + MIX + currentMix + "/" + CHANNEL + channel + "/" + MUTE, arguments);
         Log.i("OSC", message.getAddress() + " " + message.getArguments().get(0).toString());
         connectionService.send(message);
     }
@@ -404,7 +405,7 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
     public void SendOSCGetMix(int mix) {
         ArrayList<Object> arguments = new ArrayList<>();
         arguments.add(1);
-        OSCMessage message = new OSCMessage("/mix" + mix, arguments);
+        OSCMessage message = new OSCMessage("/" + MIX + mix, arguments);
         connectionService.send(message);
     }
 
