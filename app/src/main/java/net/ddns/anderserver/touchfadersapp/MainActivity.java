@@ -48,6 +48,15 @@ import java.util.Map;
  */
 public class MainActivity extends AppCompatActivity implements ItemMoveCallback.StartDragListener {
 
+    public final String CONNECT = "test";
+    public final String DISCONNECT = "disconnect";
+
+    public final String CHANNEL = "fader";
+    public final String MIX = "mix";
+    public final String NAME = "label";
+    public final String PATCH = "patch";
+    public final String MUTE = "mute";
+
     Thread udpListenerThread;
     boolean runUDP = true;
 
@@ -133,7 +142,7 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
         }
     };
 
-    OSCPatternAddressMessageSelector faderPattern = new OSCPatternAddressMessageSelector("/mix*/fader*");
+    OSCPatternAddressMessageSelector faderPattern = new OSCPatternAddressMessageSelector("/" + MIX + "*/" + CHANNEL + "*");
     OSCMessageListener faderListener = new OSCMessageListener() {
         @Override
         public void acceptMessage(OSCMessageEvent event) {
@@ -146,7 +155,7 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
         }
     };
 
-    OSCPatternAddressMessageSelector mutePattern = new OSCPatternAddressMessageSelector("/mix*/fader*/mute");
+    OSCPatternAddressMessageSelector mutePattern = new OSCPatternAddressMessageSelector("/" + MIX + "*/" + CHANNEL + "*/" + MUTE);
     OSCMessageListener muteListener = new OSCMessageListener() {
         @Override
         public void acceptMessage(OSCMessageEvent event) {
@@ -160,7 +169,7 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
         }
     };
 
-    OSCPatternAddressMessageSelector labelPattern = new OSCPatternAddressMessageSelector("/label*");
+    OSCPatternAddressMessageSelector labelPattern = new OSCPatternAddressMessageSelector("/" + NAME + "*");
     OSCMessageListener labelListener = new OSCMessageListener() {
         @Override
         public void acceptMessage(OSCMessageEvent event) {
@@ -173,7 +182,7 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
         }
     };
 
-    OSCPatternAddressMessageSelector patchPattern = new OSCPatternAddressMessageSelector("/patch*");
+    OSCPatternAddressMessageSelector patchPattern = new OSCPatternAddressMessageSelector("/" + PATCH + "*");
     OSCMessageListener patchListener = new OSCMessageListener() {
         @Override
         public void acceptMessage(OSCMessageEvent event) {
@@ -186,7 +195,7 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
         }
     };
 
-    OSCPatternAddressMessageSelector disconnectPattern = new OSCPatternAddressMessageSelector("/disconnect");
+    OSCPatternAddressMessageSelector disconnectPattern = new OSCPatternAddressMessageSelector("/" + DISCONNECT);
     OSCMessageListener disconnectListener = new OSCMessageListener() {
         @Override
         public void acceptMessage(OSCMessageEvent event) {
