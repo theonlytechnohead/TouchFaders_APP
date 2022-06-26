@@ -116,8 +116,9 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
 
 //            connectionService.addListener(new OSCPatternAddressMessageSelector("/tes?/*"), event -> Log.i("OSC", "Got OSC!"));
             connectionService.addListener(sendPattern, sendListener);
-            connectionService.addListener(mutePattern, muteListener);
+            connectionService.addListener(sendMutePattern, sendMuteListener);
             connectionService.addListener(labelPattern, labelListener);
+            connectionService.addListener(channelMutePattern, channelMuteListener);
             connectionService.addListener(patchPattern, patchListener);
             connectionService.addListener(colourPattern, colourListener);
             connectionService.addListener(disconnectPattern, disconnectListener);
@@ -139,8 +140,9 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
             connectionService.stopListening();
 //            connectionService.removeListener(new OSCPatternAddressMessageSelector("/tes?/*"), event -> Log.i("OSC", "Got OSC!"));
             connectionService.removeListener(sendPattern, sendListener);
-            connectionService.removeListener(mutePattern, muteListener);
+            connectionService.removeListener(sendMutePattern, sendMuteListener);
             connectionService.removeListener(labelPattern, labelListener);
+            connectionService.removeListener(channelMutePattern, channelMuteListener);
             connectionService.removeListener(patchPattern, patchListener);
             connectionService.removeListener(colourPattern, colourListener);
             connectionService.removeListener(disconnectPattern, disconnectListener);
@@ -158,22 +160,23 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
                 if (0 <= channelIndex && channelIndex < adapter.getItemCount()) {
                     handler.post(() -> adapter.setFaderLevel(channelIndex, (int) event.getMessage().getArguments().get(0)));
                 }
-            } else if (event.getMessage().getArguments().size() == 5) {
+            } else if (event.getMessage().getArguments().size() == 6) {
                 if (0 <= channelIndex && channelIndex < adapter.getItemCount()) {
                     Handler handler = new Handler(Looper.getMainLooper());
                     int level = (int) event.getMessage().getArguments().get(0);
-                    boolean muted = (boolean) event.getMessage().getArguments().get(1);
+                    boolean sendMuted = (boolean) event.getMessage().getArguments().get(1);
                     String name = (String) event.getMessage().getArguments().get(2);
-                    String patch = (String) event.getMessage().getArguments().get(3);
-                    int colourIndex = (int) event.getMessage().getArguments().get(4);
-                    handler.post(() -> adapter.setChannelStrip(channelIndex, level, muted, name, patch, colourIndex));
+                    boolean channelMuted =(boolean) event.getMessage().getArguments().get(3);
+                    String patch = (String) event.getMessage().getArguments().get(4);
+                    int colourIndex = (int) event.getMessage().getArguments().get(5);
+                    handler.post(() -> adapter.setChannelStrip(channelIndex, level, sendMuted, name, channelMuted, patch, colourIndex));
                 }
             }
         }
     };
 
-    OSCPatternAddressMessageSelector mutePattern = new OSCPatternAddressMessageSelector("/" + MIX + "*/" + CHANNEL + "*/" + MUTE);
-    OSCMessageListener muteListener = new OSCMessageListener() {
+    OSCPatternAddressMessageSelector sendMutePattern = new OSCPatternAddressMessageSelector("/" + MIX + "*/" + CHANNEL + "*/" + MUTE);
+    OSCMessageListener sendMuteListener = new OSCMessageListener() {
         @Override
         public void acceptMessage(OSCMessageEvent event) {
             String[] segments = event.getMessage().getAddress().split("/");
@@ -181,7 +184,7 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
             if (0 <= channelIndex && channelIndex < adapter.getItemCount()) {
                 Handler handler = new Handler(Looper.getMainLooper());
                 boolean muted = (int) event.getMessage().getArguments().get(0) == 1;
-                handler.post(() -> adapter.setChannelMute(channelIndex, muted));
+                handler.post(() -> adapter.setSendMute(channelIndex, muted));
             }
         }
     };
@@ -195,6 +198,20 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
             if (0 <= channelIndex && channelIndex < adapter.getItemCount()) {
                 Handler handler = new Handler(Looper.getMainLooper());
                 handler.post(() -> adapter.setChannelName(channelIndex, (String) event.getMessage().getArguments().get(0)));
+            }
+        }
+    };
+
+    OSCPatternAddressMessageSelector channelMutePattern = new OSCPatternAddressMessageSelector("/" + CHANNEL + "*/" + MUTE);
+    OSCMessageListener channelMuteListener = new OSCMessageListener() {
+        @Override
+        public void acceptMessage(OSCMessageEvent event) {
+            String[] segments = event.getMessage().getAddress().split("/");
+            int channelIndex = Integer.parseInt(segments[1].replaceAll("\\D+", "")) - 1; // extract only digits via RegEx
+            if (0 <= channelIndex && channelIndex < adapter.getItemCount()) {
+                Handler handler = new Handler(Looper.getMainLooper());
+                boolean muted = (boolean) event.getMessage().getArguments().get(0);
+                handler.post(() -> adapter.setChannelMute(channelIndex, muted));
             }
         }
     };
