@@ -51,9 +51,9 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
     public final String CONNECT = "test";
     public final String DISCONNECT = "disconnect";
 
-    public final String CHANNEL = "fader";
+    public final String CHANNEL = "channel";
     public final String MIX = "mix";
-    public final String NAME = "label";
+    public final String NAME = "name";
     public final String PATCH = "patch";
     public final String MUTE = "mute";
 
@@ -309,6 +309,11 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
             touchHelper = new ItemTouchHelper(callback);
             touchHelper.attachToRecyclerView(recyclerView);
             recyclerView.setAdapter(adapter);
+            for (int i = 0; i < adapter.getItemCount(); i++) {
+                adapter.setFaderLevel(i, 623);
+                adapter.setChannelName(i, "CH " + (i + 1));
+                adapter.setChannelPatchIn(i, "IN " + (i + 1));
+            }
         }
     }
 

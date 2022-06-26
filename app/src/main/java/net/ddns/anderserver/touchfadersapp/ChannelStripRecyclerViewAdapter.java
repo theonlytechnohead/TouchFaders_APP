@@ -49,10 +49,10 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
             ChannelStrip channel = new ChannelStrip();
             channel.index = i;
 
-            channel.level = 623;
+            channel.level = 0;
             channel.muted = false;
-            channel.name = "CH " + (i + 1);
-            channel.patch = "IN " + (i + 1);
+            channel.name = "";
+            channel.patch = "";
             channel.colour = colourArray[channelColours.get(i)];
             channel.colourLighter = colourArrayLighter[channelColours.get(i)];
 
