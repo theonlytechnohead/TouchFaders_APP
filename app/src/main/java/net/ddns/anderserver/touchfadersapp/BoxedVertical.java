@@ -365,6 +365,10 @@ public class BoxedVertical extends View {
         this.enabled = enabled;
     }
 
+    public void setTouchDisabled(boolean disabled) {
+        this.touchDisabled = disabled;
+    }
+
     public int getMax() {
         return max;
     }

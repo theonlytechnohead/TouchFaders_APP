@@ -84,6 +84,12 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
 
         };
          */
+        binding.helpButton.setOnClickListener {
+            val intent = Intent(it.context, HelpActivity::class.java)
+            intent.putExtra(EXTRA_DEMO_MODE, true)
+            startActivity(intent)
+        }
+
         binding.demoButton.setOnClickListener {
             val intent = Intent(it.context, MainActivity::class.java)
             intent.putExtra(EXTRA_DEMO_MODE, true)

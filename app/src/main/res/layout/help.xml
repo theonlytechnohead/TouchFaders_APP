@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:id="@+id/fullscreen_frame"
+	android:layout_width="match_parent"
+
+	android:layout_height="match_parent"
+	android:background="?attr/fullscreenBackgroundColor"
+	android:orientation="vertical"
+	android:theme="@style/ThemeOverlay.TouchFaders.FullscreenContainer"
+	tools:context=".MainActivity">
+
+
+	<androidx.constraintlayout.widget.ConstraintLayout
+		android:id="@+id/mix_meter_layout"
+		android:layout_width="200dp"
+		android:layout_height="0dp"
+		android:background="@color/dark_grey"
+		app:layout_constraintBottom_toBottomOf="parent"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toTopOf="parent">
+
+		<com.google.android.material.button.MaterialButton
+			android:id="@+id/hide_button"
+			android:layout_width="35dp"
+			android:layout_height="0dp"
+			android:backgroundTint="@color/dark_grey"
+			android:insetLeft="0dp"
+			android:insetTop="0dp"
+			android:insetRight="0dp"
+			android:insetBottom="0dp"
+			android:minWidth="0dp"
+			android:minHeight="0dp"
+			android:padding="0dp"
+			android:stateListAnimator="@null"
+			app:icon="@android:drawable/ic_menu_view"
+			app:iconGravity="textStart"
+			app:iconPadding="0dp"
+			app:layout_constraintDimensionRatio="1:1"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toTopOf="parent" />
+
+		<net.ddns.anderserver.touchfadersapp.BoxedVertical
+			android:id="@+id/mixMeter"
+			android:layout_width="35dp"
+			android:layout_height="0dp"
+			app:gradientEnd="@color/meter_end"
+			app:gradientStart="@color/meter_start"
+			app:layout_constraintBottom_toBottomOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toBottomOf="@+id/hide_button"
+			app:max="127"
+			app:meter="true"
+			app:startValue="103"
+			app:textEnabled="false"
+			app:touchDisabled="true" />
+
+		<TextView
+			android:id="@+id/eyeHelp"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:text="Use the eye to hide channels that are set to -Inf volume."
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toEndOf="@+id/hide_button"
+			app:layout_constraintTop_toTopOf="parent" />
+
+		<TextView
+			android:id="@+id/meterHelp"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:text="This meter will show the current output volume."
+			app:layout_constraintBottom_toBottomOf="parent"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toEndOf="@+id/mixMeter"
+			app:layout_constraintTop_toTopOf="parent" />
+
+	</androidx.constraintlayout.widget.ConstraintLayout>
+
+	<TextView
+		android:id="@+id/faderHelp"
+		android:layout_width="0dp"
+		android:layout_height="wrap_content"
+		android:text="Use the fader to adjust the volume of that channel."
+		app:layout_constraintBottom_toBottomOf="parent"
+		app:layout_constraintEnd_toStartOf="@+id/faderRecyclerView"
+		app:layout_constraintStart_toEndOf="@+id/mix_meter_layout"
+		app:layout_constraintTop_toTopOf="parent" />
+
+	<TextView
+		android:id="@+id/touchHelp"
+		android:layout_width="0dp"
+		android:layout_height="55dp"
+		android:text="Double-tap to (un)mute, touch and hold to change order."
+		app:layout_constraintBottom_toBottomOf="parent"
+		app:layout_constraintStart_toEndOf="@id/mix_meter_layout"
+		app:layout_constraintEnd_toStartOf="@+id/faderRecyclerView" />
+
+	<androidx.recyclerview.widget.RecyclerView
+		android:id="@+id/faderRecyclerView"
+		android:layout_width="wrap_content"
+		android:layout_height="0dp"
+		android:orientation="horizontal"
+		app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+		app:layout_constraintBottom_toBottomOf="parent"
+		app:layout_constraintStart_toEndOf="@id/faderHelp"
+		app:layout_constraintEnd_toStartOf="@+id/channelHelp"
+		app:layout_constraintTop_toTopOf="parent"
+		tools:itemCount="1"
+		tools:listitem="@layout/recyclerview_channel_strip" />
+
+	<TextView
+		android:id="@+id/channelHelp"
+		android:layout_width="0dp"
+		android:layout_height="55dp"
+		android:text="All the information for a channel is displayed here."
+		app:layout_constraintBottom_toBottomOf="parent"
+		app:layout_constraintStart_toEndOf="@id/faderRecyclerView"
+		app:layout_constraintEnd_toStartOf="@+id/mix_info_layout" />
+
+	<androidx.constraintlayout.widget.ConstraintLayout
+		android:id="@+id/mix_info_layout"
+		android:layout_width="200dp"
+		android:layout_height="0dp"
+		app:layout_constraintBottom_toBottomOf="parent"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintTop_toTopOf="parent">
+
+		<com.google.android.material.button.MaterialButton
+			android:id="@+id/back_button"
+			android:layout_width="35dp"
+			android:layout_height="0dp"
+			app:layout_constraintDimensionRatio="1:1"
+			app:iconGravity="textStart"
+			app:iconPadding="0dp"
+			android:padding="0dp"
+			android:minWidth="0dp"
+			android:minHeight="0dp"
+			android:insetTop="0dp"
+			android:insetLeft="0dp"
+			android:insetRight="0dp"
+			android:insetBottom="0dp"
+			android:backgroundTint="@color/red"
+			android:stateListAnimator="@null"
+			app:icon="@android:drawable/ic_menu_close_clear_cancel"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintTop_toTopOf="parent"/>
+
+		<TextView
+			android:id="@+id/mix_name"
+			android:layout_width="35dp"
+			android:layout_height="0dp"
+			android:fontFamily="monospace"
+			android:gravity="center"
+			android:textAlignment="center"
+			android:textAllCaps="true"
+			android:textColor="@color/white"
+			android:textSize="35sp"
+			app:layout_constraintBottom_toTopOf="@+id/mix_number"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintTop_toBottomOf="@+id/back_button"
+			tools:text="MIX \n1" />
+
+		<TextView
+			android:id="@+id/mix_number"
+			android:layout_width="35dp"
+			android:layout_height="wrap_content"
+			android:fontFamily="monospace"
+			android:gravity="center"
+			android:includeFontPadding="false"
+			android:textAlignment="center"
+			android:textAllCaps="true"
+			android:textColor="@color/light_grey"
+			android:textSize="50sp"
+			app:layout_constraintBottom_toBottomOf="parent"
+			app:layout_constraintEnd_toEndOf="parent"
+			tools:text="1" />
+
+		<TextView
+			android:id="@+id/exitHelp"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:text="Use the red button to go back."
+			app:layout_constraintEnd_toStartOf="@+id/back_button"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toTopOf="parent" />
+
+		<TextView
+			android:id="@+id/mixNameHelp"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:text="The name of the current mix is displayed here."
+			app:layout_constraintBottom_toBottomOf="@+id/mix_name"
+			app:layout_constraintEnd_toStartOf="@+id/mix_name"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toTopOf="@+id/mix_name" />
+
+		<TextView
+			android:id="@+id/mixNunmberHelp"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:text="The number of the current mix is displayed here."
+			app:layout_constraintBottom_toBottomOf="parent"
+			app:layout_constraintEnd_toStartOf="@+id/mix_number"
+			app:layout_constraintStart_toStartOf="parent" />
+
+	</androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
