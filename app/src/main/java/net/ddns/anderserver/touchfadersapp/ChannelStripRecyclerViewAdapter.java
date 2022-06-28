@@ -2,7 +2,6 @@ package net.ddns.anderserver.touchfadersapp;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -92,6 +91,8 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
     // https://stackoverflow.com/questions/5300962/getviewtypecount-and-getitemviewtype-methods-of-arrayadapter
     @Override
     public int getItemViewType(int position) {
+        ChannelStrip channel = channels.get(position);
+        if (channel.groupIndex != -1) return channel.groupIndex + 1;
         return 1;
     }
 
@@ -131,10 +132,13 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
         setBackgroundColour(holder);
     }
 
-    private void setBackgroundColour (ChannelStripViewHolder holder) {
+    private void setBackgroundColour(ChannelStripViewHolder holder) {
         ChannelStrip channelStrip = channels.get(holder.getAdapterPosition());
         if (channelStrip.group) {
             holder.faderBackground.setBackgroundColor(channelStrip.colourDarker);
+        } else if (channelStrip.groupIndex != -1) {
+            ChannelStrip group = getGroup(channelStrip.groupIndex);
+            holder.faderBackground.setBackgroundColor(group.colourDarker);
         } else {
             int position = holder.getAdapterPosition();
             position = position - groupsBefore(position);
@@ -239,8 +243,7 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
                         ChannelStrip channelStrip = channels.get(holder.getAdapterPosition());
                         if (channelStrip.group) {
                             // TODO: trigger edit group
-                            Log.i("GRP", "onSingleTapUp: " + channelStrip.index);
-                            GroupEditDialog editDialog = new GroupEditDialog(channelStrip.index, channelStrip.name, channelStrip.colourIndex);
+                            GroupEditDialog editDialog = new GroupEditDialog(channelStrip.index, channelStrip.name, channelStrip.colourIndex, ungroupedChannels());
                             editDialog.setResultListener((dialogInterface, i) -> {
                                 channelStrip.name = editDialog.name;
                                 channelStrip.colourIndex = editDialog.colour;
@@ -248,8 +251,9 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
                                 channelStrip.colourLighter = colourArrayLighter[channelStrip.colourIndex];
                                 channelStrip.colourDarker = colourArrayDarker[channelStrip.colourIndex];
                                 notifyItemChanged(holder.getAdapterPosition());
+                                updateGroup(-channelStrip.index, editDialog.groupedChannels);
                             });
-                            FragmentManager fragmentManager = ((FragmentActivity)context).getSupportFragmentManager();
+                            FragmentManager fragmentManager = ((FragmentActivity) context).getSupportFragmentManager();
                             editDialog.show(fragmentManager, "group edit dialog");
                         }
                         return super.onSingleTapConfirmed(e);
@@ -329,6 +333,30 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
         return output;
     }
 
+    private ArrayList<ChannelStrip> ungroupedChannels() {
+        ArrayList<ChannelStrip> channelStrips = new ArrayList<>();
+        for (ChannelStrip channel : channels) {
+            if (!channel.group && channel.groupIndex == -1) {
+                channelStrips.add(channel);
+            }
+        }
+        return channelStrips;
+    }
+
+    private void updateGroup(int group, ArrayList<ChannelStrip> groupedChannels) {
+        for (ChannelStrip c : groupedChannels) {
+            Log.i("GRP", "updateGroup " + group + ": " + c.index);
+            int channelIndex = getIndex(c.index);
+            if (channelIndex < 0) {
+                Objects.requireNonNull(hiddenChannels.get(c.index)).groupIndex = group;
+            } else {
+                ChannelStrip channel = channels.get(channelIndex);
+                channel.groupIndex = group;
+                notifyItemChanged(channelIndex);
+            }
+        }
+    }
+
     int getIndex(int channelIndex) {
         if (hiddenChannels.containsKey(channelIndex)) {
             return -channelIndex;
@@ -339,6 +367,21 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
             }
         }
         return 0;
+    }
+
+    ChannelStrip getGroup(int group) {
+        for (ChannelStrip channel : channels) {
+            if (channel.index == -group) {
+                return channel;
+            }
+        }
+        for (Map.Entry<Integer, ChannelStrip> entry : hiddenChannels.entrySet()) {
+            ChannelStrip channel = entry.getValue();
+            if (channel.index == -group) {
+                return channel;
+            }
+        }
+        return null;
     }
 
     void addGroup() {
@@ -359,7 +402,7 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
         notifyItemInserted(0);
     }
 
-    void setChannelStrip (int index, int level, boolean sendMuted, String name, boolean channelMuted, String patch, int colourIndex) {
+    void setChannelStrip(int index, int level, boolean sendMuted, String name, boolean channelMuted, String patch, int colourIndex) {
         int channelIndex = getIndex(index);
         if (channelIndex < 0) {
             Objects.requireNonNull(hiddenChannels.get(index)).level = level;

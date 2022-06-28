@@ -15,5 +15,6 @@ public class ChannelStrip {
     public int colourDarker;
 
     public boolean group = false;
+    public int groupIndex = -1;
 
 }
