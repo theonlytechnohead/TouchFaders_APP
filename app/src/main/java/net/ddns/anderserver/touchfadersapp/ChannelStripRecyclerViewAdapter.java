@@ -2,8 +2,10 @@ package net.ddns.anderserver.touchfadersapp;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -13,6 +15,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -38,15 +42,19 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
 
     int[] colourArray;
     int[] colourArrayLighter;
+    int[] colourArrayDarker;
     int darkGreyColour;
     int greyColour;
     int whiteColour;
+
+    int groups = 0;
 
     public ChannelStripRecyclerViewAdapter(ItemMoveCallback.StartDragListener startDragListener, Context context, int numChannels, HashMap<Integer, Integer> channelLayer, ArrayList<Integer> channelColours, float width) {
         this.context = context;
         this.startDragListener = startDragListener;
         colourArray = context.getResources().getIntArray(R.array.mixer_colours);
         colourArrayLighter = context.getResources().getIntArray(R.array.mixer_colours_lighter);
+        colourArrayDarker = context.getResources().getIntArray(R.array.mixer_colours_darker);
         darkGreyColour = context.getColor(R.color.dark_grey);
         greyColour = context.getColor(R.color.grey);
         whiteColour = context.getColor(R.color.white);
@@ -61,8 +69,10 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
             channel.sendMuted = false;
             channel.name = "";
             channel.patch = "";
-            channel.colour = colourArray[channelColours.get(i)];
-            channel.colourLighter = colourArrayLighter[channelColours.get(i)];
+            channel.colourIndex = channelColours.get(i);
+            channel.colour = colourArray[channel.colourIndex];
+            channel.colourLighter = colourArrayLighter[channel.colourIndex];
+            channel.colourDarker = colourArrayDarker[channel.colourIndex];
 
             channelLayout.put(channelLayer.getOrDefault(i, i), channel);
         }
@@ -99,8 +109,12 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
         ViewGroup.LayoutParams faderParams = holder.fader.getLayoutParams();
         faderParams.width = pixels;
         holder.fader.setLayoutParams(faderParams);
-        String number = String.valueOf(channelStrip.index + 1);
-        holder.channelNumber.setText(number);
+        if (channelStrip.index < 0) {
+            holder.channelNumber.setVisibility(View.INVISIBLE);
+        } else {
+            String number = String.valueOf(channelStrip.index + 1);
+            holder.channelNumber.setText(number);
+        }
         holder.channelName.setText(channelStrip.name);
         holder.channelPatch.setText(channelStrip.patch);
         holder.channelName.setBackgroundColor(channelStrip.colour);
@@ -110,19 +124,30 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
             holder.channelBackground.setBackgroundColor(darkGreyColour);
         } else {
             holder.channelNumber.setTextColor(channelStrip.colour);
-            holder.channelPatch.setTextColor(channelStrip.colour);
+            holder.channelPatch.setTextColor(channelStrip.colourDarker);
             holder.channelBackground.setBackgroundColor(channelStrip.colourLighter);
         }
-        if ((holder.getAdapterPosition() / 8) % 2 == 0) {
-            if (holder.getAdapterPosition() % 2 == 0)
-                holder.faderBackground.setBackgroundColor(context.getColor(R.color.fader_light_even));
-            else
-                holder.faderBackground.setBackgroundColor(context.getColor(R.color.fader_light_odd));
+        setBackgroundColour(holder);
+    }
+
+    private void setBackgroundColour (ChannelStripViewHolder holder) {
+        ChannelStrip channelStrip = channels.get(holder.getAdapterPosition());
+        if (channelStrip.group) {
+            holder.faderBackground.setBackgroundColor(channelStrip.colourDarker);
         } else {
-            if (holder.getAdapterPosition() % 2 == 0)
-                holder.faderBackground.setBackgroundColor(context.getColor(R.color.fader_dark_even));
-            else
-                holder.faderBackground.setBackgroundColor(context.getColor(R.color.fader_dark_odd));
+            int position = holder.getAdapterPosition();
+            position = position - groupsBefore(position);
+            if ((position / 8) % 2 == 0) {
+                if (position % 2 == 0)
+                    holder.faderBackground.setBackgroundColor(context.getColor(R.color.fader_light_even));
+                else
+                    holder.faderBackground.setBackgroundColor(context.getColor(R.color.fader_light_odd));
+            } else {
+                if (position % 2 == 0)
+                    holder.faderBackground.setBackgroundColor(context.getColor(R.color.fader_dark_even));
+                else
+                    holder.faderBackground.setBackgroundColor(context.getColor(R.color.fader_dark_odd));
+            }
         }
     }
 
@@ -160,17 +185,7 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
 
     @Override
     public void onChannelClear(ChannelStripViewHolder channelStripViewHolder) {
-        if ((channelStripViewHolder.getAdapterPosition() / 8) % 2 == 0) {
-            if (channelStripViewHolder.getAdapterPosition() % 2 == 0)
-                channelStripViewHolder.faderBackground.setBackgroundColor(context.getColor(R.color.fader_light_even));
-            else
-                channelStripViewHolder.faderBackground.setBackgroundColor(context.getColor(R.color.fader_light_odd));
-        } else {
-            if (channelStripViewHolder.getAdapterPosition() % 2 == 0)
-                channelStripViewHolder.faderBackground.setBackgroundColor(context.getColor(R.color.fader_dark_even));
-            else
-                channelStripViewHolder.faderBackground.setBackgroundColor(context.getColor(R.color.fader_dark_odd));
-        }
+        setBackgroundColour(channelStripViewHolder);
     }
 
     public class ChannelStripViewHolder extends RecyclerView.ViewHolder implements ChannelStripRecyclerViewAdapter.FaderValueChangedListener {
@@ -193,7 +208,9 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
             fader.setOnBoxedPointsChangeListener((boxedPoints, points) -> {
                 int index = channels.get(holder.getAdapterPosition()).index;
                 channels.get(holder.getAdapterPosition()).level = points;
-                faderValueChangedListener.onValueChanged(boxedPoints.getRootView(), index, boxedPoints, points);
+                if (!channels.get(holder.getAdapterPosition()).group)
+                    faderValueChangedListener.onValueChanged(boxedPoints.getRootView(), index, boxedPoints, points);
+                // TODO: update sub-channels
             });
             channelBackground.setOnTouchListener(new View.OnTouchListener() {
                 private final GestureDetector gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
@@ -204,7 +221,9 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
                         channels.get(holder.getAdapterPosition()).sendMuted = !channelStrip.sendMuted;
                         fader.setMute(channelStrip.sendMuted);
                         notifyItemChanged(holder.getAdapterPosition());
-                        channelMuteListener.onChannelMuteChange(itemView, index, channelStrip.sendMuted);
+                        if (!channelStrip.group)
+                            channelMuteListener.onChannelMuteChange(itemView, index, channelStrip.sendMuted);
+                        // TODO: mute sub-channels
                         return super.onDoubleTap(e);
                     }
 
@@ -212,6 +231,27 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
                     public void onLongPress(MotionEvent e) {
                         startDragListener.requestDrag(holder);
                         super.onLongPress(e);
+                    }
+
+                    @Override
+                    public boolean onSingleTapConfirmed(MotionEvent e) {
+                        ChannelStrip channelStrip = channels.get(holder.getAdapterPosition());
+                        if (channelStrip.group) {
+                            // TODO: trigger edit group
+                            Log.i("GRP", "onSingleTapUp: " + channelStrip.index);
+                            GroupEditDialog editDialog = new GroupEditDialog(channelStrip.index, channelStrip.name, channelStrip.colourIndex);
+                            editDialog.setResultListener((dialogInterface, i) -> {
+                                channelStrip.name = editDialog.name;
+                                channelStrip.colourIndex = editDialog.colour;
+                                channelStrip.colour = colourArray[channelStrip.colourIndex];
+                                channelStrip.colourLighter = colourArrayLighter[channelStrip.colourIndex];
+                                channelStrip.colourDarker = colourArrayDarker[channelStrip.colourIndex];
+                                notifyItemChanged(holder.getAdapterPosition());
+                            });
+                            FragmentManager fragmentManager = ((FragmentActivity)context).getSupportFragmentManager();
+                            editDialog.show(fragmentManager, "group edit dialog");
+                        }
+                        return super.onSingleTapConfirmed(e);
                     }
                 });
 
@@ -256,6 +296,10 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
             }
         }
 
+        refreshAllItems();
+    }
+
+    void refreshAllItems() {
         Handler handler = new Handler(Looper.getMainLooper());
         Executors.newSingleThreadExecutor().execute(() -> {
             try {
@@ -275,6 +319,15 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
         });
     }
 
+    private int groupsBefore(int channelIndex) {
+        int output = 0;
+        for (int i = 0; i < channelIndex; i++) {
+            if (channels.get(i).group)
+                output++;
+        }
+        return output;
+    }
+
     int getIndex(int channelIndex) {
         if (hiddenChannels.containsKey(channelIndex)) {
             return -channelIndex;
@@ -285,6 +338,24 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
             }
         }
         return 0;
+    }
+
+    void addGroup() {
+        groups++;
+        ChannelStrip channel = new ChannelStrip();
+        channel.index = -groups;
+
+        channel.level = 823;
+        channel.sendMuted = false;
+        channel.name = "GRP " + groups;
+        channel.patch = "";
+        channel.colourIndex = groups % colourArray.length;
+        channel.colour = colourArray[channel.colourIndex];
+        channel.colourLighter = colourArrayLighter[channel.colourIndex];
+        channel.colourDarker = colourArrayDarker[channel.colourIndex];
+        channel.group = true;
+        channels.add(0, channel);
+        notifyItemInserted(0);
     }
 
     void setChannelStrip (int index, int level, boolean sendMuted, String name, boolean channelMuted, String patch, int colourIndex) {
@@ -380,11 +451,13 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
         ArrayList<ChannelStrip> allChannels = channels;
         for (Map.Entry<Integer, ChannelStrip> entry : hiddenChannels.entrySet()) {
             ChannelStrip channelStrip = entry.getValue();
-            allChannels.add(entry.getKey(), channelStrip);
+            if (!channelStrip.group)
+                allChannels.add(entry.getKey(), channelStrip);
         }
         for (int i = 0; i < allChannels.size(); i++) {
             ChannelStrip channelStrip = allChannels.get(i);
-            channelMap.put(channelStrip.index, i);
+            if (!channelStrip.group)
+                channelMap.put(channelStrip.index, i);
         }
         return channelMap;
     }

@@ -60,7 +60,6 @@ public class HelpActivity extends AppCompatActivity implements ItemMoveCallback.
         setContentView(R.layout.help);
 
         mixMeter = findViewById(R.id.mixMeter);
-        mixMeter.setValue(100);
         mixMeter.setTouchDisabled(true);
 
         mixInfo = findViewById(R.id.mix_info_layout);
@@ -134,6 +133,14 @@ public class HelpActivity extends AppCompatActivity implements ItemMoveCallback.
                 view.setBackgroundColor(getColor(R.color.dark_grey));
             }
         }));
+
+        findViewById(R.id.add_group_button).setOnClickListener(view -> {
+            adapter.addGroup();
+            RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
+            if (layoutManager != null) {
+                layoutManager.scrollToPosition(0);
+            }
+        });
 
         findViewById(R.id.back_button).setOnClickListener((view) -> finish());
 

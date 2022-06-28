@@ -9,7 +9,11 @@ public class ChannelStrip {
     public String name;
     public boolean channelMuted;
     public String patch;
+    public int colourIndex;
     public int colour;
     public int colourLighter;
+    public int colourDarker;
+
+    public boolean group = false;
 
 }

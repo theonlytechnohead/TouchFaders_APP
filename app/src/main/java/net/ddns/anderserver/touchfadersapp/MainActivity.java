@@ -382,10 +382,18 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
             }
         }));
 
+        findViewById(R.id.add_group_button).setOnClickListener(view -> {
+            adapter.addGroup();
+            RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
+            if (layoutManager != null) {
+                layoutManager.scrollToPosition(0);
+            }
+        });
+
         findViewById(R.id.back_button).setOnClickListener((view) -> finish());
 
-        runUDP = true;
         if (!demo) {
+            runUDP = true;
             if (udpListenerThread.getState() != Thread.State.NEW) {
                 udpListenerThread.start();
             }

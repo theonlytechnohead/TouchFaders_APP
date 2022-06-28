@@ -12,6 +12,17 @@
     <string name="demo_button">DEMO</string>
     <string name="reset_layout_button">RESET CUSTOM FADER LAYOUT</string>
 
+    <string-array name="colours_array">
+        <item>Blue</item>
+        <item>Orange</item>
+        <item>Gold</item>
+        <item>Purple</item>
+        <item>Cyan</item>
+        <item>Pink</item>
+        <item>Brown</item>
+        <item>Green</item>
+    </string-array>
+
 
     <string-array name="fader_db">
         <item>-Inf</item>

@@ -48,7 +48,7 @@
 			android:layout_height="0dp"
 			app:gradientEnd="@color/meter_end"
 			app:gradientStart="@color/meter_start"
-			app:layout_constraintBottom_toBottomOf="parent"
+			app:layout_constraintBottom_toTopOf="@id/add_group_button"
 			app:layout_constraintStart_toStartOf="parent"
 			app:layout_constraintTop_toBottomOf="@+id/hide_button"
 			app:max="127"
@@ -56,6 +56,26 @@
 			app:startValue="103"
 			app:textEnabled="false"
 			app:touchDisabled="true" />
+
+		<com.google.android.material.button.MaterialButton
+			android:id="@+id/add_group_button"
+			android:layout_width="35dp"
+			android:layout_height="0dp"
+			android:backgroundTint="@color/dark_grey"
+			android:insetLeft="0dp"
+			android:insetTop="0dp"
+			android:insetRight="0dp"
+			android:insetBottom="0dp"
+			android:minWidth="0dp"
+			android:minHeight="0dp"
+			android:padding="0dp"
+			android:stateListAnimator="@null"
+			app:icon="@android:drawable/ic_menu_add"
+			app:iconGravity="textStart"
+			app:iconPadding="0dp"
+			app:layout_constraintBottom_toBottomOf="parent"
+			app:layout_constraintDimensionRatio="1:1"
+			app:layout_constraintStart_toStartOf="parent" />
 
 		<TextView
 			android:id="@+id/eyeHelp"
@@ -75,6 +95,15 @@
 			app:layout_constraintEnd_toEndOf="parent"
 			app:layout_constraintStart_toEndOf="@+id/mixMeter"
 			app:layout_constraintTop_toTopOf="parent" />
+
+		<TextView
+			android:id="@+id/groupHelp"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:text="Use this to add groups."
+			app:layout_constraintBottom_toBottomOf="parent"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toEndOf="@+id/mixMeter" />
 
 	</androidx.constraintlayout.widget.ConstraintLayout>
 
