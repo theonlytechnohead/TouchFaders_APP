@@ -109,9 +109,10 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
         ViewGroup.LayoutParams faderParams = holder.fader.getLayoutParams();
         faderParams.width = pixels;
         holder.fader.setLayoutParams(faderParams);
-        if (channelStrip.index < 0) {
+        if (channelStrip.group) {
             holder.channelNumber.setVisibility(View.INVISIBLE);
         } else {
+            holder.channelNumber.setVisibility(View.VISIBLE);
             String number = String.valueOf(channelStrip.index + 1);
             holder.channelNumber.setText(number);
         }
