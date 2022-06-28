@@ -28,32 +28,23 @@ public class GroupEditDialog extends AppCompatDialogFragment {
     int colour;
     ArrayList<ChannelStrip> ungroupedChannels;
     ArrayList<ChannelStrip> groupedChannels;
+    ArrayList<ChannelStrip> addedChannels;
+    ArrayList<ChannelStrip> removedChannels;
 
     DialogInterface.OnClickListener resultListener;
 
-    public GroupEditDialog(int index, String name, int colour, ArrayList<ChannelStrip> ungroupedChannels) {
+    public GroupEditDialog(int index, String name, int colour, ArrayList<ChannelStrip> ungroupedChannels, ArrayList<ChannelStrip> groupedChannels) {
         this.index = -index;
         this.name = name;
         this.colour = colour;
-        this.ungroupedChannels = ungroupedChannels;
-    }
-
-    public GroupEditDialog(ArrayList<ChannelStrip> ungroupedChannels) {
-        this.ungroupedChannels = ungroupedChannels;
-        groupedChannels = new ArrayList<>();
+        this.ungroupedChannels = new ArrayList<>(ungroupedChannels);
+        this.groupedChannels = new ArrayList<>(groupedChannels);
+        addedChannels = new ArrayList<>();
+        removedChannels = new ArrayList<>();
     }
 
     public void setResultListener(DialogInterface.OnClickListener resultListener) {
         this.resultListener = resultListener;
-    }
-
-    private CharSequence[] getUngroupedChannels() {
-        CharSequence[] channels = new CharSequence[ungroupedChannels.size()];
-        for (int i = 0; i < ungroupedChannels.size(); i++) {
-            ChannelStrip channel = ungroupedChannels.get(i);
-            channels[i] = "" + (channel.index + 1) + ": " + channel.name + " (" + channel.patch + ")";
-        }
-        return channels;
     }
 
     @NonNull
@@ -63,66 +54,84 @@ public class GroupEditDialog extends AppCompatDialogFragment {
         requireActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
-        if (groupedChannels == null) {
-            builder.setTitle("Edit group");
+        builder.setTitle("Edit " + name);
 
-            LayoutInflater inflater = requireActivity().getLayoutInflater();
-            View layout = inflater.inflate(R.layout.group_edit, null);
+        LayoutInflater inflater = requireActivity().getLayoutInflater();
+        View layout = inflater.inflate(R.layout.group_edit, null);
 
-            EditText groupName = layout.findViewById(R.id.group_name);
-            groupName.setText(name);
-            groupName.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
+        EditText groupName = layout.findViewById(R.id.group_name);
+        groupName.setText(name);
+        groupName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
 
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int start, int count, int after) {
+                name = charSequence.toString();
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
+        Spinner colourSelection = layout.findViewById(R.id.group_colour);
+        colourSelection.setSelection(colour);
+        colourSelection.setOnItemSelectedListener(new OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                colour = position;
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        Button editChannels = layout.findViewById(R.id.group_edit);
+        editChannels.setOnClickListener(view -> {
+            GroupSelectDialog childDialog = new GroupSelectDialog(index, name, ungroupedChannels, groupedChannels);
+            childDialog.setResultListener((dialogInterface, i) -> {
+                ArrayList<ChannelStrip> added = new ArrayList<>();
+                ArrayList<ChannelStrip> removed = new ArrayList<>();
+                for (ChannelStrip channel : this.ungroupedChannels) {
+                    if (childDialog.grouped.contains(channel)) {
+                        added.add(channel);
+                    }
                 }
-
-                @Override
-                public void onTextChanged(CharSequence charSequence, int start, int count, int after) {
-                    name = charSequence.toString();
+                for (ChannelStrip channel : this.groupedChannels) {
+                    if (!childDialog.grouped.contains(channel)) {
+                        removed.add(channel);
+                    }
                 }
-
-                @Override
-                public void afterTextChanged(Editable editable) {
-
+                this.groupedChannels.addAll(added);
+                for (ChannelStrip channel : added) {
+                    if (!addedChannels.contains(channel)) {
+                        addedChannels.add(channel);
+                        removedChannels.remove(channel);
+                    }
+                }
+                this.groupedChannels.removeAll(removed);
+                this.ungroupedChannels.addAll(removed);
+                for (ChannelStrip channel : removed) {
+                    if (!removedChannels.contains(channel)) {
+                        removedChannels.add(channel);
+                        addedChannels.remove(channel);
+                    }
                 }
             });
+            childDialog.show(requireActivity().getSupportFragmentManager(), "group channels dialog");
+        });
 
-            Spinner colourSelection = layout.findViewById(R.id.group_colour);
-            colourSelection.setSelection(colour);
-            colourSelection.setOnItemSelectedListener(new OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    colour = position;
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
-
-                }
-            });
-
-            Button editChannels = layout.findViewById(R.id.group_edit);
-            editChannels.setOnClickListener(view -> {
-                GroupEditDialog childDialog = new GroupEditDialog(ungroupedChannels);
-                childDialog.setResultListener((dialogInterface, i) -> this.groupedChannels = childDialog.groupedChannels);
-                childDialog.show(requireActivity().getSupportFragmentManager(), "group channels dialog");
-            });
-
-            builder.setView(layout);
-        } else {
-            builder.setTitle("Edit group channels");
-            builder.setMultiChoiceItems(getUngroupedChannels(), null, (dialogInterface, position, isChecked) -> {
-                if (isChecked) {
-                    groupedChannels.add(ungroupedChannels.get(position));
-                } else {
-                    groupedChannels.remove(ungroupedChannels.get(position));
-                }
-            });
-        }
+        builder.setView(layout);
 
         builder.setPositiveButton("Done", resultListener);
         builder.setNegativeButton("Cancel", null);
         return builder.create();
     }
 }
+

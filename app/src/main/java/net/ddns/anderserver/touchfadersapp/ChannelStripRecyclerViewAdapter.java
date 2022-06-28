@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -243,7 +242,7 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
                         ChannelStrip channelStrip = channels.get(holder.getAdapterPosition());
                         if (channelStrip.group) {
                             // TODO: trigger edit group
-                            GroupEditDialog editDialog = new GroupEditDialog(channelStrip.index, channelStrip.name, channelStrip.colourIndex, ungroupedChannels());
+                            GroupEditDialog editDialog = new GroupEditDialog(channelStrip.index, channelStrip.name, channelStrip.colourIndex, ungroupedChannels(), groupedChannels(channelStrip.index));
                             editDialog.setResultListener((dialogInterface, i) -> {
                                 channelStrip.name = editDialog.name;
                                 channelStrip.colourIndex = editDialog.colour;
@@ -251,7 +250,7 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
                                 channelStrip.colourLighter = colourArrayLighter[channelStrip.colourIndex];
                                 channelStrip.colourDarker = colourArrayDarker[channelStrip.colourIndex];
                                 notifyItemChanged(holder.getAdapterPosition());
-                                updateGroup(-channelStrip.index, editDialog.groupedChannels);
+                                updateGroup(-channelStrip.index, editDialog.addedChannels, editDialog.removedChannels);
                             });
                             FragmentManager fragmentManager = ((FragmentActivity) context).getSupportFragmentManager();
                             editDialog.show(fragmentManager, "group edit dialog");
@@ -343,15 +342,36 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Channe
         return channelStrips;
     }
 
-    private void updateGroup(int group, ArrayList<ChannelStrip> groupedChannels) {
-        for (ChannelStrip c : groupedChannels) {
-            Log.i("GRP", "updateGroup " + group + ": " + c.index);
+    private ArrayList<ChannelStrip> groupedChannels(int group) {
+        ArrayList<ChannelStrip> channelStrips = new ArrayList<>();
+        for (ChannelStrip channel : channels) {
+            if (!channel.group && channel.groupIndex == -group) {
+                channelStrips.add(channel);
+            }
+        }
+        return channelStrips;
+    }
+
+    private void updateGroup(int group, ArrayList<ChannelStrip> addedChannels, ArrayList<ChannelStrip> removedChannels) {
+        for (ChannelStrip c : addedChannels) {
             int channelIndex = getIndex(c.index);
             if (channelIndex < 0) {
-                Objects.requireNonNull(hiddenChannels.get(c.index)).groupIndex = group;
+                ChannelStrip channel = hiddenChannels.get(c.index);
+                if (channel != null) channel.groupIndex = group;
             } else {
                 ChannelStrip channel = channels.get(channelIndex);
                 channel.groupIndex = group;
+                notifyItemChanged(channelIndex);
+            }
+        }
+        for (ChannelStrip c : removedChannels) {
+            int channelIndex = getIndex(c.index);
+            if (channelIndex < 0) {
+                ChannelStrip channel = hiddenChannels.get(c.index);
+                if (channel != null) channel.groupIndex = -1;
+            } else {
+                ChannelStrip channel = channels.get(channelIndex);
+                channel.groupIndex = -1;
                 notifyItemChanged(channelIndex);
             }
         }
