@@ -57,7 +57,7 @@ public class GroupEditDialog extends AppCompatDialogFragment {
         super.onCreateDialog(savedInstanceState);
         requireActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity(), R.style.Theme_TouchFaders_Dialog);
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
         builder.setTitle("Edit " + name);
 
         LayoutInflater inflater = requireActivity().getLayoutInflater();

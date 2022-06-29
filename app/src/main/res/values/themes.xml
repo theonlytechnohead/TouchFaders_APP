@@ -17,6 +17,8 @@
 		<item name="android:textColor">@color/white</item>
 		<item name="android:textColorSecondary">@color/light_grey</item>
 		<item name="background">@color/background</item>
+
+		<item name="alertDialogTheme">@style/Theme.TouchFaders.Dialog</item>
 	</style>
 
 	<style name="Theme.TouchFaders.Dialog" parent="Theme.AppCompat.DayNight.Dialog.Alert">

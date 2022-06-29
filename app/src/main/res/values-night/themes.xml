@@ -12,6 +12,12 @@
 		<!-- Status bar color. -->
 		<item name="android:statusBarColor">?attr/colorAccent</item>
 		<!-- Customize your theme here. -->
+
+		<item name="alertDialogTheme">@style/Theme.TouchFaders.Dialog</item>
+	</style>
+
+	<style name="Theme.TouchFaders.Dialog" parent="Theme.AppCompat.DayNight.Dialog.Alert">
+		<item name="android:background">@color/black</item>
 	</style>
 
 	<style name="ThemeOverlay.TouchFaders.FullscreenContainer" parent="">
