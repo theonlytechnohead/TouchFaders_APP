@@ -55,7 +55,8 @@ public class HelpActivity extends AppCompatActivity implements ItemMoveCallback.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //BasicConfigurator.configure();
+        final View decorView = getWindow().getDecorView();
+        decorView.setOnSystemUiVisibilityChangeListener(i -> hideUI());
 
         setContentView(R.layout.help);
 
@@ -73,6 +74,23 @@ public class HelpActivity extends AppCompatActivity implements ItemMoveCallback.
         channelColours.add(0);
         currentMix = 1;
         mixColour = 1;
+    }
+
+    private void hideUI() {
+        // Making it fullscreen...
+        View frameLayout = findViewById(R.id.fullscreen_frame);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.hide();
+        }
+        frameLayout.setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LOW_PROFILE
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+        // Fullscreen done!
     }
 
     @Override
@@ -105,20 +123,7 @@ public class HelpActivity extends AppCompatActivity implements ItemMoveCallback.
     @Override
     protected void onResume() {
         super.onResume();
-        // Making it fullscreen...
-        View frameLayout = findViewById(R.id.fullscreen_frame);
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.hide();
-        }
-        frameLayout.setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_LOW_PROFILE
-                        | View.SYSTEM_UI_FLAG_FULLSCREEN
-                        | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
-        // Fullscreen done!
+        hideUI();
 
         mixInfo.setBackgroundColor(getResources().getIntArray(R.array.mixer_colours)[mixColour]);
         mixName.setText("MIX \n1");
@@ -145,6 +150,7 @@ public class HelpActivity extends AppCompatActivity implements ItemMoveCallback.
         findViewById(R.id.back_button).setOnClickListener((view) -> finish());
 
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
+            View frameLayout = findViewById(R.id.fullscreen_frame);
             frameLayout.addOnLayoutChangeListener((v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
                 DisplayCutout cutout = getWindow().getDecorView().getRootWindowInsets().getDisplayCutout();
                 ConstraintLayout meterInfo = findViewById(R.id.mix_meter_layout);
