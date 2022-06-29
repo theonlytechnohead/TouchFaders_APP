@@ -28,6 +28,7 @@ public class GroupEditDialog extends AppCompatDialogFragment {
     int colour;
     ArrayList<ChannelStrip> ungroupedChannels;
     ArrayList<ChannelStrip> groupedChannels;
+    ArrayList<ChannelStrip> allChannels;
     ArrayList<ChannelStrip> addedChannels;
     ArrayList<ChannelStrip> removedChannels;
 
@@ -39,6 +40,9 @@ public class GroupEditDialog extends AppCompatDialogFragment {
         this.colour = colour;
         this.ungroupedChannels = new ArrayList<>(ungroupedChannels);
         this.groupedChannels = new ArrayList<>(groupedChannels);
+        allChannels = new ArrayList<>();
+        allChannels.addAll(ungroupedChannels);
+        allChannels.addAll(groupedChannels);
         addedChannels = new ArrayList<>();
         removedChannels = new ArrayList<>();
     }
@@ -94,33 +98,44 @@ public class GroupEditDialog extends AppCompatDialogFragment {
 
         Button editChannels = layout.findViewById(R.id.group_edit);
         editChannels.setOnClickListener(view -> {
-            GroupSelectDialog childDialog = new GroupSelectDialog(index, name, ungroupedChannels, groupedChannels);
+            ArrayList<ChannelStrip> ungrouped = new ArrayList<>();
+            ungrouped.addAll(ungroupedChannels);
+            ungrouped.removeAll(addedChannels);
+            ungrouped.addAll(removedChannels);
+            ArrayList<ChannelStrip> grouped = new ArrayList<>();
+            grouped.addAll(groupedChannels);
+            grouped.addAll(addedChannels);
+            grouped.removeAll(removedChannels);
+            GroupSelectDialog childDialog = new GroupSelectDialog(index, name, ungrouped, grouped);
             childDialog.setResultListener((dialogInterface, i) -> {
-                ArrayList<ChannelStrip> added = new ArrayList<>();
-                ArrayList<ChannelStrip> removed = new ArrayList<>();
-                for (ChannelStrip channel : this.ungroupedChannels) {
-                    if (childDialog.grouped.contains(channel)) {
-                        added.add(channel);
+
+                // for each channel...
+                for (ChannelStrip channel : allChannels) {
+                    // if it was ungrouped...
+                    if (ungroupedChannels.contains(channel)) {
+                        // ... and is still ungrouped
+                        if (!childDialog.grouped.contains(channel)) {
+                            // do nothing (unmark from "added" just in case)
+                            addedChannels.remove(channel);
+                        }
+                        // if it is now grouped, mark it as "added"
+                        if (childDialog.grouped.contains(channel)) {
+                            addedChannels.add(channel);
+                            removedChannels.remove(channel);
+                        }
                     }
-                }
-                for (ChannelStrip channel : this.groupedChannels) {
-                    if (!childDialog.grouped.contains(channel)) {
-                        removed.add(channel);
-                    }
-                }
-                this.groupedChannels.addAll(added);
-                for (ChannelStrip channel : added) {
-                    if (!addedChannels.contains(channel)) {
-                        addedChannels.add(channel);
-                        removedChannels.remove(channel);
-                    }
-                }
-                this.groupedChannels.removeAll(removed);
-                this.ungroupedChannels.addAll(removed);
-                for (ChannelStrip channel : removed) {
-                    if (!removedChannels.contains(channel)) {
-                        removedChannels.add(channel);
-                        addedChannels.remove(channel);
+                    // if it was grouped...
+                    if (groupedChannels.contains(channel)) {
+                        // .. and is still grouped
+                        if (childDialog.grouped.contains(channel)) {
+                            // do nothing (unmark from "removed" just in case)
+                            removedChannels.remove(channel);
+                        }
+                        // if it is now ungrouped, mark it as "removed"
+                        if (!childDialog.grouped.contains(channel)) {
+                            removedChannels.add(channel);
+                            addedChannels.remove(channel);
+                        }
                     }
                 }
             });

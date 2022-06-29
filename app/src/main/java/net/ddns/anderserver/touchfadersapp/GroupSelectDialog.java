@@ -3,7 +3,6 @@ package net.ddns.anderserver.touchfadersapp;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
@@ -70,9 +69,7 @@ public class GroupSelectDialog extends AppCompatDialogFragment {
             if (channel != null) {
                 if (grouped.contains(channel)) {
                     selectedChannels[i] = true;
-                    continue;
                 }
-//                selectedChannels[i] = channel.groupIndex == index;
             }
         }
         return selectedChannels;
@@ -88,7 +85,7 @@ public class GroupSelectDialog extends AppCompatDialogFragment {
         builder.setTitle("Edit " + name + " channels");
         builder.setMultiChoiceItems(getAllChannels(), getSelectedChannels(), (dialogInterface, position, isChecked) -> {
             if (isChecked) {
-                grouped.add(ungrouped.get(position));
+                grouped.add(allChannels.get(position));
             } else {
                 grouped.removeIf(channel -> channel.index == position);
             }

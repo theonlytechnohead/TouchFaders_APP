@@ -1,5 +1,9 @@
 package net.ddns.anderserver.touchfadersapp;
 
+import androidx.annotation.Nullable;
+
+import java.util.Objects;
+
 public class ChannelStrip {
 
     public int index;
@@ -17,4 +21,16 @@ public class ChannelStrip {
     public boolean group = false;
     public int groupIndex = -1;
 
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (obj instanceof ChannelStrip) {
+            return ((ChannelStrip) obj).index == index;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(index);
+    }
 }
