@@ -10,7 +10,8 @@
     <EditText
         android:id="@+id/group_name"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:textColor="@color/white" />
 
     <Spinner
         android:id="@+id/group_colour"

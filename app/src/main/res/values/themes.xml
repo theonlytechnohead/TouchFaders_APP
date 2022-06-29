@@ -19,6 +19,14 @@
 		<item name="background">@color/background</item>
 	</style>
 
+	<style name="Theme.TouchFaders.Dialog" parent="Theme.AppCompat.DayNight.Dialog.Alert">
+		<item name="android:colorControlNormal">@color/white</item>
+		<item name="android:colorControlActivated">@color/light_blue_600</item>
+		<item name="android:textColor">@color/white</item>
+		<item name="textColorAlertDialogListItem">@color/white</item>
+		<item name="android:background">@color/background</item>
+	</style>
+
 	<style name="Theme.TouchFaders.Fullscreen" parent="Theme.TouchFaders">
 		<item name="android:actionBarStyle">@style/Widget.Theme.TouchFaders.ActionBar.Fullscreen</item>
 		<item name="android:windowActionBarOverlay">true</item>
