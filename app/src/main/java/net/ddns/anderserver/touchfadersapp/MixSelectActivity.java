@@ -90,19 +90,13 @@ public class MixSelectActivity extends AppCompatActivity implements MixSelectRec
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        final View decorView = getWindow().getDecorView();
+        decorView.setOnSystemUiVisibilityChangeListener(i -> hideUI());
+
         setContentView(R.layout.mix_selection);
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        Intent serviceIntent = new Intent(this, ConnectionService.class);
-        bindService(serviceIntent, connection, 0);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
+    private void hideUI() {
         // Making it fullscreen...
         View mixLayout = findViewById(R.id.mix_select_layout);
         ActionBar actionBar = getSupportActionBar();
@@ -117,6 +111,19 @@ public class MixSelectActivity extends AppCompatActivity implements MixSelectRec
                         | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                         | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         // Fullscreen done!
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Intent serviceIntent = new Intent(this, ConnectionService.class);
+        bindService(serviceIntent, connection, 0);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        hideUI();
 
         findViewById(R.id.back_button).setOnClickListener((view) -> {
             finish();

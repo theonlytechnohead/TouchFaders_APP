@@ -23,10 +23,24 @@ class SettingsActivity : AppCompatActivity() {
                 .commit()
         }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        val decor = window.decorView
+        decor.setOnSystemUiVisibilityChangeListener { hideUI() }
     }
 
     override fun onResume() {
         super.onResume()
+        hideUI()
+
+        binding.backButton.setOnClickListener { finish() }
+
+        binding.resetLayoutButton.setOnClickListener {
+            PreferenceManager.getDefaultSharedPreferences(applicationContext).edit()
+                .remove("channel_layer").apply();
+            finish()
+        }
+    }
+
+    private fun hideUI() {
         // Making it fullscreen...
         val actionBar = supportActionBar
         actionBar?.hide()
@@ -37,14 +51,6 @@ class SettingsActivity : AppCompatActivity() {
                 or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                 or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
         // Fullscreen done!
-
-        binding.backButton.setOnClickListener { finish() }
-
-        binding.resetLayoutButton.setOnClickListener {
-            PreferenceManager.getDefaultSharedPreferences(applicationContext).edit()
-                .remove("channel_layer").apply();
-            finish()
-        }
     }
 
     class SettingsFragment : PreferenceFragmentCompat() {

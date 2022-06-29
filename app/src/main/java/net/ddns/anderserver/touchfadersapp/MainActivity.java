@@ -166,7 +166,7 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
                     int level = (int) event.getMessage().getArguments().get(0);
                     boolean sendMuted = (boolean) event.getMessage().getArguments().get(1);
                     String name = (String) event.getMessage().getArguments().get(2);
-                    boolean channelMuted =(boolean) event.getMessage().getArguments().get(3);
+                    boolean channelMuted = (boolean) event.getMessage().getArguments().get(3);
                     String patch = (String) event.getMessage().getArguments().get(4);
                     int colourIndex = (int) event.getMessage().getArguments().get(5);
                     handler.post(() -> adapter.setChannelStrip(channelIndex, level, sendMuted, name, channelMuted, patch, colourIndex));
@@ -259,7 +259,8 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //BasicConfigurator.configure();
+        final View decorView = getWindow().getDecorView();
+        decorView.setOnSystemUiVisibilityChangeListener(i -> hideUI());
 
         demo = getIntent().getBooleanExtra(StartupActivity.EXTRA_DEMO_MODE, false);
 
@@ -351,20 +352,7 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
     @Override
     protected void onResume() {
         super.onResume();
-        // Making it fullscreen...
-        View frameLayout = findViewById(R.id.fullscreen_frame);
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.hide();
-        }
-        frameLayout.setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_LOW_PROFILE
-                        | View.SYSTEM_UI_FLAG_FULLSCREEN
-                        | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
-        // Fullscreen done!
+        hideUI();
 
         if (demo) {
             mixInfo.setBackgroundColor(getResources().getIntArray(R.array.mixer_colours)[mixColour]);
@@ -400,6 +388,7 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
         }
 
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
+            View frameLayout = findViewById(R.id.fullscreen_frame);
             frameLayout.addOnLayoutChangeListener((v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
                 DisplayCutout cutout = getWindow().getDecorView().getRootWindowInsets().getDisplayCutout();
                 ConstraintLayout meterInfo = findViewById(R.id.mix_meter_layout);
@@ -428,6 +417,23 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
                 }
             });
         }
+    }
+
+    private void hideUI() {
+        // Making it fullscreen...
+        View frameLayout = findViewById(R.id.fullscreen_frame);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.hide();
+        }
+        frameLayout.setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LOW_PROFILE
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+        // Fullscreen done!
     }
 
     @Override

@@ -51,6 +51,9 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
         val view = binding.root
         setContentView(view)
 
+        val decor = window.decorView
+        decor.setOnSystemUiVisibilityChangeListener { hideUI() }
+
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         sharedPreferences?.run {
 //            this.edit().putString(resources.getString(R.string.setting_fader_width), "52.5").apply();
@@ -134,6 +137,19 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
         broadcastReceiver = Receiver()
     }
 
+    private fun hideUI() {
+        // Making it fullscreen...
+        val actionBar = supportActionBar
+        actionBar?.hide()
+        binding.startupLayout.systemUiVisibility = (View.SYSTEM_UI_FLAG_LOW_PROFILE
+                or View.SYSTEM_UI_FLAG_FULLSCREEN
+                or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
+        // Fullscreen done!
+    }
+
     inner class Receiver : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent?.action == START_MIX_ACTIVITY) {
@@ -151,16 +167,7 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
 
     override fun onResume() {
         super.onResume()
-        // Making it fullscreen...
-        val actionBar = supportActionBar
-        actionBar?.hide()
-        binding.startupLayout.systemUiVisibility = (View.SYSTEM_UI_FLAG_LOW_PROFILE
-                or View.SYSTEM_UI_FLAG_FULLSCREEN
-                or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
-        // Fullscreen done!
+        hideUI()
         launch(Dispatchers.IO) {
             listenUDP = true
             UDPListener();
