@@ -11,6 +11,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatDialogFragment;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.TreeMap;
 
 public class GroupSelectDialog extends AppCompatDialogFragment {
@@ -44,11 +45,11 @@ public class GroupSelectDialog extends AppCompatDialogFragment {
             ChannelStrip channel = grouped.get(i);
             allChannels.put(channel.index, channel);
         }
-        CharSequence[] channelLabels = new CharSequence[ungrouped.size() + grouped.size()];
-        for (int i = 0; i < allChannels.size(); i++) {
-            ChannelStrip channel = allChannels.get(i);
-            if (channel != null)
-                channelLabels[i] = "" + (channel.index + 1) + ": " + channel.name + " (" + channel.patch + ")";
+        CharSequence[] channelLabels = new CharSequence[allChannels.size()];
+        int index = 0;
+        for (Map.Entry<Integer, ChannelStrip> entry : allChannels.entrySet()) {
+            ChannelStrip channel = entry.getValue();
+            channelLabels[index++] = "" + (channel.index + 1) + ": " + channel.name + " (" + channel.patch + ")";
         }
         return channelLabels;
     }
@@ -63,13 +64,12 @@ public class GroupSelectDialog extends AppCompatDialogFragment {
             ChannelStrip channel = grouped.get(i);
             allChannels.put(channel.index, channel);
         }
-        boolean[] selectedChannels = new boolean[ungrouped.size() + grouped.size()];
-        for (int i = 0; i < allChannels.size(); i++) {
-            ChannelStrip channel = allChannels.get(i);
-            if (channel != null) {
-                if (grouped.contains(channel)) {
-                    selectedChannels[i] = true;
-                }
+        boolean[] selectedChannels = new boolean[allChannels.size()];
+        int index = 0;
+        for (Map.Entry<Integer, ChannelStrip> entry : allChannels.entrySet()) {
+            ChannelStrip channel = entry.getValue();
+            if (grouped.contains(channel)) {
+                selectedChannels[index++] = true;
             }
         }
         return selectedChannels;
