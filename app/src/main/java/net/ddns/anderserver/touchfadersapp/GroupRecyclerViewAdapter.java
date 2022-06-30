@@ -1,7 +1,10 @@
 package net.ddns.anderserver.touchfadersapp;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -11,9 +14,10 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
-public class GroupRecyclerViewAdapter extends RecyclerView.Adapter<GroupRecyclerViewAdapter.GroupViewHolder> {
+public class GroupRecyclerViewAdapter extends RecyclerView.Adapter<GroupRecyclerViewAdapter.GroupViewHolder> implements ItemMoveCallback.ItemTouchHelperContract {
 
     private final Context context;
 
@@ -98,6 +102,40 @@ public class GroupRecyclerViewAdapter extends RecyclerView.Adapter<GroupRecycler
         return 1;
     }
 
+    @Override
+    public void onChannelMoved(int from, int to) {
+        // everybody do the swap!
+        if (from < to) {
+            for (int i = from; i < to; i++) {
+                swapChannel(i, i + 1);
+                notifyItemMoved(i, i + 1);
+                notifyItemChanged(i);
+            }
+        } else {
+            for (int i = from; i > to; i--) {
+                swapChannel(i, i - 1);
+                notifyItemMoved(i, i - 1);
+                notifyItemChanged(i);
+            }
+        }
+    }
+
+    void swapChannel(int from, int to) {
+        Collections.swap(channels, from, to);
+    }
+
+    @Override
+    public void onChannelSelected(RecyclerView.ViewHolder viewHolder) {
+        if (viewHolder instanceof GroupViewHolder)
+            ((GroupViewHolder) viewHolder).faderBackground.setBackgroundColor(channels.get(viewHolder.getAdapterPosition()).colourLighter);
+    }
+
+    @Override
+    public void onChannelClear(RecyclerView.ViewHolder viewHolder) {
+        if (viewHolder instanceof GroupViewHolder)
+            ((GroupViewHolder) viewHolder).faderBackground.setBackgroundColor(colourArrayDarker[colourIndex]);
+    }
+
     public class GroupViewHolder extends RecyclerView.ViewHolder {
 
         int position;
@@ -108,6 +146,7 @@ public class GroupRecyclerViewAdapter extends RecyclerView.Adapter<GroupRecycler
         TextView channelPatch;
         TextView channelName;
 
+        @SuppressLint("ClickableViewAccessibility")
         public GroupViewHolder(@NonNull View itemView) {
             super(itemView);
             GroupViewHolder holder = this;
@@ -122,6 +161,37 @@ public class GroupRecyclerViewAdapter extends RecyclerView.Adapter<GroupRecycler
             channelNumber = itemView.findViewById(R.id.channelNumber);
             channelPatch = itemView.findViewById(R.id.channelPatch);
             channelName = itemView.findViewById(R.id.channelName);
+            channelBackground.setOnTouchListener(new View.OnTouchListener() {
+                private final GestureDetector gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
+                    @Override
+                    public boolean onDoubleTap(MotionEvent e) {
+                        ChannelStrip channelStrip = channels.get(holder.getAdapterPosition());
+                        int index = channelStrip.index;
+                        channels.get(holder.getAdapterPosition()).sendMuted = !channelStrip.sendMuted;
+                        fader.setMute(channelStrip.sendMuted);
+                        notifyItemChanged(holder.getAdapterPosition());
+                        if (!channelStrip.group) {
+                            if (channelMuteListener != null)
+                                channelMuteListener.onChannelMuteChange(itemView, index, channelStrip.sendMuted);
+                        }
+                        // TODO: mute sub-channels
+                        return super.onDoubleTap(e);
+                    }
+
+                    @Override
+                    public void onLongPress(MotionEvent e) {
+                        if (startDragListener != null)
+                            startDragListener.requestDrag(holder);
+                        super.onLongPress(e);
+                    }
+                });
+
+                @Override
+                public boolean onTouch(View view, MotionEvent motionEvent) {
+                    gestureDetector.onTouchEvent(motionEvent);
+                    return true;
+                }
+            });
         }
     }
 

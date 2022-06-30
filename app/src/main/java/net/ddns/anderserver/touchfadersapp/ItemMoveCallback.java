@@ -50,6 +50,10 @@ public class ItemMoveCallback extends ItemTouchHelper.Callback {
                 ChannelStripRecyclerViewAdapter.ChannelStripViewHolder channelStripViewHolder = (ChannelStripRecyclerViewAdapter.ChannelStripViewHolder) viewHolder;
                 adapter.onChannelSelected(channelStripViewHolder);
             }
+            if (viewHolder instanceof GroupRecyclerViewAdapter.GroupViewHolder) {
+                GroupRecyclerViewAdapter.GroupViewHolder groupViewHolder = (GroupRecyclerViewAdapter.GroupViewHolder) viewHolder;
+                adapter.onChannelSelected(groupViewHolder);
+            }
         }
         super.onSelectedChanged(viewHolder, actionState);
     }
@@ -61,19 +65,23 @@ public class ItemMoveCallback extends ItemTouchHelper.Callback {
             ChannelStripRecyclerViewAdapter.ChannelStripViewHolder channelStripViewHolder = (ChannelStripRecyclerViewAdapter.ChannelStripViewHolder) viewHolder;
             adapter.onChannelClear(channelStripViewHolder);
         }
+        if (viewHolder instanceof GroupRecyclerViewAdapter.GroupViewHolder) {
+            GroupRecyclerViewAdapter.GroupViewHolder groupViewHolder = (GroupRecyclerViewAdapter.GroupViewHolder) viewHolder;
+            adapter.onChannelClear(groupViewHolder);
+        }
     }
 
     public interface StartDragListener {
-        void requestDrag(ChannelStripRecyclerViewAdapter.ChannelStripViewHolder channelStripViewHolder);
+        void requestDrag(RecyclerView.ViewHolder viewHolder);
     }
 
     public interface ItemTouchHelperContract {
 
         void onChannelMoved(int fromPosition, int toPosition);
 
-        void onChannelSelected(ChannelStripRecyclerViewAdapter.ChannelStripViewHolder channelStripViewHolder);
+        void onChannelSelected(RecyclerView.ViewHolder viewHolder);
 
-        void onChannelClear(ChannelStripRecyclerViewAdapter.ChannelStripViewHolder channelStripViewHolder);
+        void onChannelClear(RecyclerView.ViewHolder viewHolder);
 
     }
 }

@@ -15,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -201,13 +202,14 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
     }
 
     @Override
-    public void onChannelSelected(ChannelStripViewHolder channelStripViewHolder) {
-        channelStripViewHolder.faderBackground.setBackgroundColor(channels.get(channelStripViewHolder.getAdapterPosition()).colourLighter);
+    public void onChannelSelected(RecyclerView.ViewHolder viewHolder) {
+        if (viewHolder instanceof ChannelStripViewHolder)
+            ((ChannelStripViewHolder) viewHolder).faderBackground.setBackgroundColor(channels.get(viewHolder.getAdapterPosition()).colourLighter);
     }
 
     @Override
-    public void onChannelClear(ChannelStripViewHolder channelStripViewHolder) {
-        setBackgroundColour(channelStripViewHolder);
+    public void onChannelClear(RecyclerView.ViewHolder viewHolder) {
+        setBackgroundColour((ChannelStripViewHolder) viewHolder);
     }
 
     public class ChannelStripViewHolder extends RecyclerView.ViewHolder implements ChannelStripRecyclerViewAdapter.FaderValueChangedListener {
@@ -234,6 +236,9 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
                     faderValueChangedListener.onValueChanged(boxedPoints.getRootView(), index, boxedPoints, points);
                 // TODO: update sub-channels
             });
+            channelNumber = itemView.findViewById(R.id.channelNumber);
+            channelPatch = itemView.findViewById(R.id.channelPatch);
+            channelName = itemView.findViewById(R.id.channelName);
             channelBackground.setOnTouchListener(new View.OnTouchListener() {
                 private final GestureDetector gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
                     @Override
@@ -283,9 +288,6 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
                     return true;
                 }
             });
-            channelNumber = itemView.findViewById(R.id.channelNumber);
-            channelPatch = itemView.findViewById(R.id.channelPatch);
-            channelName = itemView.findViewById(R.id.channelName);
         }
 
         @Override
@@ -299,12 +301,16 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
 
         GroupRecyclerViewAdapter adapter;
         RecyclerView recyclerView;
+        ItemTouchHelper touchHelper;
 
         public SubChannelViewHolder(@NonNull View itemView) {
             super(itemView);
             SubChannelViewHolder holder = this;
-            adapter = new GroupRecyclerViewAdapter(context, width, null);
+            adapter = new GroupRecyclerViewAdapter(context, width, viewHolder -> touchHelper.startDrag(viewHolder));
             recyclerView = itemView.findViewById(R.id.groupRecyclerView);
+            ItemTouchHelper.Callback callback = new ItemMoveCallback(adapter);
+            touchHelper = new ItemTouchHelper(callback);
+            touchHelper.attachToRecyclerView(recyclerView);
             recyclerView.setAdapter(adapter);
         }
     }
@@ -403,15 +409,6 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
         // remove removed channels from group channels and add to regular channels
         Collections.reverse(removedChannels);
         for (ChannelStrip c : removedChannels) {
-//            int channelIndex = getIndex(c.index);
-//            if (channelIndex < 0) {
-//                ChannelStrip channel = hiddenChannels.get(c.index);
-//                if (channel != null) channel.groupIndex = -1;
-//            } else {
-//                ChannelStrip channel = channels.get(channelIndex);
-//                channel.groupIndex = -1;
-//                notifyItemChanged(channelIndex);
-//            }
             channels.add(position + 2, c);
             currentChannels.remove(c);
             notifyItemInserted(position + 2);

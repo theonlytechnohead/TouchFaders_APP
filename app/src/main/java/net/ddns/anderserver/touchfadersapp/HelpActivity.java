@@ -94,8 +94,8 @@ public class HelpActivity extends AppCompatActivity implements ItemMoveCallback.
     }
 
     @Override
-    public void requestDrag(ChannelStripRecyclerViewAdapter.ChannelStripViewHolder channelStripViewHolder) {
-        touchHelper.startDrag(channelStripViewHolder);
+    public void requestDrag(RecyclerView.ViewHolder viewHolder) {
+        touchHelper.startDrag(viewHolder);
     }
 
     @Override
