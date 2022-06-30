@@ -17,12 +17,12 @@ public class GroupRecyclerViewAdapter extends RecyclerView.Adapter<GroupRecycler
 
     private final Context context;
 
-    private final ArrayList<ChannelStrip> channels = new ArrayList<>();
+    private ArrayList<ChannelStrip> channels = new ArrayList<>();
     private final HashMap<Integer, ChannelStrip> hiddenChannels = new HashMap<>();
     private boolean hidden;
     private final float width;
 
-    private final ChannelStrip group;
+    private int colourIndex;
 
     private ChannelStripRecyclerViewAdapter.FaderValueChangedListener faderValueChangedListener;
     private ChannelStripRecyclerViewAdapter.ChannelMuteListener channelMuteListener;
@@ -35,13 +35,13 @@ public class GroupRecyclerViewAdapter extends RecyclerView.Adapter<GroupRecycler
     int greyColour;
     int whiteColour;
 
-    public GroupRecyclerViewAdapter(Context context, float width, ChannelStrip group, ItemMoveCallback.StartDragListener startDragListener) {
+    public GroupRecyclerViewAdapter(Context context, float width, ItemMoveCallback.StartDragListener startDragListener) {
         super();
         this.context = context;
         this.width = width;
         this.startDragListener = startDragListener;
         this.hidden = false;
-        this.group = group;
+//        this.group = group;
 
         colourArray = context.getResources().getIntArray(R.array.mixer_colours);
         colourArrayLighter = context.getResources().getIntArray(R.array.mixer_colours_lighter);
@@ -81,11 +81,11 @@ public class GroupRecyclerViewAdapter extends RecyclerView.Adapter<GroupRecycler
             holder.channelPatch.setTextColor(whiteColour);
             holder.channelBackground.setBackgroundColor(darkGreyColour);
         } else {
-            holder.channelNumber.setTextColor(channelStrip.colour);
-            holder.channelPatch.setTextColor(channelStrip.colourDarker);
-            holder.channelBackground.setBackgroundColor(channelStrip.colourLighter);
+            holder.channelNumber.setTextColor(colourArray[colourIndex]);
+            holder.channelPatch.setTextColor(colourArrayDarker[colourIndex]);
+            holder.channelBackground.setBackgroundColor(colourArrayLighter[colourIndex]);
         }
-        holder.faderBackground.setBackgroundColor(group.colourDarker);
+        holder.faderBackground.setBackgroundColor(colourArrayDarker[colourIndex]);
     }
 
     @Override
@@ -119,18 +119,20 @@ public class GroupRecyclerViewAdapter extends RecyclerView.Adapter<GroupRecycler
                 channels.get(holder.getAdapterPosition()).level = points;
                 faderValueChangedListener.onValueChanged(boxedPoints.getRootView(), index, boxedPoints, points);
             });
+            channelNumber = itemView.findViewById(R.id.channelNumber);
+            channelPatch = itemView.findViewById(R.id.channelPatch);
+            channelName = itemView.findViewById(R.id.channelName);
         }
     }
 
-    public void addChannel(ChannelStrip channel) {
-        // TODO: figure out correct order to add?
-        channels.add(channel);
-        notifyItemInserted(channels.indexOf(channel));
+    public void setColourIndex(int index) {
+        this.colourIndex = index;
     }
 
-    public void removeChannel(ChannelStrip channel) {
-        int position = channels.indexOf(channel);
-        channels.remove(channel);
-        notifyItemRemoved(position);
+    public void setChannels(ArrayList<ChannelStrip> channels) {
+        // TODO: figure out correct order to add?
+        this.channels = channels;
+        notifyItemRangeInserted(0, channels.size());
     }
+
 }

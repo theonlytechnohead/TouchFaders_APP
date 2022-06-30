@@ -69,8 +69,9 @@ public class GroupSelectDialog extends AppCompatDialogFragment {
         for (Map.Entry<Integer, ChannelStrip> entry : allChannels.entrySet()) {
             ChannelStrip channel = entry.getValue();
             if (grouped.contains(channel)) {
-                selectedChannels[index++] = true;
+                selectedChannels[index] = true;
             }
+            index++;
         }
         return selectedChannels;
     }
