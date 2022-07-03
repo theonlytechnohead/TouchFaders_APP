@@ -20,6 +20,10 @@
 		<item name="android:background">@color/black</item>
 	</style>
 
+	<style name="Theme.TouchFaders.Spinner" parent="Theme.AppCompat.DayNight">
+		<item name="android:popupBackground">@color/black</item>
+	</style>
+
 	<style name="ThemeOverlay.TouchFaders.FullscreenContainer" parent="">
 		<item name="fullscreenBackgroundColor">@color/black</item>
 		<item name="fullscreenTextColor">@color/light_blue_A200</item>

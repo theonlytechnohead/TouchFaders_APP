@@ -29,6 +29,10 @@
 		<item name="android:background">@color/background</item>
 	</style>
 
+	<style name="Theme.TouchFaders.Spinner" parent="Theme.AppCompat.DayNight">
+		<item name="android:popupBackground">@color/background</item>
+	</style>
+
 	<style name="Theme.TouchFaders.Fullscreen" parent="Theme.TouchFaders">
 		<item name="android:actionBarStyle">@style/Widget.Theme.TouchFaders.ActionBar.Fullscreen</item>
 		<item name="android:windowActionBarOverlay">true</item>

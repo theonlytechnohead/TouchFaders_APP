@@ -19,7 +19,8 @@
         android:id="@+id/group_colour"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:entries="@array/colours_array" />
+        android:entries="@array/colours_array"
+        style="@style/Theme.TouchFaders.Spinner" />
 
     <Button
         android:id="@+id/group_edit"

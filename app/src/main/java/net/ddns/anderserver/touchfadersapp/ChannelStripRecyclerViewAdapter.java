@@ -267,12 +267,19 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
                             // TODO: trigger edit group
                             GroupEditDialog editDialog = new GroupEditDialog(channelStrip.index, channelStrip.name, channelStrip.colourIndex, ungroupedChannels(), groupedChannels(channelStrip.index));
                             editDialog.setResultListener((dialogInterface, i) -> {
-                                channelStrip.name = editDialog.name;
-                                channelStrip.colourIndex = editDialog.colour;
-                                channelStrip.colour = colourArray[channelStrip.colourIndex];
-                                channelStrip.colourLighter = colourArrayLighter[channelStrip.colourIndex];
-                                channelStrip.colourDarker = colourArrayDarker[channelStrip.colourIndex];
-                                notifyItemChanged(holder.getAdapterPosition());
+                                if (!Objects.equals(channelStrip.name, editDialog.name)) {
+                                    channelStrip.name = editDialog.name;
+                                    notifyItemChanged(holder.getAdapterPosition());
+                                }
+                                if (channelStrip.colourIndex != editDialog.colour) {
+                                    channelStrip.colourIndex = editDialog.colour;
+                                    channelStrip.colour = colourArray[channelStrip.colourIndex];
+                                    channelStrip.colourLighter = colourArrayLighter[channelStrip.colourIndex];
+                                    channelStrip.colourDarker = colourArrayDarker[channelStrip.colourIndex];
+                                    notifyItemChanged(holder.getAdapterPosition());
+                                    channels.get(holder.getAdapterPosition() + 1).colourIndex = editDialog.colour;
+                                    notifyItemChanged(holder.getAdapterPosition() + 1);
+                                }
                                 updateGroup(holder.getAdapterPosition(), -channelStrip.index, editDialog.addedChannels, editDialog.removedChannels);
                             });
                             FragmentManager fragmentManager = ((FragmentActivity) context).getSupportFragmentManager();

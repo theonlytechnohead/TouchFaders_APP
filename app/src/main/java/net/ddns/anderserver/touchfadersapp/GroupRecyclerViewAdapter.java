@@ -198,6 +198,9 @@ public class GroupRecyclerViewAdapter extends RecyclerView.Adapter<GroupRecycler
 
     public void setColourIndex(int index) {
         this.colourIndex = index;
+        for (int i = 0; i < channels.size(); i++) {
+            notifyItemChanged(i);
+        }
     }
 
     public void setChannels(ArrayList<ChannelStrip> channels) {
