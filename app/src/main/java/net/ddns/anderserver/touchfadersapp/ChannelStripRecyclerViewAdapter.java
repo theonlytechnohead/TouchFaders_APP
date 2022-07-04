@@ -179,13 +179,14 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
 
     @Override
     public void onChannelMoved(int from, int to) {
-        ChannelStrip channel = channels.get(from);
+        ChannelStrip moving = channels.get(from);
+        ChannelStrip target = channels.get(to);
         // everybody do the swap!
         if (from < to) {
             for (int i = from; i < to; i += 2) {
-                if (channel.group) {
+                if (moving.group) {
                     // move subchannels
-                    ArrayList<ChannelStrip> subchannels = groupedChannels.get(-channel.index);
+                    ArrayList<ChannelStrip> subchannels = groupedChannels.get(-moving.index);
                     if (subchannels != null && 0 < subchannels.size()) {
                         swapChannel(i + 1, i + 2);
                         notifyItemMoved(i + 1, i + 2);
@@ -199,15 +200,18 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
                     notifyItemMoved(i, i + 1);
                     notifyItemChanged(i);
                 }
+                if (target.group) {
+                    moveSubchannelsToGroup(-target.index);
+                }
             }
         } else {
             for (int i = from; i > to; i--) {
-                if (channel.group) {
+                if (moving.group) {
                     // move group
                     swapChannel(i, i - 1);
                     notifyItemMoved(i, i - 1);
                     // move subchannels
-                    ArrayList<ChannelStrip> subchannels = groupedChannels.get(-channel.index);
+                    ArrayList<ChannelStrip> subchannels = groupedChannels.get(-moving.index);
                     if (subchannels != null && 0 < subchannels.size()) {
                         swapChannel(i + 1, i);
                         notifyItemMoved(i + 1, i);
