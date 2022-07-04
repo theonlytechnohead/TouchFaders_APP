@@ -205,7 +205,7 @@ public class GroupRecyclerViewAdapter extends RecyclerView.Adapter<GroupRecycler
 
     public void setChannels(ArrayList<ChannelStrip> channels) {
         if (channels != null) {
-            this.channels = channels;
+            this.channels = new ArrayList<>(channels);
             notifyItemRangeInserted(0, channels.size());
         } else {
             notifyDataSetChanged();

@@ -20,6 +20,7 @@ public class ChannelStrip {
 
     public boolean group = false;
     public int groupIndex = -1;
+    public boolean hide = false;
 
     @Override
     public boolean equals(@Nullable Object obj) {

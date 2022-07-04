@@ -144,14 +144,17 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
             ChannelStrip subChannels = channels.get(viewHolder.getAdapterPosition());
             holder.adapter.setColourIndex(subChannels.colourIndex);
             ArrayList<ChannelStrip> grouped = groupedChannels.get(subChannels.groupIndex);
-            holder.adapter.setChannels(grouped);
+            if (!subChannels.hide) holder.adapter.setChannels(grouped);
+            else holder.adapter.setChannels(null);
         }
     }
 
     private void setBackgroundColour(ChannelStripViewHolder holder) {
         ChannelStrip channelStrip = channels.get(holder.getAdapterPosition());
         if (channelStrip.group) {
-            holder.faderBackground.setBackgroundColor(channelStrip.colourDarker);
+            if (channelStrip.hide)
+                holder.faderBackground.setBackgroundColor(channelStrip.colourDarker);
+            else holder.faderBackground.setBackgroundColor(channelStrip.colour);
         } else if (channelStrip.groupIndex != -1) {
             ChannelStrip group = getGroup(channelStrip.groupIndex);
             holder.faderBackground.setBackgroundColor(group.colourDarker);
@@ -187,7 +190,7 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
                 if (moving.group) {
                     // move subchannels
                     ArrayList<ChannelStrip> subchannels = groupedChannels.get(-moving.index);
-                    if (subchannels != null && 0 < subchannels.size()) {
+                    if (subchannels != null && 0 < subchannels.size() && !moving.hide) {
                         swapChannel(i + 1, i + 2);
                         notifyItemMoved(i + 1, i + 2);
                     }
@@ -212,7 +215,7 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
                     notifyItemMoved(i, i - 1);
                     // move subchannels
                     ArrayList<ChannelStrip> subchannels = groupedChannels.get(-moving.index);
-                    if (subchannels != null && 0 < subchannels.size()) {
+                    if (subchannels != null && 0 < subchannels.size() && !moving.hide) {
                         swapChannel(i + 1, i);
                         notifyItemMoved(i + 1, i);
                     }
@@ -303,8 +306,11 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
                 private final GestureDetector gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
                     @Override
                     public boolean onSingleTapConfirmed(MotionEvent e) {
-                        // TODO: show/hide subchannels
-//                        Log.i("GRP", "toggle subchannels for group " + channels.get(holder.getAdapterPosition()).index);
+                        ChannelStrip group = channels.get(holder.getAdapterPosition());
+                        channels.get(holder.getAdapterPosition()).hide = !group.hide;
+                        notifyItemChanged(holder.getAdapterPosition());
+                        channels.get(getSubchannelIndex(-group.index)).hide = !channels.get(getSubchannelIndex(-group.index)).hide;
+                        notifyItemChanged(getSubchannelIndex(-group.index));
                         return super.onSingleTapConfirmed(e);
                     }
                 });
