@@ -86,7 +86,8 @@ public class GroupSelectDialog extends AppCompatDialogFragment {
         builder.setTitle("Edit " + name + " channels");
         builder.setMultiChoiceItems(getAllChannels(), getSelectedChannels(), (dialogInterface, position, isChecked) -> {
             if (isChecked) {
-                grouped.add(allChannels.get(position));
+                ArrayList<ChannelStrip> channelList = new ArrayList<>(allChannels.values());
+                grouped.add(channelList.get(position));
             } else {
                 grouped.removeIf(channel -> channel.index == position);
             }
