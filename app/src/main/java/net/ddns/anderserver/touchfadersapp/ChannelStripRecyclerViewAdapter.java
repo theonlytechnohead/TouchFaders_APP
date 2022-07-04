@@ -144,9 +144,7 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
             ChannelStrip subChannels = channels.get(viewHolder.getAdapterPosition());
             holder.adapter.setColourIndex(subChannels.colourIndex);
             ArrayList<ChannelStrip> grouped = groupedChannels.get(subChannels.groupIndex);
-            if (grouped != null) {
-                holder.adapter.setChannels(grouped);
-            }
+            holder.adapter.setChannels(grouped);
         }
     }
 
@@ -227,6 +225,34 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
 
     void swapChannel(int from, int to) {
         Collections.swap(channels, from, to);
+    }
+
+    void moveSubchannelsToGroup(int group) {
+        int index = -1;
+        int groupIndex = -1;
+        for (int i = 0; i < channels.size(); i++) {
+            ChannelStrip channel = channels.get(i);
+            if (channel.group && channel.groupIndex == group) {
+                index = i;
+            }
+            if (channel.group && channel.index == -group) {
+                groupIndex = i;
+            }
+        }
+        if (index != -1 && groupIndex != -1 && index != groupIndex + 1) {
+            // move it all along?
+            if (index < groupIndex) {
+                for (int i = index; i < groupIndex; i++) {
+                    swapChannel(i, i + 1);
+                    notifyItemMoved(i, i + 1);
+                }
+            } else {
+                for (int i = index; groupIndex < i; i--) {
+                    swapChannel(i, i - 1);
+                    notifyItemMoved(i, i - 1);
+                }
+            }
+        }
     }
 
     @Override
@@ -448,7 +474,11 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
             currentChannels.remove(c);
             notifyItemInserted(position + 2);
         }
-        groupedChannels.put(group, currentChannels);
+        moveSubchannelsToGroup(group);
+        if (currentChannels.size() == 0) {
+            groupedChannels.remove(group);
+        } else
+            groupedChannels.put(group, currentChannels);
         notifyItemChanged(position + 1);
     }
 

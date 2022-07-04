@@ -204,9 +204,13 @@ public class GroupRecyclerViewAdapter extends RecyclerView.Adapter<GroupRecycler
     }
 
     public void setChannels(ArrayList<ChannelStrip> channels) {
-        // TODO: figure out correct order to add?
-        this.channels = channels;
-        notifyItemRangeInserted(0, channels.size());
+        if (channels != null) {
+            this.channels = channels;
+            notifyItemRangeInserted(0, channels.size());
+        } else {
+            notifyDataSetChanged();
+            this.channels.clear();
+        }
     }
 
 }
