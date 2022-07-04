@@ -181,20 +181,48 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
 
     @Override
     public void onChannelMoved(int from, int to) {
+        ChannelStrip channel = channels.get(from);
         // everybody do the swap!
         if (from < to) {
-            for (int i = from; i < to; i++) {
-                swapChannel(i, i + 1);
-                notifyItemMoved(i, i + 1);
-                notifyItemChanged(i);
+            for (int i = from; i < to; i += 2) {
+                if (channel.group) {
+                    // move subchannels
+                    ArrayList<ChannelStrip> subchannels = groupedChannels.get(-channel.index);
+                    if (subchannels != null && 0 < subchannels.size()) {
+                        swapChannel(i + 1, i + 2);
+                        notifyItemMoved(i + 1, i + 2);
+                    }
+                    // move group
+                    swapChannel(i, i + 1);
+                    notifyItemMoved(i, i + 1);
+                    notifyItemChanged(i);
+                } else {
+                    swapChannel(i, i + 1);
+                    notifyItemMoved(i, i + 1);
+                    notifyItemChanged(i);
+                }
             }
         } else {
             for (int i = from; i > to; i--) {
-                swapChannel(i, i - 1);
-                notifyItemMoved(i, i - 1);
-                notifyItemChanged(i);
+                if (channel.group) {
+                    // move group
+                    swapChannel(i, i - 1);
+                    notifyItemMoved(i, i - 1);
+                    // move subchannels
+                    ArrayList<ChannelStrip> subchannels = groupedChannels.get(-channel.index);
+                    if (subchannels != null && 0 < subchannels.size()) {
+                        swapChannel(i + 1, i);
+                        notifyItemMoved(i + 1, i);
+                    }
+                    notifyItemChanged(i);
+                } else {
+                    swapChannel(i, i - 1);
+                    notifyItemMoved(i, i - 1);
+                    notifyItemChanged(i);
+                }
             }
         }
+
     }
 
     void swapChannel(int from, int to) {

@@ -32,7 +32,7 @@ public class ItemMoveCallback extends ItemTouchHelper.Callback {
     @Override
     public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
         if (viewHolder.getItemViewType() != target.getItemViewType()) {
-            return false;
+//            return false;
         }
         adapter.onChannelMoved(viewHolder.getAdapterPosition(), target.getAdapterPosition());
         return true;
