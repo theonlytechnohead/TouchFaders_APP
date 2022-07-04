@@ -235,7 +235,7 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
             if (channel.group && channel.groupIndex == group) {
                 index = i;
             }
-            if (channel.group && channel.index == -group) {
+            if (channel.group && channel.index == -group && channel.groupIndex == -1) {
                 groupIndex = i;
             }
         }
@@ -247,7 +247,7 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
                     notifyItemMoved(i, i + 1);
                 }
             } else {
-                for (int i = index; groupIndex < i; i--) {
+                for (int i = index; groupIndex + 1 < i; i--) {
                     swapChannel(i, i - 1);
                     notifyItemMoved(i, i - 1);
                 }
