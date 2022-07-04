@@ -332,9 +332,19 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
                         channels.get(holder.getAdapterPosition()).sendMuted = !channelStrip.sendMuted;
                         fader.setMute(channelStrip.sendMuted);
                         notifyItemChanged(holder.getAdapterPosition());
-                        if (!channelStrip.group)
+                        if (!channelStrip.group) {
                             channelMuteListener.onChannelMuteChange(itemView, index, channelStrip.sendMuted);
-                        // TODO: mute sub-channels
+                        } else {
+                            ArrayList<ChannelStrip> subchannels = groupedChannels.get(-channelStrip.index);
+                            if (subchannels != null) {
+                                for (ChannelStrip subchannel : subchannels) {
+                                    // TODO: propagate mute listening upstream via channelMuteListener
+                                    subchannel.sendMuted = channels.get(holder.getAdapterPosition()).sendMuted;
+                                }
+                                if (!channelStrip.hide)
+                                    notifyItemChanged(getSubchannelIndex(-channelStrip.index));
+                            }
+                        }
                         return super.onDoubleTap(e);
                     }
 
