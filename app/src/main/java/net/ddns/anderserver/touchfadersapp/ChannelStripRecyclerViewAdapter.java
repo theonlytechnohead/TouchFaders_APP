@@ -224,7 +224,6 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
                 }
             }
         }
-
     }
 
     void swapChannel(int from, int to) {
@@ -268,6 +267,9 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
     @Override
     public void onChannelClear(RecyclerView.ViewHolder viewHolder) {
         setBackgroundColour((ChannelStripViewHolder) viewHolder);
+        ChannelStrip moving = channels.get(viewHolder.getAdapterPosition());
+        if (moving.group)
+            moveSubchannelsToGroup(-moving.index);
     }
 
     public class ChannelStripViewHolder extends RecyclerView.ViewHolder implements ChannelStripRecyclerViewAdapter.FaderValueChangedListener {
@@ -297,6 +299,24 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
             channelNumber = itemView.findViewById(R.id.channelNumber);
             channelPatch = itemView.findViewById(R.id.channelPatch);
             channelName = itemView.findViewById(R.id.channelName);
+            fader.setOnTouchListener(new View.OnTouchListener() {
+                private final GestureDetector gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
+                    @Override
+                    public boolean onSingleTapConfirmed(MotionEvent e) {
+                        // TODO: show/hide subchannels
+//                        Log.i("GRP", "toggle subchannels for group " + channels.get(holder.getAdapterPosition()).index);
+                        return super.onSingleTapConfirmed(e);
+                    }
+                });
+
+                @Override
+                public boolean onTouch(View view, MotionEvent motionEvent) {
+                    if (channels.get(holder.getAdapterPosition()).group) {
+                        gestureDetector.onTouchEvent(motionEvent);
+                    }
+                    return false;
+                }
+            });
             channelBackground.setOnTouchListener(new View.OnTouchListener() {
                 private final GestureDetector gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
                     @Override
@@ -479,11 +499,10 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
             notifyItemInserted(position + 2);
         }
         moveSubchannelsToGroup(group);
-        if (currentChannels.size() == 0) {
-            groupedChannels.remove(group);
-        } else
-            groupedChannels.put(group, currentChannels);
-        notifyItemChanged(position + 1);
+        if (currentChannels.size() == 0) groupedChannels.remove(group);
+        else groupedChannels.put(group, currentChannels);
+        int subchannelsIndex = getSubchannelIndex(group);
+        notifyItemChanged(subchannelsIndex);
     }
 
     int getIndex(int channelIndex) {
@@ -496,6 +515,16 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
             }
         }
         return 0;
+    }
+
+    int getSubchannelIndex(int group) {
+        for (int i = 0; i < channels.size(); i++) {
+            ChannelStrip channel = channels.get(i);
+            if (channel.group && channel.groupIndex == group) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     ChannelStrip getGroup(int group) {
