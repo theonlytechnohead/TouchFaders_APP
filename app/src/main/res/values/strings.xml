@@ -1056,11 +1056,13 @@
     <array name="fader_width_entries">
         <item>Normal</item>
         <item>Wide</item>
+        <item>Wider</item>
         <item>Widest</item>
     </array>
 
     <array name="fader_width_values">
         <item>"35"</item>
+        <item>"43.75"</item>
         <item>"52.5"</item>
         <item>"70"</item>
     </array>
