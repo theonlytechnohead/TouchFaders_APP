@@ -4,14 +4,14 @@ plugins {
 }
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 32
 
     defaultConfig {
         applicationId "net.ddns.anderserver.touchfaders"
-        minSdkVersion 26
-        targetSdkVersion 30
-        versionCode 2
-        versionName '1.1'
+        minSdk 24
+        targetSdkVersion 32
+        versionCode 3
+        versionName '1.2'
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -39,7 +39,7 @@ dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.4.30'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9'
     implementation 'com.illposed.osc:javaosc-core:0.8'
-    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.appcompat:appcompat:1.3.1'
     implementation 'com.google.android.material:material:1.3.0'
 	implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation 'com.github.captain-miao:topalignedtextview:1.0.0'

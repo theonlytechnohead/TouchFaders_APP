@@ -37,14 +37,16 @@ class ConnectionService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val channel = NotificationChannel(
-            NOTIFICATION_CHANNEL_ID,
-            "Connection service",
-            NotificationManager.IMPORTANCE_LOW
-        )
         val notificationService =
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationService.createNotificationChannel(channel)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                NOTIFICATION_CHANNEL_ID,
+                "Connection service",
+                NotificationManager.IMPORTANCE_LOW
+            )
+            notificationService.createNotificationChannel(channel)
+        }
 
         val notification = buildNotification("Pending connection")
         startForeground(ONGOING_NOTIFICATION_ID, notification)
@@ -62,7 +64,13 @@ class ConnectionService : Service() {
             PendingIntent.getActivity(this, 0, it, 0)
         }
 
-        return Notification.Builder(this, NOTIFICATION_CHANNEL_ID)
+        val builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Notification.Builder(this, NOTIFICATION_CHANNEL_ID)
+        } else {
+            Notification.Builder(this)
+        }
+
+        return builder
             .setContentTitle("TouchFaders connection")
             .setContentText(text)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
@@ -281,6 +289,8 @@ class ConnectionService : Service() {
                     socket.close()
                 } catch (e: IOException) {
                     e.printStackTrace()
+                } catch (e: NullPointerException) {
+                    // Not connected? just ignore
                 }
                 reset()
             }

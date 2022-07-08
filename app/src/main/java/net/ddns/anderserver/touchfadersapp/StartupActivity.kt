@@ -3,10 +3,7 @@ package net.ddns.anderserver.touchfadersapp
 import android.content.*
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.os.Bundle
-import android.os.Handler
-import android.os.IBinder
-import android.os.Looper
+import android.os.*
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -131,7 +128,11 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
 
         // Start connection service
         val serviceIntent = Intent(applicationContext, ConnectionService::class.java)
-        applicationContext.startForegroundService(serviceIntent)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            applicationContext.startForegroundService(serviceIntent)
+        } else {
+            applicationContext.startService(serviceIntent)
+        }
 
         // create broadcast receiver to start activity
         broadcastReceiver = Receiver()
