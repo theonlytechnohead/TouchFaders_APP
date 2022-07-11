@@ -213,4 +213,8 @@ public class GroupRecyclerViewAdapter extends RecyclerView.Adapter<GroupRecycler
         }
     }
 
+    public void setFaderValueChangedListener(ChannelStripRecyclerViewAdapter.FaderValueChangedListener listener) {
+        faderValueChangedListener = listener;
+    }
+
 }

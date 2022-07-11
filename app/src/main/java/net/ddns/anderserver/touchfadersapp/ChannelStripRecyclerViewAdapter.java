@@ -144,8 +144,17 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
             ChannelStrip subChannels = channels.get(viewHolder.getAdapterPosition());
             holder.adapter.setColourIndex(subChannels.colourIndex);
             ArrayList<ChannelStrip> grouped = groupedChannels.get(subChannels.groupIndex);
-            if (!subChannels.hide) holder.adapter.setChannels(grouped);
-            else holder.adapter.setChannels(null);
+            if (!subChannels.hide) {
+                holder.adapter.setChannels(grouped);
+                holder.adapter.setFaderValueChangedListener((view, index, boxedVertical, points) -> {
+                    if (grouped != null) {
+                        ChannelStrip group = getGroup(subChannels.groupIndex);
+                        group.level = grouped.stream().mapToInt(channel -> channel.level).filter(channel -> channel >= 0).max().orElse(823);
+                        subChannels.level = group.level;
+                        notifyItemChanged(viewHolder.getAdapterPosition() - 1);
+                    }
+                });
+            } else holder.adapter.setChannels(null);
         }
     }
 
@@ -293,11 +302,18 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
             channelBackground = itemView.findViewById(R.id.stripLayout);
             fader = itemView.findViewById(R.id.fader);
             fader.setOnBoxedPointsChangeListener((boxedPoints, points) -> {
-                int index = channels.get(holder.getAdapterPosition()).index;
-                channels.get(holder.getAdapterPosition()).level = points;
-                if (!channels.get(holder.getAdapterPosition()).group)
+                ChannelStrip group = channels.get(holder.getAdapterPosition());
+                int index = group.index;
+                group.level = points;
+                if (!group.group)
                     faderValueChangedListener.onValueChanged(boxedPoints.getRootView(), index, boxedPoints, points);
                 // TODO: update sub-channels
+                int change = points - channels.get(holder.getAdapterPosition() + 1).level;
+                ArrayList<ChannelStrip> subchannels = groupedChannels.get(-group.index);
+                if (subchannels != null)
+                    for (ChannelStrip channel : subchannels) channel.level += change;
+                channels.get(holder.getAdapterPosition() + 1).level = points;
+                notifyItemChanged(holder.getAdapterPosition() + 1);
             });
             channelNumber = itemView.findViewById(R.id.channelNumber);
             channelPatch = itemView.findViewById(R.id.channelPatch);
@@ -375,6 +391,12 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
                                     notifyItemChanged(holder.getAdapterPosition() + 1);
                                 }
                                 updateGroup(holder.getAdapterPosition(), -channelStrip.index, editDialog.addedChannels, editDialog.removedChannels);
+                                ArrayList<ChannelStrip> subchannels = groupedChannels.get(-channelStrip.index);
+                                if (subchannels != null) {
+                                    channelStrip.level = subchannels.stream().mapToInt(channel -> channel.level).filter(channel -> channel >= 0).max().orElse(823);
+                                    channels.get(holder.getAdapterPosition() + 1).level = channelStrip.level;
+                                    notifyItemChanged(holder.getAdapterPosition());
+                                }
                             });
                             FragmentManager fragmentManager = ((FragmentActivity) context).getSupportFragmentManager();
                             editDialog.show(fragmentManager, "group edit dialog");
@@ -575,6 +597,7 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
 
         ChannelStrip subChannels = new ChannelStrip();
         subChannels.index = -groups;
+        subChannels.level = 823;
         subChannels.group = true;
         subChannels.groupIndex = groups;
         subChannels.colourIndex = groups % colourArray.length;
