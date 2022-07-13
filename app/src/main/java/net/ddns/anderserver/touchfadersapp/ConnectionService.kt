@@ -20,6 +20,7 @@ import kotlinx.coroutines.launch
 import java.io.IOException
 import java.net.*
 
+@Suppress("DeferredResultUnused")
 class ConnectionService : Service() {
 
     enum class states {
@@ -147,7 +148,7 @@ class ConnectionService : Service() {
                         for (c: Int in 0 until 6) {
                             val byte = byteArrayReceive[index + (i * 6) + c]
                             if (byte != 0.toByte()) {
-                                mixName += byte.toChar()
+                                mixName += byte.toInt().toChar()
                             }
                         }
                         mixNames().add(mixName)
@@ -220,7 +221,7 @@ class ConnectionService : Service() {
                     typeChar++
                 }
                 oscPortOut = OSCPortOut(serializer, InetSocketAddress(address(), sendPort()))
-                oscPortOut.send(OSCMessage("/test", mutableListOf(1)))
+                oscPortOut.send(OSCMessage("/" + MainActivity.CONNECT, mutableListOf(1)))
                 oscPortIn =
                     OSCPortIn(InetSocketAddress(StartupActivity.getLocalIP(), receivePort()))
                 oscPortIn.dispatcher.isAlwaysDispatchingImmediately = true
@@ -234,7 +235,11 @@ class ConnectionService : Service() {
     fun send(message: OSCMessage) {
         CoroutineScope(Dispatchers.Default).launch {
             async(Dispatchers.IO) {
-                oscPortOut.send(message)
+                try {
+                    oscPortOut.send(message)
+                } catch (e: Exception) {
+                    // TODO: output buffer overflow
+                }
             }
         }
     }

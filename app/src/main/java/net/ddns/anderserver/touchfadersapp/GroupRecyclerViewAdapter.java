@@ -157,7 +157,7 @@ public class GroupRecyclerViewAdapter extends RecyclerView.Adapter<GroupRecycler
                 int index = channels.get(holder.getAdapterPosition()).index;
                 channels.get(holder.getAdapterPosition()).level = points;
                 if (faderValueChangedListener != null)
-                    faderValueChangedListener.onValueChanged(boxedPoints.getRootView(), index, boxedPoints, points);
+                    faderValueChangedListener.onValueChanged(index, points);
             });
             channelNumber = itemView.findViewById(R.id.channelNumber);
             channelPatch = itemView.findViewById(R.id.channelPatch);

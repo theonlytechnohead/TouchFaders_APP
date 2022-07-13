@@ -104,7 +104,7 @@ public class HelpActivity extends AppCompatActivity implements ItemMoveCallback.
         width = 70;
         channelLayer = loadMap();
         adapter = new ChannelStripRecyclerViewAdapter(this, instanceContext, numChannels, channelLayer, channelColours, width);
-        adapter.setValuesChangeListener((view, index, boxedVertical, points) -> {
+        adapter.setValuesChangeListener((index, points) -> {
         });
         adapter.setFaderMuteListener(((view, index, muted) -> {
         }));

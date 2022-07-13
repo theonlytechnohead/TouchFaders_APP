@@ -146,7 +146,7 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
             ArrayList<ChannelStrip> grouped = groupedChannels.get(subChannels.groupIndex);
             if (!subChannels.hide) {
                 holder.adapter.setChannels(grouped);
-                holder.adapter.setFaderValueChangedListener((view, index, boxedVertical, points) -> {
+                holder.adapter.setFaderValueChangedListener((index, points) -> {
                     if (grouped != null) {
                         ChannelStrip group = getGroup(subChannels.groupIndex);
                         group.level = grouped.stream().mapToInt(channel -> channel.level).filter(channel -> channel >= 0).max().orElse(823);
@@ -302,18 +302,25 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
             channelBackground = itemView.findViewById(R.id.stripLayout);
             fader = itemView.findViewById(R.id.fader);
             fader.setOnBoxedPointsChangeListener((boxedPoints, points) -> {
-                ChannelStrip group = channels.get(holder.getAdapterPosition());
-                int index = group.index;
-                group.level = points;
-                if (!group.group)
-                    faderValueChangedListener.onValueChanged(boxedPoints.getRootView(), index, boxedPoints, points);
-                // TODO: update sub-channels
-                int change = points - channels.get(holder.getAdapterPosition() + 1).level;
-                ArrayList<ChannelStrip> subchannels = groupedChannels.get(-group.index);
-                if (subchannels != null)
-                    for (ChannelStrip channel : subchannels) channel.level += change;
-                channels.get(holder.getAdapterPosition() + 1).level = points;
-                notifyItemChanged(holder.getAdapterPosition() + 1);
+                ChannelStrip channelStrip = channels.get(holder.getAdapterPosition());
+                int index = channelStrip.index;
+                channelStrip.level = points;
+                if (!channelStrip.group) {
+                    if (faderValueChangedListener != null)
+                        faderValueChangedListener.onValueChanged(index, points);
+                } else {
+                    int change = points - channels.get(holder.getAdapterPosition() + 1).level;
+                    ArrayList<ChannelStrip> subchannels = groupedChannels.get(-channelStrip.index);
+                    if (subchannels != null) {
+                        for (ChannelStrip channel : subchannels) {
+                            channel.level += change;
+                            if (faderValueChangedListener != null)
+                                faderValueChangedListener.onValueChanged(channel.index, channel.level);
+                        }
+                    }
+                    channels.get(holder.getAdapterPosition() + 1).level = points;
+                    notifyItemChanged(holder.getAdapterPosition() + 1);
+                }
             });
             channelNumber = itemView.findViewById(R.id.channelNumber);
             channelPatch = itemView.findViewById(R.id.channelPatch);
@@ -374,7 +381,6 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
                     public boolean onSingleTapConfirmed(MotionEvent e) {
                         ChannelStrip channelStrip = channels.get(holder.getAdapterPosition());
                         if (channelStrip.group) {
-                            // TODO: trigger edit group
                             GroupEditDialog editDialog = new GroupEditDialog(channelStrip.index, channelStrip.name, channelStrip.colourIndex, ungroupedChannels(), groupedChannels(channelStrip.index));
                             editDialog.setResultListener((dialogInterface, i) -> {
                                 if (!Objects.equals(channelStrip.name, editDialog.name)) {
@@ -414,9 +420,9 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
         }
 
         @Override
-        public void onValueChanged(View view, int index, BoxedVertical boxedVertical, int points) {
+        public void onValueChanged(int index, int points) {
             if (faderValueChangedListener != null)
-                faderValueChangedListener.onValueChanged(view, index, boxedVertical, points);
+                faderValueChangedListener.onValueChanged(index, points);
         }
     }
 
@@ -717,7 +723,7 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
     }
 
     public interface FaderValueChangedListener {
-        void onValueChanged(View view, int index, BoxedVertical boxedVertical, int points);
+        void onValueChanged(int index, int points);
     }
 
     void setFaderMuteListener(ChannelMuteListener listener) {

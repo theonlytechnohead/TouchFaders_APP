@@ -48,16 +48,16 @@ import java.util.Map;
  */
 public class MainActivity extends AppCompatActivity implements ItemMoveCallback.StartDragListener {
 
-    public final String CONNECT = "test";
-    public final String DISCONNECT = "disconnect";
+    public static final String CONNECT = "connect";
+    public static final String DISCONNECT = "disconnect";
 
-    public final String CHANNEL = "channel";
-    public final String MIX = "mix";
-    public final String NAME = "name";
-    public final String PATCH = "patch";
-    public final String MUTE = "mute";
+    public static final String CHANNEL = "channel";
+    public static final String MIX = "mix";
+    public static final String NAME = "name";
+    public static final String PATCH = "patch";
+    public static final String MUTE = "mute";
 
-    public final String COLOUR = "colour";
+    public static final String COLOUR = "colour";
 
     Thread udpListenerThread;
     boolean runUDP = true;
@@ -100,13 +100,11 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
                 mixInfo.setBackgroundColor(getResources().getIntArray(R.array.mixer_colours)[mixColour]);
             }
 
-            // TODO: hook up some OSC mute stuff
-
             width = Float.parseFloat(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getResources().getString(R.string.setting_fader_width), "35"));
 
             channelLayer = loadMap();
             adapter = new ChannelStripRecyclerViewAdapter(MainActivity.this, instanceContext, numChannels, channelLayer, channelColours, width);
-            adapter.setValuesChangeListener((view, index, boxedVertical, points) -> SendOSCFaderValue(index + 1, points));
+            adapter.setValuesChangeListener((index, points) -> SendOSCFaderValue(index + 1, points));
             adapter.setFaderMuteListener(((view, index, muted) -> SendOSCChannelMute(index + 1, muted)));
             recyclerView = findViewById(R.id.faderRecyclerView);
             ItemTouchHelper.Callback callback = new ItemMoveCallback(adapter);
@@ -332,7 +330,7 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
             width = Float.parseFloat(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getResources().getString(R.string.setting_fader_width), "35"));
             channelLayer = loadMap();
             adapter = new ChannelStripRecyclerViewAdapter(this, instanceContext, numChannels, channelLayer, channelColours, width);
-            adapter.setValuesChangeListener((view, index, boxedVertical, points) -> {
+            adapter.setValuesChangeListener((index, points) -> {
             });
             adapter.setFaderMuteListener(((view, index, muted) -> {
             }));
@@ -455,7 +453,7 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
         ArrayList<Object> arguments = new ArrayList<>();
         arguments.add(faderValue);
         OSCMessage message = new OSCMessage("/" + MIX + currentMix + "/" + CHANNEL + fader, arguments);
-        Log.i("OSC", message.getAddress() + " " + message.getArguments().get(0).toString());
+        Log.d("OSC", message.getAddress() + " " + message.getArguments().get(0).toString());
         connectionService.send(message);
     }
 
@@ -463,7 +461,7 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
         ArrayList<Object> arguments = new ArrayList<>();
         arguments.add(muted ? 1 : 0);
         OSCMessage message = new OSCMessage("/" + MIX + currentMix + "/" + CHANNEL + channel + "/" + MUTE, arguments);
-        Log.i("OSC", message.getAddress() + " " + message.getArguments().get(0).toString());
+        Log.d("OSC", message.getAddress() + " " + message.getArguments().get(0).toString());
         connectionService.send(message);
     }
 
