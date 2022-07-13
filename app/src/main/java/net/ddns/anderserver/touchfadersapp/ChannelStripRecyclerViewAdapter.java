@@ -718,6 +718,34 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
         return channelMap;
     }
 
+    public HashMap<Integer, Object> getLayout() {
+        HashMap<Integer, Object> layout = new HashMap<>();
+        for (int i = 0; i < channels.size(); i++) {
+            ChannelStrip channel = channels.get(i);
+            if (!channel.group) {
+                layout.put(i, channel.index);
+            }
+            if (channel.group && channel.groupIndex == 0) {
+                Group group = new Group();
+                group.index = channel.index;
+                group.name = channel.name;
+                group.colourIndex = channel.colourIndex;
+                // add subchannels
+                ArrayList<ChannelStrip> subchannels = groupedChannels.get(-channel.index);
+                if (subchannels != null) {
+                    for (int j = 0; j < subchannels.size(); j++) {
+                        ChannelStrip subchannel = subchannels.get(j);
+                        group.channels.put(j, subchannel.index);
+                    }
+                }
+            }
+        }
+        for (Map.Entry<Integer, ChannelStrip> entry : hiddenChannels.entrySet()) {
+            layout.put(entry.getKey(), entry.getValue().index);
+        }
+        return layout;
+    }
+
     void setValuesChangeListener(FaderValueChangedListener listener) {
         faderValueChangedListener = listener;
     }

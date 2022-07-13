@@ -440,6 +440,7 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
         runUDP = false;
         channelLayer = adapter.getChannelMap();
         saveMap(channelLayer);
+        saveLayout(adapter.getLayout());
     }
 
     @Override
@@ -526,6 +527,47 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
                     .putString("channel_layer", jsonString)
                     .apply();
         }
+    }
+
+    private void saveLayout(HashMap<Integer, Object> inputLayout) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        if (preferences != null) {
+            JSONObject json = new JSONObject();
+            for (Map.Entry<Integer, Object> inputEntry : inputLayout.entrySet()) {
+                try {
+                    json.put(inputEntry.getKey().toString(), inputEntry.getValue());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            String jsonString = json.toString();
+            preferences.edit()
+                    .remove("channel_layout")
+                    .putString("channel_layout", jsonString)
+                    .apply();
+        }
+    }
+
+    private HashMap<Integer, Object> loadLayout() {
+        HashMap<Integer, Object> outputMap = new HashMap<>();
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        try {
+            if (preferences != null) {
+                String jsonString = preferences.getString("channel_layout", (new JSONObject()).toString());
+                if (jsonString != null) {
+                    JSONObject json = new JSONObject(jsonString);
+                    Iterator<String> keys = json.keys();
+                    while (keys.hasNext()) {
+                        String key = keys.next();
+                        Object value = json.get(key);
+                        outputMap.put(Integer.valueOf(key), value);
+                    }
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return outputMap;
     }
 
     private HashMap<Integer, Integer> loadMap() {
