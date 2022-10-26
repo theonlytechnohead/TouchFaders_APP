@@ -25,6 +25,10 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.ToNumberPolicy;
+import com.google.gson.reflect.TypeToken;
 import com.illposed.osc.OSCMessage;
 import com.illposed.osc.OSCMessageEvent;
 import com.illposed.osc.OSCMessageListener;
@@ -34,6 +38,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketTimeoutException;
@@ -58,6 +63,8 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
     public static final String MUTE = "mute";
 
     public static final String COLOUR = "colour";
+
+    public static final String JSON_CHANNEL_LAYOUT = "channel_layout";
 
     Thread udpListenerThread;
     boolean runUDP = true;
@@ -103,7 +110,7 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
             width = Float.parseFloat(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getResources().getString(R.string.setting_fader_width), "35"));
 
             channelLayer = loadMap();
-            adapter = new ChannelStripRecyclerViewAdapter(MainActivity.this, instanceContext, numChannels, channelLayer, channelColours, width);
+            adapter = new ChannelStripRecyclerViewAdapter(MainActivity.this, instanceContext, numChannels, channelLayer, loadLayout(), channelColours, width);
             adapter.setValuesChangeListener((index, points) -> SendOSCFaderValue(index + 1, points));
             adapter.setFaderMuteListener(((view, index, muted) -> SendOSCChannelMute(index + 1, muted)));
             recyclerView = findViewById(R.id.faderRecyclerView);
@@ -329,7 +336,7 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
         } else {
             width = Float.parseFloat(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getResources().getString(R.string.setting_fader_width), "35"));
             channelLayer = loadMap();
-            adapter = new ChannelStripRecyclerViewAdapter(this, instanceContext, numChannels, channelLayer, channelColours, width);
+            adapter = new ChannelStripRecyclerViewAdapter(this, instanceContext, numChannels, channelLayer, loadLayout(), channelColours, width);
             adapter.setValuesChangeListener((index, points) -> {
             });
             adapter.setFaderMuteListener(((view, index, muted) -> {
@@ -535,15 +542,20 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
             JSONObject json = new JSONObject();
             for (Map.Entry<Integer, Object> inputEntry : inputLayout.entrySet()) {
                 try {
-                    json.put(inputEntry.getKey().toString(), inputEntry.getValue());
+                    if (inputEntry.getValue() instanceof Group) {
+                        Group group = (Group) inputEntry.getValue();
+                        json.put(inputEntry.getKey().toString(), new JSONObject(group.toMap()));
+                    } else {
+                        json.put(inputEntry.getKey().toString(), inputEntry.getValue());
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
             String jsonString = json.toString();
             preferences.edit()
-                    .remove("channel_layout")
-                    .putString("channel_layout", jsonString)
+                    .remove(JSON_CHANNEL_LAYOUT)
+                    .putString(JSON_CHANNEL_LAYOUT, jsonString)
                     .apply();
         }
     }
@@ -551,21 +563,18 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
     private HashMap<Integer, Object> loadLayout() {
         HashMap<Integer, Object> outputMap = new HashMap<>();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        try {
-            if (preferences != null) {
-                String jsonString = preferences.getString("channel_layout", (new JSONObject()).toString());
-                if (jsonString != null) {
-                    JSONObject json = new JSONObject(jsonString);
-                    Iterator<String> keys = json.keys();
-                    while (keys.hasNext()) {
-                        String key = keys.next();
-                        Object value = json.get(key);
-                        outputMap.put(Integer.valueOf(key), value);
-                    }
+        if (preferences != null) {
+            String jsonString = preferences.getString(JSON_CHANNEL_LAYOUT, (new JSONObject()).toString());
+            if (jsonString != null) {
+                Gson gson = new GsonBuilder().setObjectToNumberStrategy(ToNumberPolicy.LONG_OR_DOUBLE).create();
+                Type mapType = new TypeToken<Map<String, Object>>() {
+                }.getType();
+                Map<String, Object> map = gson.fromJson(jsonString, mapType);
+                for (String key : map.keySet()) {
+                    Object value = map.get(key);
+                    outputMap.put(Integer.valueOf(key), value);
                 }
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
         }
         return outputMap;
     }

@@ -49,7 +49,7 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
     int groups = 0;
     private final HashMap<Integer, ArrayList<ChannelStrip>> groupedChannels = new HashMap<>();
 
-    public ChannelStripRecyclerViewAdapter(ItemMoveCallback.StartDragListener startDragListener, Context context, int numChannels, HashMap<Integer, Integer> channelLayer, ArrayList<Integer> channelColours, float width) {
+    public ChannelStripRecyclerViewAdapter(ItemMoveCallback.StartDragListener startDragListener, Context context, int numChannels, HashMap<Integer, Integer> channelLayer, HashMap<Integer, Object> layout, ArrayList<Integer> channelColours, float width) {
         this.context = context;
         this.startDragListener = startDragListener;
         colourArray = context.getResources().getIntArray(R.array.mixer_colours);
@@ -79,6 +79,9 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
         for (Map.Entry<Integer, ChannelStrip> entry : channelLayout.entrySet()) {
             channels.add(entry.getValue());
             notifyItemInserted(entry.getKey());
+        }
+        for (Map.Entry<Integer, Object> entry : layout.entrySet()) {
+//            Log.i("LAYOUT", entry.getKey() + " " + entry.getValue());
         }
     }
 
@@ -725,7 +728,7 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
             if (!channel.group) {
                 layout.put(i, channel.index);
             }
-            if (channel.group && channel.groupIndex == 0) {
+            if (channel.group && channel.colour != 0) {
                 Group group = new Group();
                 group.index = channel.index;
                 group.name = channel.name;
@@ -738,6 +741,7 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
                         group.channels.put(j, subchannel.index);
                     }
                 }
+                layout.put(group.index, group.toMap());
             }
         }
         for (Map.Entry<Integer, ChannelStrip> entry : hiddenChannels.entrySet()) {
