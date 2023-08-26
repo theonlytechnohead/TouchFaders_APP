@@ -1,5 +1,6 @@
 package net.ddns.anderserver.touchfadersapp
 
+import android.annotation.SuppressLint
 import android.content.*
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
@@ -166,6 +167,7 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
         bindService(serviceIntent, connection, 0)
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun onResume() {
         super.onResume()
         hideUI()
@@ -178,6 +180,7 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
         }
         devices.clear()
         deviceNames.clear()
+        // must update whole backgrounds on whole dataset
         adapter.notifyDataSetChanged()
 
         registerReceiver(broadcastReceiver, IntentFilter(START_MIX_ACTIVITY))

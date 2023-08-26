@@ -16,7 +16,6 @@
 	<color name="light_blue_A200">#FF40C4FF</color>
 	<color name="black_overlay">#999999</color>
 	<color name="background">#4F4F4F</color>
-	<color name="transparent">#00000000</color>
 
 	<!-- Metering colours -->
 	<color name="meter_start">#00A500</color>

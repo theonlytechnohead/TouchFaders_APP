@@ -4,14 +4,7 @@
 		<item name="android:background">@color/black_overlay</item>
 	</style>
 
-	<style name="Widget.Theme.TouchFaders.MixButton" parent="">
-		<item name="android:textColor">@color/white</item>
-		<item name="android:textSize">25sp</item>
-		<item name="android:insetBottom">0dp</item>
-		<item name="android:insetTop">0dp</item>
-	</style>
-
-	<style name="Widget.Theme.TouchFaders.BoxedVerticalSeekBar" parent="">
+    <style name="Widget.Theme.TouchFaders.BoxedVerticalSeekBar" parent="">
 		<item name="max">1023</item>
 		<item name="startValue">623</item> <!-- now -10dB -->
 		<item name="min">0</item>

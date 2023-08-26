@@ -1,14 +1,7 @@
 <resources>
     <string name="app_name">TouchFaders</string>
-    <string name="mix_1">MIX 1</string>
-    <string name="mix_2">MIX 2</string>
-    <string name="mix_3">MIX 3</string>
-    <string name="mix_4">MIX 4</string>
-    <string name="mix_5">MIX 5</string>
-    <string name="mix_6">MIX 6</string>
     <string name="hint_ip">192.168.1.2</string>
     <string name="start">CONNECT</string>
-    <string name="greeting_msg">TouchFaders</string>
     <string name="demo_button">DEMO</string>
     <string name="reset_layout_button">RESET CUSTOM FADER LAYOUT</string>
 
@@ -1053,6 +1046,16 @@
     <string name="title_activity_settings">Settings</string>
     <string name="setting_fader_width">fader_width</string>
     <string name="group_name_hint">Group name</string>
+    <string name="select_channels">Select channels</string>
+    <string name="help_eye">Use the eye to hide channels that are turned all the way down (set to -Inf).</string>
+    <string name="help_meter">This meter will show the current output volume.</string>
+    <string name="help_group">Use this button to add groups.</string>
+    <string name="help_fader">Use the fader to adjust the volume of that channel.</string>
+    <string name="help_touch">Double-tap to (un)mute, touch and hold to change order.</string>
+    <string name="help_channel">All the information for a channel is displayed here.</string>
+    <string name="help_exit">Use the red button to go back.</string>
+    <string name="help_mix_name">The name of the current mix is displayed here.</string>
+    <string name="help_mix_number">The number of the current mix is displayed here.</string>
 
     <array name="fader_width_entries">
         <item>Normal</item>

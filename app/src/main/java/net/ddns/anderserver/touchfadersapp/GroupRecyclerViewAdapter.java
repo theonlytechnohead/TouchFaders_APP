@@ -203,11 +203,13 @@ public class GroupRecyclerViewAdapter extends RecyclerView.Adapter<GroupRecycler
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     public void setChannels(ArrayList<ChannelStrip> channels) {
         if (channels != null) {
             this.channels = new ArrayList<>(channels);
             notifyItemRangeInserted(0, channels.size());
         } else {
+            // must update backgrounds on whole dataset
             notifyDataSetChanged();
             this.channels.clear();
         }

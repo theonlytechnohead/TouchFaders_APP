@@ -78,35 +78,32 @@
 			app:layout_constraintStart_toStartOf="parent" />
 
 		<TextView
-			android:id="@+id/eyeHelp"
 			android:layout_width="0dp"
 			android:layout_height="wrap_content"
 			android:paddingStart="10dp"
 			android:paddingEnd="10dp"
-			android:text="Use the eye to hide channels that are turned all the way down (set to -Inf)."
+			android:text="@string/help_eye"
 			app:layout_constraintEnd_toEndOf="parent"
 			app:layout_constraintStart_toEndOf="@+id/hide_button"
 			app:layout_constraintTop_toTopOf="parent" />
 
 		<TextView
-			android:id="@+id/meterHelp"
 			android:layout_width="0dp"
 			android:layout_height="wrap_content"
 			android:paddingStart="10dp"
 			android:paddingEnd="10dp"
-			android:text="This meter will show the current output volume."
+			android:text="@string/help_meter"
 			app:layout_constraintBottom_toBottomOf="parent"
 			app:layout_constraintEnd_toEndOf="parent"
 			app:layout_constraintStart_toEndOf="@+id/mixMeter"
 			app:layout_constraintTop_toTopOf="parent" />
 
 		<TextView
-			android:id="@+id/groupHelp"
 			android:layout_width="0dp"
 			android:layout_height="wrap_content"
 			android:paddingStart="10dp"
 			android:paddingEnd="10dp"
-			android:text="Use this button to add groups."
+			android:text="@string/help_group"
 			app:layout_constraintBottom_toBottomOf="parent"
 			app:layout_constraintEnd_toEndOf="parent"
 			app:layout_constraintStart_toEndOf="@+id/mixMeter"
@@ -120,19 +117,18 @@
 		android:layout_height="wrap_content"
 		android:paddingStart="10dp"
 		android:paddingEnd="10dp"
-		android:text="Use the fader to adjust the volume of that channel."
+		android:text="@string/help_fader"
 		app:layout_constraintBottom_toBottomOf="parent"
 		app:layout_constraintEnd_toStartOf="@+id/faderRecyclerView"
 		app:layout_constraintStart_toEndOf="@+id/mix_meter_layout"
 		app:layout_constraintTop_toTopOf="parent" />
 
 	<TextView
-		android:id="@+id/touchHelp"
 		android:layout_width="0dp"
 		android:layout_height="55dp"
 		android:paddingStart="10dp"
 		android:paddingEnd="10dp"
-		android:text="Double-tap to (un)mute, touch and hold to change order."
+		android:text="@string/help_touch"
 		app:layout_constraintBottom_toBottomOf="parent"
 		app:layout_constraintStart_toEndOf="@id/mix_meter_layout"
 		app:layout_constraintEnd_toStartOf="@+id/faderRecyclerView" />
@@ -156,7 +152,7 @@
 		android:layout_height="55dp"
 		android:paddingStart="10dp"
 		android:paddingEnd="10dp"
-		android:text="All the information for a channel is displayed here."
+		android:text="@string/help_channel"
 		app:layout_constraintBottom_toBottomOf="parent"
 		app:layout_constraintStart_toEndOf="@id/faderRecyclerView"
 		app:layout_constraintEnd_toStartOf="@+id/mix_info_layout" />
@@ -220,35 +216,32 @@
 			tools:text="1" />
 
 		<TextView
-			android:id="@+id/exitHelp"
 			android:layout_width="0dp"
 			android:layout_height="wrap_content"
 			android:paddingStart="10dp"
 			android:paddingEnd="10dp"
-			android:text="Use the red button to go back."
+			android:text="@string/help_exit"
 			app:layout_constraintEnd_toStartOf="@+id/back_button"
 			app:layout_constraintStart_toStartOf="parent"
 			app:layout_constraintTop_toTopOf="parent" />
 
 		<TextView
-			android:id="@+id/mixNameHelp"
 			android:layout_width="0dp"
 			android:layout_height="wrap_content"
 			android:paddingStart="10dp"
 			android:paddingEnd="10dp"
-			android:text="The name of the current mix is displayed here."
+			android:text="@string/help_mix_name"
 			app:layout_constraintBottom_toBottomOf="@+id/mix_name"
 			app:layout_constraintEnd_toStartOf="@+id/mix_name"
 			app:layout_constraintStart_toStartOf="parent"
 			app:layout_constraintTop_toTopOf="@+id/mix_name" />
 
 		<TextView
-			android:id="@+id/mixNunmberHelp"
 			android:layout_width="0dp"
 			android:layout_height="wrap_content"
 			android:paddingStart="10dp"
 			android:paddingEnd="10dp"
-			android:text="The number of the current mix is displayed here."
+			android:text="@string/help_mix_number"
 			app:layout_constraintBottom_toBottomOf="parent"
 			app:layout_constraintEnd_toStartOf="@+id/mix_number"
 			app:layout_constraintStart_toStartOf="parent" />
