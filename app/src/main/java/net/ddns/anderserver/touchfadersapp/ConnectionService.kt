@@ -62,7 +62,7 @@ class ConnectionService : Service() {
 //            .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
 
         val pendingIntent: PendingIntent = notificationIntent.let {
-            PendingIntent.getActivity(this, 0, it, 0)
+            PendingIntent.getActivity(this, 0, it, PendingIntent.FLAG_IMMUTABLE)
         }
 
         val builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

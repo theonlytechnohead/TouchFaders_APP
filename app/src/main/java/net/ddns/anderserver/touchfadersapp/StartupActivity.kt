@@ -167,7 +167,7 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
         bindService(serviceIntent, connection, 0)
     }
 
-    @SuppressLint("NotifyDataSetChanged")
+    @SuppressLint("NotifyDataSetChanged", "UnspecifiedRegisterReceiverFlag")
     override fun onResume() {
         super.onResume()
         hideUI()
@@ -183,7 +183,11 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
         // must update whole backgrounds on whole dataset
         adapter.notifyDataSetChanged()
 
-        registerReceiver(broadcastReceiver, IntentFilter(START_MIX_ACTIVITY))
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(broadcastReceiver, IntentFilter(START_MIX_ACTIVITY), RECEIVER_NOT_EXPORTED)
+        } else {
+            registerReceiver(broadcastReceiver, IntentFilter(START_MIX_ACTIVITY))
+        }
     }
 
     override fun onPause() {
