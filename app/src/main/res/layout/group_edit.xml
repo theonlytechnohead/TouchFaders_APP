@@ -13,7 +13,10 @@
         android:layout_height="wrap_content"
         android:maxLength="6"
         android:maxLines="1"
-        android:textColor="@color/white" />
+        android:hint="@string/group_name_hint"
+        android:textColor="@color/white"
+        android:autofillHints="name"
+        android:inputType="textNoSuggestions" />
 
     <Spinner
         android:id="@+id/group_colour"

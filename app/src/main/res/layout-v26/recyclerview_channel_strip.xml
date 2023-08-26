@@ -63,6 +63,8 @@
             tools:text="CHANNL"
             android:textAlignment="center"
             android:scrollHorizontally="false"
+            android:autoSizeTextType="uniform"
+            android:autoSizeMinTextSize="11sp"
             android:textColor="@color/white"
             android:typeface="monospace"
             app:layout_constraintBottom_toBottomOf="parent"

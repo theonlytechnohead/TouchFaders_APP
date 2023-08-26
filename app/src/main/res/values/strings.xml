@@ -1052,6 +1052,7 @@
     </string-array>
     <string name="title_activity_settings">Settings</string>
     <string name="setting_fader_width">fader_width</string>
+    <string name="group_name_hint">Group name</string>
 
     <array name="fader_width_entries">
         <item>Normal</item>
