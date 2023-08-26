@@ -7,7 +7,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.preference.PreferenceManager;
+import androidx.preference.PreferenceManager;
 import android.view.DisplayCutout;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,7 +48,6 @@ public class HelpActivity extends AppCompatActivity implements ItemMoveCallback.
     private HashMap<Integer, Integer> channelLayer;
     private int currentMix;
     private Integer mixColour;
-    private float width;
 
     @SuppressLint("StaticFieldLeak")
     @Override
@@ -101,7 +100,7 @@ public class HelpActivity extends AppCompatActivity implements ItemMoveCallback.
     @Override
     protected void onStart() {
         super.onStart();
-        width = 70;
+        float width = 70;
         channelLayer = loadMap();
         adapter = new ChannelStripRecyclerViewAdapter(this, instanceContext, numChannels, channelLayer, loadLayout(), channelColours, width);
         adapter.setValuesChangeListener((index, points) -> {
@@ -233,14 +232,12 @@ public class HelpActivity extends AppCompatActivity implements ItemMoveCallback.
         try {
             if (preferences != null) {
                 String jsonString = preferences.getString("channel_layout", (new JSONObject()).toString());
-                if (jsonString != null) {
-                    JSONObject json = new JSONObject(jsonString);
-                    Iterator<String> keys = json.keys();
-                    while (keys.hasNext()) {
-                        String key = keys.next();
-                        Object value = json.get(key);
-                        outputMap.put(Integer.valueOf(key), value);
-                    }
+                JSONObject json = new JSONObject(jsonString);
+                Iterator<String> keys = json.keys();
+                while (keys.hasNext()) {
+                    String key = keys.next();
+                    Object value = json.get(key);
+                    outputMap.put(Integer.valueOf(key), value);
                 }
             }
         } catch (JSONException e) {
@@ -255,14 +252,12 @@ public class HelpActivity extends AppCompatActivity implements ItemMoveCallback.
         try {
             if (preferences != null) {
                 String jsonString = preferences.getString("channel_layer", (new JSONObject()).toString());
-                if (jsonString != null) {
-                    JSONObject jsonObject = new JSONObject(jsonString);
-                    Iterator<String> keys = jsonObject.keys();
-                    while (keys.hasNext()) {
-                        String key = keys.next();
-                        Integer value = jsonObject.getInt(key);
-                        outputMap.put(Integer.valueOf(key), value);
-                    }
+                JSONObject jsonObject = new JSONObject(jsonString);
+                Iterator<String> keys = jsonObject.keys();
+                while (keys.hasNext()) {
+                    String key = keys.next();
+                    Integer value = jsonObject.getInt(key);
+                    outputMap.put(Integer.valueOf(key), value);
                 }
             }
         } catch (JSONException e) {

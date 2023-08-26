@@ -173,7 +173,7 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
         hideUI()
         launch(Dispatchers.IO) {
             listenUDP = true
-            UDPListener();
+            UDPListener()
         }
         launch(Dispatchers.IO) {
             checkNetwork()
@@ -192,7 +192,7 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
 
     override fun onPause() {
         super.onPause()
-        listenUDP = false;
+        listenUDP = false
         unregisterReceiver(broadcastReceiver)
     }
 
@@ -229,10 +229,11 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
         }
     }
 
+    @Suppress("FunctionName")
     private fun UDPListener() {
         val handler = Handler(Looper.getMainLooper())
         var socket = DatagramSocket(8877)
-        socket.soTimeout = 100;
+        socket.soTimeout = 100
         socket.broadcast = true
         while (listenUDP) {
             try {
@@ -245,7 +246,7 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
                 val packet = DatagramPacket(recvBuf, recvBuf.size)
                 socket.receive(packet)
                 val length = packet.length
-                val senderIP = packet.address.hostAddress;
+                val senderIP = packet.address.hostAddress
                 val senderName = String(recvBuf.copyOfRange(3, length - 1))
 //                Log.i("UDP", senderName)
                 handler.post { adapter.addDevice(senderName) }
@@ -281,7 +282,7 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
             connectionService = binder.getService()
             bound = true
 
-            if (connectionService.state() == ConnectionService.states.CONNECTED) connectionService.Disconnect()
+            if (connectionService.state() == ConnectionService.States.CONNECTED) connectionService.Disconnect()
         }
 
         override fun onServiceDisconnected(className: ComponentName?) {

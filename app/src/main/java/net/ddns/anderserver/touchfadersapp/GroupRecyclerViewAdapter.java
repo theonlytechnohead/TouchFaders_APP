@@ -23,7 +23,6 @@ public class GroupRecyclerViewAdapter extends RecyclerView.Adapter<GroupRecycler
 
     private ArrayList<ChannelStrip> channels = new ArrayList<>();
     private final HashMap<Integer, ChannelStrip> hiddenChannels = new HashMap<>();
-    private boolean hidden;
     private final float width;
 
     private int colourIndex;
@@ -32,20 +31,19 @@ public class GroupRecyclerViewAdapter extends RecyclerView.Adapter<GroupRecycler
     private ChannelStripRecyclerViewAdapter.ChannelMuteListener channelMuteListener;
     private final ItemMoveCallback.StartDragListener startDragListener;
 
-    int[] colourArray;
-    int[] colourArrayLighter;
-    int[] colourArrayDarker;
-    int darkGreyColour;
-    int greyColour;
-    int whiteColour;
+    final int[] colourArray;
+    final int[] colourArrayLighter;
+    final int[] colourArrayDarker;
+    final int darkGreyColour;
+    final int greyColour;
+    final int whiteColour;
 
     public GroupRecyclerViewAdapter(Context context, float width, ItemMoveCallback.StartDragListener startDragListener) {
         super();
         this.context = context;
         this.width = width;
         this.startDragListener = startDragListener;
-        this.hidden = false;
-//        this.group = group;
+        //        this.group = group;
 
         colourArray = context.getResources().getIntArray(R.array.mixer_colours);
         colourArrayLighter = context.getResources().getIntArray(R.array.mixer_colours_lighter);
@@ -139,12 +137,12 @@ public class GroupRecyclerViewAdapter extends RecyclerView.Adapter<GroupRecycler
     public class GroupViewHolder extends RecyclerView.ViewHolder {
 
         int position;
-        ConstraintLayout faderBackground;
-        ConstraintLayout channelBackground;
-        BoxedVertical fader;
-        TextView channelNumber;
-        TextView channelPatch;
-        TextView channelName;
+        final ConstraintLayout faderBackground;
+        final ConstraintLayout channelBackground;
+        final BoxedVertical fader;
+        final TextView channelNumber;
+        final TextView channelPatch;
+        final TextView channelName;
 
         @SuppressLint("ClickableViewAccessibility")
         public GroupViewHolder(@NonNull View itemView) {
@@ -165,7 +163,7 @@ public class GroupRecyclerViewAdapter extends RecyclerView.Adapter<GroupRecycler
             channelBackground.setOnTouchListener(new View.OnTouchListener() {
                 private final GestureDetector gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
                     @Override
-                    public boolean onDoubleTap(MotionEvent e) {
+                    public boolean onDoubleTap(@NonNull MotionEvent e) {
                         ChannelStrip channelStrip = channels.get(holder.getAdapterPosition());
                         int index = channelStrip.index;
                         channels.get(holder.getAdapterPosition()).sendMuted = !channelStrip.sendMuted;
@@ -180,7 +178,7 @@ public class GroupRecyclerViewAdapter extends RecyclerView.Adapter<GroupRecycler
                     }
 
                     @Override
-                    public void onLongPress(MotionEvent e) {
+                    public void onLongPress(@NonNull MotionEvent e) {
                         if (startDragListener != null)
                             startDragListener.requestDrag(holder);
                         super.onLongPress(e);

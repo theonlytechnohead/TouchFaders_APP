@@ -52,17 +52,12 @@ public class MixSelectRecyclerViewAdapter extends RecyclerView.Adapter<MixSelect
         int position;
 
         //TextView mixTextView;
-        Button mixSelectButton;
+        final Button mixSelectButton;
 
         ViewHolder(View itemView) {
             super(itemView);
-            //mixTextView = itemView.findViewById(R.id.mix_select_text);
-            //mixTextView.setOnClickListener(this);
             mixSelectButton = itemView.findViewById(R.id.mix_select_button);
-            mixSelectButton.setOnClickListener(view -> {
-//                mixSelectButton.setEnabled(false);
-                onItemClick(view, position);
-            });
+            mixSelectButton.setOnClickListener(view -> onItemClick(view, position));
         }
 
         @Override

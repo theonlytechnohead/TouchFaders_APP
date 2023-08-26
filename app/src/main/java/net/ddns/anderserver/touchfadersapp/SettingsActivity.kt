@@ -35,7 +35,7 @@ class SettingsActivity : AppCompatActivity() {
 
         binding.resetLayoutButton.setOnClickListener {
             PreferenceManager.getDefaultSharedPreferences(applicationContext).edit()
-                .remove("channel_layer").apply();
+                .remove("channel_layer").apply()
             finish()
         }
     }

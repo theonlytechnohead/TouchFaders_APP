@@ -20,10 +20,10 @@ import kotlinx.coroutines.launch
 import java.io.IOException
 import java.net.*
 
-@Suppress("DeferredResultUnused")
+@Suppress("DeferredResultUnused", "FunctionName")
 class ConnectionService : Service() {
 
-    enum class states {
+    enum class States {
         WAITING,
         CONNECTED,
         RUNNING
@@ -103,18 +103,18 @@ class ConnectionService : Service() {
             async(Dispatchers.IO) {
                 // connects via TCP
                 val socketAddress = InetSocketAddress(address, 8878)
-                val socket = Socket();
+                val socket = Socket()
                 try {
-                    socket.connect(socketAddress, 100);
+                    socket.connect(socketAddress, 100)
                 } catch (e: IOException) {
                     return@async
                 }
-                socket.soTimeout = 100;
+                socket.soTimeout = 100
                 var byteArraySend = InetAddress.getByName(StartupActivity.getLocalIP()).address
                 byteArraySend += Build.MODEL.encodeToByteArray()
                 socket.getOutputStream().write(byteArraySend)
                 val byteArrayReceive = ByteArray(socket.receiveBufferSize)
-                val bytesRead: Int;
+                val bytesRead: Int
                 try {
                     bytesRead =
                         socket.getInputStream().read(byteArrayReceive, 0, socket.receiveBufferSize)
@@ -125,7 +125,7 @@ class ConnectionService : Service() {
                 }
 
                 if (bytesRead >= 4) {
-                    var index = 0;
+                    var index = 0
                     // OSC port to recieve on
                     receivePort = 9000 + byteArrayReceive[index++].toInt()
                     // OSC port to send on
@@ -154,7 +154,7 @@ class ConnectionService : Service() {
                         mixNames().add(mixName)
                     }
 
-                    state = states.CONNECTED
+                    state = States.CONNECTED
 
                     launch(Dispatchers.Default) {
                         val newNotification = buildNotification(
@@ -170,8 +170,8 @@ class ConnectionService : Service() {
         }
     }
 
-    var state = states.WAITING
-    fun state(): states = state
+    var state = States.WAITING
+    fun state(): States = state
 
     fun address(): String = DEVICE_IP.toString().trim('/')
 
@@ -199,7 +199,7 @@ class ConnectionService : Service() {
     private var selectedMix: Int? = null
     fun selectedMix(): Int = selectedMix ?: 0
     fun selectedMix(index: Int) {
-        state = states.RUNNING
+        state = States.RUNNING
         selectedMix = index
         updateNotification(
             buildNotification(
@@ -261,7 +261,7 @@ class ConnectionService : Service() {
     }
 
     fun deselectMix() {
-        state = states.CONNECTED
+        state = States.CONNECTED
         selectedMix = null
         updateNotification(
             buildNotification(
@@ -280,7 +280,7 @@ class ConnectionService : Service() {
     }
 
     fun Disconnect() {
-        state = states.WAITING
+        state = States.WAITING
         val newNotification = buildNotification("Pending connection")
         updateNotification(newNotification)
         // disconnects via TCP

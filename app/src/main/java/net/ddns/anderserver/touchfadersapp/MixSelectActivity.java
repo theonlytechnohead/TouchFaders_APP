@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.Nullable;
@@ -24,20 +23,18 @@ public class MixSelectActivity extends AppCompatActivity implements MixSelectRec
 
     ConnectionService connectionService;
     Boolean bound = false;
-    ServiceConnection connection = new ServiceConnection() {
+    final ServiceConnection connection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             connectionService = ((ConnectionService.ConnectionBinder) iBinder).getService();
             bound = true;
 
 //            Log.i("MIX", "Service connected");
-            if (connectionService.state() == ConnectionService.states.RUNNING)
+            if (connectionService.state() == ConnectionService.States.RUNNING)
                 connectionService.deselectMix();
-            if (connectionService.state() == ConnectionService.states.WAITING) finish();
+            if (connectionService.state() == ConnectionService.States.WAITING) finish();
 
             // Generate mix names
-//            ArrayList<String> mixNames = new ArrayList<>();
-//            for (int i = 1; i <= connectionService.mixes(); i++) mixNames.add("Mix " + i);
 
             List<String> mixNames = connectionService.mixNames();
 
@@ -125,14 +122,12 @@ public class MixSelectActivity extends AppCompatActivity implements MixSelectRec
         super.onResume();
         hideUI();
 
-        findViewById(R.id.back_button).setOnClickListener((view) -> {
-            finish();
-        });
+        findViewById(R.id.back_button).setOnClickListener((view) -> finish());
 
         if (connectionService != null) {
-            if (connectionService.state() == ConnectionService.states.RUNNING)
+            if (connectionService.state() == ConnectionService.States.RUNNING)
                 connectionService.deselectMix();
-            if (connectionService.state() == ConnectionService.states.WAITING) finish();
+            if (connectionService.state() == ConnectionService.States.WAITING) finish();
         }
     }
 

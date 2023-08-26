@@ -39,12 +39,12 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
     private ChannelMuteListener channelMuteListener;
     private final ItemMoveCallback.StartDragListener startDragListener;
 
-    int[] colourArray;
-    int[] colourArrayLighter;
-    int[] colourArrayDarker;
-    int darkGreyColour;
-    int greyColour;
-    int whiteColour;
+    final int[] colourArray;
+    final int[] colourArrayLighter;
+    final int[] colourArrayDarker;
+    final int darkGreyColour;
+    final int greyColour;
+    final int whiteColour;
 
     int groups = 0;
     private final HashMap<Integer, ArrayList<ChannelStrip>> groupedChannels = new HashMap<>();
@@ -79,9 +79,6 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
         for (Map.Entry<Integer, ChannelStrip> entry : channelLayout.entrySet()) {
             channels.add(entry.getValue());
             notifyItemInserted(entry.getKey());
-        }
-        for (Map.Entry<Integer, Object> entry : layout.entrySet()) {
-//            Log.i("LAYOUT", entry.getKey() + " " + entry.getValue());
         }
     }
 
@@ -206,15 +203,11 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
                         swapChannel(i + 1, i + 2);
                         notifyItemMoved(i + 1, i + 2);
                     }
-                    // move group
-                    swapChannel(i, i + 1);
-                    notifyItemMoved(i, i + 1);
-                    notifyItemChanged(i);
-                } else {
-                    swapChannel(i, i + 1);
-                    notifyItemMoved(i, i + 1);
-                    notifyItemChanged(i);
                 }
+                // move group
+                swapChannel(i, i + 1);
+                notifyItemMoved(i, i + 1);
+                notifyItemChanged(i);
                 if (target.group) {
                     moveSubchannelsToGroup(-target.index);
                 }
@@ -290,12 +283,12 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
     public class ChannelStripViewHolder extends RecyclerView.ViewHolder implements ChannelStripRecyclerViewAdapter.FaderValueChangedListener {
 
         int position;
-        ConstraintLayout faderBackground;
-        ConstraintLayout channelBackground;
-        BoxedVertical fader;
-        TextView channelNumber;
-        TextView channelPatch;
-        TextView channelName;
+        final ConstraintLayout faderBackground;
+        final ConstraintLayout channelBackground;
+        final BoxedVertical fader;
+        final TextView channelNumber;
+        final TextView channelPatch;
+        final TextView channelName;
 
         @SuppressLint("ClickableViewAccessibility")
         ChannelStripViewHolder(View itemView) {
@@ -331,7 +324,7 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
             fader.setOnTouchListener(new View.OnTouchListener() {
                 private final GestureDetector gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
                     @Override
-                    public boolean onSingleTapConfirmed(MotionEvent e) {
+                    public boolean onSingleTapConfirmed(@NonNull MotionEvent e) {
                         ChannelStrip group = channels.get(holder.getAdapterPosition());
                         channels.get(holder.getAdapterPosition()).hide = !group.hide;
                         notifyItemChanged(holder.getAdapterPosition());
@@ -352,7 +345,7 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
             channelBackground.setOnTouchListener(new View.OnTouchListener() {
                 private final GestureDetector gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
                     @Override
-                    public boolean onDoubleTap(MotionEvent e) {
+                    public boolean onDoubleTap(@NonNull MotionEvent e) {
                         ChannelStrip channelStrip = channels.get(holder.getAdapterPosition());
                         int index = channelStrip.index;
                         channels.get(holder.getAdapterPosition()).sendMuted = !channelStrip.sendMuted;
@@ -375,13 +368,13 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
                     }
 
                     @Override
-                    public void onLongPress(MotionEvent e) {
+                    public void onLongPress(@NonNull MotionEvent e) {
                         startDragListener.requestDrag(holder);
                         super.onLongPress(e);
                     }
 
                     @Override
-                    public boolean onSingleTapConfirmed(MotionEvent e) {
+                    public boolean onSingleTapConfirmed(@NonNull MotionEvent e) {
                         ChannelStrip channelStrip = channels.get(holder.getAdapterPosition());
                         if (channelStrip.group) {
                             GroupEditDialog editDialog = new GroupEditDialog(channelStrip.index, channelStrip.name, channelStrip.colourIndex, ungroupedChannels(), groupedChannels(channelStrip.index));
@@ -431,8 +424,8 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
 
     public class SubChannelViewHolder extends RecyclerView.ViewHolder {
 
-        GroupRecyclerViewAdapter adapter;
-        RecyclerView recyclerView;
+        final GroupRecyclerViewAdapter adapter;
+        final RecyclerView recyclerView;
         ItemTouchHelper touchHelper;
 
         public SubChannelViewHolder(@NonNull View itemView) {

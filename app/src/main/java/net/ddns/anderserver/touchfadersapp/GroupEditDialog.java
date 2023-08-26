@@ -23,14 +23,14 @@ import java.util.ArrayList;
 
 public class GroupEditDialog extends AppCompatDialogFragment {
 
-    int index;
+    final int index;
     String name;
     int colour;
-    ArrayList<ChannelStrip> ungroupedChannels;
-    ArrayList<ChannelStrip> groupedChannels;
-    ArrayList<ChannelStrip> allChannels;
-    ArrayList<ChannelStrip> addedChannels;
-    ArrayList<ChannelStrip> removedChannels;
+    final ArrayList<ChannelStrip> ungroupedChannels;
+    final ArrayList<ChannelStrip> groupedChannels;
+    final ArrayList<ChannelStrip> allChannels;
+    final ArrayList<ChannelStrip> addedChannels;
+    final ArrayList<ChannelStrip> removedChannels;
 
     DialogInterface.OnClickListener resultListener;
 
@@ -98,8 +98,7 @@ public class GroupEditDialog extends AppCompatDialogFragment {
 
         Button editChannels = layout.findViewById(R.id.group_edit);
         editChannels.setOnClickListener(view -> {
-            ArrayList<ChannelStrip> ungrouped = new ArrayList<>();
-            ungrouped.addAll(ungroupedChannels);
+            ArrayList<ChannelStrip> ungrouped = new ArrayList<>(ungroupedChannels);
             ungrouped.removeAll(addedChannels);
             ungrouped.addAll(removedChannels);
             ArrayList<ChannelStrip> grouped = new ArrayList<>();

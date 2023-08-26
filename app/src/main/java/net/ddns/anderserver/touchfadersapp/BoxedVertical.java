@@ -1,11 +1,5 @@
 package net.ddns.anderserver.touchfadersapp;
 
-/**
- * Created by alpaslanbak on 29/09/2017.
- * Modified by Nick Panagopoulos @npanagop on 12/05/2018.
- * Modified by Craig Anderson @theonlytechnohead on 25/11/2020.
- */
-
 import static java.lang.Math.abs;
 
 import android.annotation.SuppressLint;
@@ -26,6 +20,11 @@ import android.view.View;
 
 import androidx.core.content.ContextCompat;
 
+/**
+ * Created by alpaslanbak on 29/09/2017.
+ * Modified by Nick Panagopoulos @npanagop on 12/05/2018.
+ * Modified by Craig Anderson @theonlytechnohead on 25/11/2020.
+ */
 public class BoxedVertical extends View {
     private static final String TAG = BoxedVertical.class.getSimpleName();
 
@@ -147,11 +146,6 @@ public class BoxedVertical extends View {
         // range check
         mPoints = Math.min(mPoints, max);
         mPoints = Math.max(mPoints, min);
-
-        //mProgressPaint = new Paint();
-        //mProgressPaint.setColor(progressColor);
-        //mProgressPaint.setAntiAlias(true);
-        //mProgressPaint.setStyle(Paint.Style.STROKE);
 
         mTextPaint = new Paint();
         mTextPaint.setColor(textColor);

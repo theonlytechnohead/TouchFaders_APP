@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
 
     ConnectionService connectionService;
     Boolean bound = false;
-    ServiceConnection connection = new ServiceConnection() {
+    final ServiceConnection connection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             connectionService = ((ConnectionService.ConnectionBinder) iBinder).getService();
@@ -155,8 +155,8 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
         }
     };
 
-    OSCPatternAddressMessageSelector sendPattern = new OSCPatternAddressMessageSelector("/" + MIX + "*/" + CHANNEL + "*");
-    OSCMessageListener sendListener = new OSCMessageListener() {
+    final OSCPatternAddressMessageSelector sendPattern = new OSCPatternAddressMessageSelector("/" + MIX + "*/" + CHANNEL + "*");
+    final OSCMessageListener sendListener = new OSCMessageListener() {
         @Override
         public void acceptMessage(OSCMessageEvent event) {
             String[] segments = event.getMessage().getAddress().split("/");
@@ -181,8 +181,8 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
         }
     };
 
-    OSCPatternAddressMessageSelector sendMutePattern = new OSCPatternAddressMessageSelector("/" + MIX + "*/" + CHANNEL + "*/" + MUTE);
-    OSCMessageListener sendMuteListener = new OSCMessageListener() {
+    final OSCPatternAddressMessageSelector sendMutePattern = new OSCPatternAddressMessageSelector("/" + MIX + "*/" + CHANNEL + "*/" + MUTE);
+    final OSCMessageListener sendMuteListener = new OSCMessageListener() {
         @Override
         public void acceptMessage(OSCMessageEvent event) {
             String[] segments = event.getMessage().getAddress().split("/");
@@ -195,8 +195,8 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
         }
     };
 
-    OSCPatternAddressMessageSelector labelPattern = new OSCPatternAddressMessageSelector("/" + NAME + "*");
-    OSCMessageListener labelListener = new OSCMessageListener() {
+    final OSCPatternAddressMessageSelector labelPattern = new OSCPatternAddressMessageSelector("/" + NAME + "*");
+    final OSCMessageListener labelListener = new OSCMessageListener() {
         @Override
         public void acceptMessage(OSCMessageEvent event) {
             String[] segments = event.getMessage().getAddress().split("/");
@@ -208,8 +208,8 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
         }
     };
 
-    OSCPatternAddressMessageSelector channelMutePattern = new OSCPatternAddressMessageSelector("/" + CHANNEL + "*/" + MUTE);
-    OSCMessageListener channelMuteListener = new OSCMessageListener() {
+    final OSCPatternAddressMessageSelector channelMutePattern = new OSCPatternAddressMessageSelector("/" + CHANNEL + "*/" + MUTE);
+    final OSCMessageListener channelMuteListener = new OSCMessageListener() {
         @Override
         public void acceptMessage(OSCMessageEvent event) {
             String[] segments = event.getMessage().getAddress().split("/");
@@ -222,8 +222,8 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
         }
     };
 
-    OSCPatternAddressMessageSelector patchPattern = new OSCPatternAddressMessageSelector("/" + PATCH + "*");
-    OSCMessageListener patchListener = new OSCMessageListener() {
+    final OSCPatternAddressMessageSelector patchPattern = new OSCPatternAddressMessageSelector("/" + PATCH + "*");
+    final OSCMessageListener patchListener = new OSCMessageListener() {
         @Override
         public void acceptMessage(OSCMessageEvent event) {
             String[] segments = event.getMessage().getAddress().split("/");
@@ -235,8 +235,8 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
         }
     };
 
-    OSCPatternAddressMessageSelector colourPattern = new OSCPatternAddressMessageSelector("/" + CHANNEL + "*/" + COLOUR);
-    OSCMessageListener colourListener = new OSCMessageListener() {
+    final OSCPatternAddressMessageSelector colourPattern = new OSCPatternAddressMessageSelector("/" + CHANNEL + "*/" + COLOUR);
+    final OSCMessageListener colourListener = new OSCMessageListener() {
         @Override
         public void acceptMessage(OSCMessageEvent event) {
             String[] segments = event.getMessage().getAddress().split("/");
@@ -248,8 +248,8 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
         }
     };
 
-    OSCPatternAddressMessageSelector disconnectPattern = new OSCPatternAddressMessageSelector("/" + DISCONNECT);
-    OSCMessageListener disconnectListener = new OSCMessageListener() {
+    final OSCPatternAddressMessageSelector disconnectPattern = new OSCPatternAddressMessageSelector("/" + DISCONNECT);
+    final OSCMessageListener disconnectListener = new OSCMessageListener() {
         @Override
         public void acceptMessage(OSCMessageEvent event) {
             Handler handler = new Handler(Looper.getMainLooper());
@@ -566,15 +566,13 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         if (preferences != null) {
             String jsonString = preferences.getString(JSON_CHANNEL_LAYOUT, (new JSONObject()).toString());
-            if (jsonString != null) {
-                Gson gson = new GsonBuilder().setObjectToNumberStrategy(ToNumberPolicy.LONG_OR_DOUBLE).create();
-                Type mapType = new TypeToken<Map<String, Object>>() {
-                }.getType();
-                Map<String, Object> map = gson.fromJson(jsonString, mapType);
-                for (String key : map.keySet()) {
-                    Object value = map.get(key);
-                    outputMap.put(Integer.valueOf(key), value);
-                }
+            Gson gson = new GsonBuilder().setObjectToNumberStrategy(ToNumberPolicy.LONG_OR_DOUBLE).create();
+            Type mapType = new TypeToken<Map<String, Object>>() {
+            }.getType();
+            Map<String, Object> map = gson.fromJson(jsonString, mapType);
+            for (String key : map.keySet()) {
+                Object value = map.get(key);
+                outputMap.put(Integer.valueOf(key), value);
             }
         }
         return outputMap;
@@ -586,14 +584,12 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
         try {
             if (preferences != null) {
                 String jsonString = preferences.getString("channel_layer", (new JSONObject()).toString());
-                if (jsonString != null) {
-                    JSONObject jsonObject = new JSONObject(jsonString);
-                    Iterator<String> keys = jsonObject.keys();
-                    while (keys.hasNext()) {
-                        String key = keys.next();
-                        Integer value = jsonObject.getInt(key);
-                        outputMap.put(Integer.valueOf(key), value);
-                    }
+                JSONObject jsonObject = new JSONObject(jsonString);
+                Iterator<String> keys = jsonObject.keys();
+                while (keys.hasNext()) {
+                    String key = keys.next();
+                    Integer value = jsonObject.getInt(key);
+                    outputMap.put(Integer.valueOf(key), value);
                 }
             }
         } catch (JSONException e) {

@@ -14,7 +14,7 @@ public class Group {
     public String name;
     public int colourIndex;
 
-    public Map<Integer, Integer> channels = new HashMap<>();
+    public final Map<Integer, Integer> channels = new HashMap<>();
 
     @NonNull
     @Override

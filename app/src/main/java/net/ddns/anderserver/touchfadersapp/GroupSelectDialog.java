@@ -16,10 +16,10 @@ import java.util.TreeMap;
 
 public class GroupSelectDialog extends AppCompatDialogFragment {
 
-    int index;
-    String name;
-    ArrayList<ChannelStrip> ungrouped;
-    ArrayList<ChannelStrip> grouped;
+    final int index;
+    final String name;
+    final ArrayList<ChannelStrip> ungrouped;
+    final ArrayList<ChannelStrip> grouped;
     TreeMap<Integer, ChannelStrip> allChannels;
 
     DialogInterface.OnClickListener resultListener;
