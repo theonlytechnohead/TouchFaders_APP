@@ -41,6 +41,7 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.2'
     implementation 'com.illposed.osc:javaosc-core:0.8'
     implementation 'androidx.appcompat:appcompat:1.4.2'
+    implementation 'androidx.preference:preference:1.2.1'
     implementation 'com.google.android.material:material:1.6.1'
 	implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'com.github.captain-miao:topalignedtextview:1.0.0'
