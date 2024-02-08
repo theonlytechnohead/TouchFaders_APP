@@ -1,10 +1,20 @@
 package net.ddns.anderserver.touchfadersapp
 
 import android.annotation.SuppressLint
-import android.content.*
+import android.content.BroadcastReceiver
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.content.ServiceConnection
+import android.content.SharedPreferences
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.os.*
+import android.os.Build
+import android.os.Bundle
+import android.os.Handler
+import android.os.IBinder
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -21,7 +31,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import net.ddns.anderserver.touchfadersapp.databinding.StartupBinding
 import java.io.IOException
-import java.net.*
+import java.net.DatagramPacket
+import java.net.DatagramSocket
+import java.net.InetAddress
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 import kotlin.coroutines.CoroutineContext
 
 class StartupActivity : AppCompatActivity(), CoroutineScope {
@@ -301,28 +315,6 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
         fun ByteArray.toHexString(length: Int): String {
             return this.joinToString("", limit = length) {
                 java.lang.String.format("%02x ", it)
-            }
-        }
-
-        fun getLocalIP(): String? {
-            return try {
-                var localAddress = ""
-                val en = NetworkInterface.getNetworkInterfaces()
-                while (en.hasMoreElements()) {
-                    val networkInterface = en.nextElement()
-                    val enumIpAddr = networkInterface.inetAddresses
-                    while (enumIpAddr.hasMoreElements()) {
-                        val inetAddress = enumIpAddr.nextElement()
-                        if (!inetAddress.isLinkLocalAddress) {
-                            if (!inetAddress.toString().contains(':'))
-                                localAddress = inetAddress.hostAddress
-                        }
-                    }
-                }
-                localAddress
-            } catch (e: SocketException) {
-                e.printStackTrace()
-                null
             }
         }
 

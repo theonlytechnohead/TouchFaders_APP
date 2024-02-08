@@ -1,6 +1,10 @@
 package net.ddns.anderserver.touchfadersapp
 
-import android.app.*
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.Binder
@@ -18,7 +22,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import java.io.IOException
-import java.net.*
+import java.net.DatagramPacket
+import java.net.DatagramSocket
+import java.net.InetAddress
+import java.net.InetSocketAddress
+import java.net.Socket
 
 @Suppress("DeferredResultUnused", "FunctionName")
 class ConnectionService : Service() {
@@ -110,8 +118,7 @@ class ConnectionService : Service() {
                     return@async
                 }
                 socket.soTimeout = 100
-                var byteArraySend = InetAddress.getByName(StartupActivity.getLocalIP()).address
-                byteArraySend += Build.MODEL.encodeToByteArray()
+                val byteArraySend = Build.MODEL.encodeToByteArray()
                 socket.getOutputStream().write(byteArraySend)
                 val byteArrayReceive = ByteArray(socket.receiveBufferSize)
                 val bytesRead: Int
@@ -222,8 +229,7 @@ class ConnectionService : Service() {
                 }
                 oscPortOut = OSCPortOut(serializer, InetSocketAddress(address(), sendPort()))
                 oscPortOut.send(OSCMessage("/" + MainActivity.CONNECT, mutableListOf(1)))
-                oscPortIn =
-                    OSCPortIn(InetSocketAddress(StartupActivity.getLocalIP(), receivePort()))
+                oscPortIn = OSCPortIn(InetSocketAddress("::", receivePort()))
                 oscPortIn.dispatcher.isAlwaysDispatchingImmediately = true
             }
         }
