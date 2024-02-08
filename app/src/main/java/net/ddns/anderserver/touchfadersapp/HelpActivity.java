@@ -125,7 +125,7 @@ public class HelpActivity extends AppCompatActivity implements ItemMoveCallback.
         hideUI();
 
         mixInfo.setBackgroundColor(getResources().getIntArray(R.array.mixer_colours)[mixColour]);
-        mixName.setText("MIX \n1");
+        mixName.setText("MX\n \n1");
         mixNumber.setText("1");
         mixNumber.setTextColor(getResources().getIntArray(R.array.mixer_colours_lighter)[currentMix]);
 

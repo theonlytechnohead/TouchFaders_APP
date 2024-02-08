@@ -136,7 +136,7 @@
 			app:layout_constraintEnd_toEndOf="parent"
 			app:layout_constraintStart_toStartOf="parent"
 			app:layout_constraintTop_toBottomOf="@+id/back_button"
-			tools:text="MIX \n1" />
+			tools:text="MX\n \n1" />
 
 		<TextView
 			android:id="@+id/mix_number"

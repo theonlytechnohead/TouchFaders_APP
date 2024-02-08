@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
                 numChannels = connectionService.channels();
                 channelColours = new ArrayList<>(connectionService.channelColours());
                 currentMix = connectionService.selectedMix();
-                mixName.setText(connectionService.mixNames().get(currentMix - 1).replace(" ", " \n"));
+                mixName.setText(connectionService.mixNames().get(currentMix - 1).replace(" ", "\n \n"));
                 mixNumber.setText(String.valueOf(currentMix));
                 mixNumber.setTextColor(getResources().getIntArray(R.array.mixer_colours_lighter)[connectionService.mixColours().get(currentMix - 1)]);
                 mixColour = connectionService.mixColours().get(currentMix - 1);
@@ -362,7 +362,7 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
 
         if (demo) {
             mixInfo.setBackgroundColor(getResources().getIntArray(R.array.mixer_colours)[mixColour]);
-            mixName.setText("MIX \n1");
+            mixName.setText("MX\n \n1");
             mixNumber.setText("1");
             mixNumber.setTextColor(getResources().getIntArray(R.array.mixer_colours_lighter)[currentMix]);
         }
