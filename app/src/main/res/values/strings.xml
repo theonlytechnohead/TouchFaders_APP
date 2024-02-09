@@ -1056,6 +1056,9 @@
     <string name="help_exit">Use the red button to go back.</string>
     <string name="help_mix_name">The name of the current mix is displayed here.</string>
     <string name="help_mix_number">The number of the current mix is displayed here.</string>
+    <string name="exit">Exit</string>
+    <string name="settings">Settings</string>
+    <string name="help">Help</string>
 
     <array name="fader_width_entries">
         <item>Normal</item>

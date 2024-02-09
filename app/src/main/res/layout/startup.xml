@@ -10,6 +10,8 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/helpButton"
+        android:text="@string/help"
+        android:textSize="0sp"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_margin="5dp"
@@ -68,6 +70,8 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/settingsButton"
+        android:text="@string/settings"
+        android:textSize="0sp"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_margin="5dp"

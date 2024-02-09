@@ -10,7 +10,7 @@
     <EditText
         android:id="@+id/group_name"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:maxLength="6"
         android:maxLines="1"
         android:hint="@string/group_name_hint"
@@ -21,7 +21,7 @@
     <Spinner
         android:id="@+id/group_colour"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:entries="@array/colours_array"
         style="@style/Theme.TouchFaders.Spinner" />
 

@@ -31,8 +31,10 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/back_button"
-        android:layout_width="35dp"
-        android:layout_height="35dp"
+        android:text="@string/exit"
+        android:textSize="0sp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:backgroundTint="@color/red"
         android:insetTop="0dp"
         android:insetBottom="0dp"
@@ -42,6 +44,7 @@
         android:layout_margin="5dp"
         android:stateListAnimator="@null"
         app:icon="@android:drawable/ic_menu_close_clear_cancel"
+        app:iconSize="48dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
