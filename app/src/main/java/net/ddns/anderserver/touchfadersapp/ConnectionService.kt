@@ -170,7 +170,11 @@ class ConnectionService : Service() {
                             }"
                         )
                         updateNotification(newNotification)
-                        sendBroadcast(Intent(StartupActivity.START_MIX_ACTIVITY))
+                        val startMixIntent = Intent(StartupActivity.START_MIX_ACTIVITY)
+                        startMixIntent.apply {
+                            `package` = applicationContext.packageName
+                        }
+                        sendBroadcast(startMixIntent)
                     }
                 }
             }

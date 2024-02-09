@@ -104,18 +104,28 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
          */
         binding.helpButton.setOnClickListener {
             val intent = Intent(it.context, HelpActivity::class.java)
+            intent.apply {
+                `package` = applicationContext.packageName
+            }
             intent.putExtra(EXTRA_DEMO_MODE, true)
             startActivity(intent)
         }
 
         binding.demoButton.setOnClickListener {
             val intent = Intent(it.context, MainActivity::class.java)
+            intent.apply {
+                `package` = applicationContext.packageName
+            }
             intent.putExtra(EXTRA_DEMO_MODE, true)
             startActivity(intent)
         }
 
         binding.settingsButton.setOnClickListener {
-            startActivity(Intent(it.context, SettingsActivity::class.java))
+            val intent = Intent(it.context, SettingsActivity::class.java)
+            intent.apply {
+                `package` = applicationContext.packageName
+            }
+            startActivity(intent)
         }
 
         binding.ipEditText.setText(sharedPreferences?.getString("ipAddress", "192.168.1.2"))
@@ -146,6 +156,9 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
 
         // Start connection service
         val serviceIntent = Intent(applicationContext, ConnectionService::class.java)
+        serviceIntent.apply {
+            `package` = applicationContext.packageName
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             applicationContext.startForegroundService(serviceIntent)
         } else {
@@ -173,6 +186,9 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent?.action == START_MIX_ACTIVITY) {
                 val mixIntent = Intent(applicationContext, MixSelectActivity::class.java)
+                mixIntent.apply {
+                    `package` = context?.packageName
+                }
                 startActivity(mixIntent)
             }
         }
@@ -181,6 +197,9 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
     override fun onStart() {
         super.onStart()
         val serviceIntent = Intent(applicationContext, ConnectionService::class.java)
+        serviceIntent.apply {
+            `package` = applicationContext.packageName
+        }
         bindService(serviceIntent, connection, 0)
 
         val notificationsEnabled = NotificationManagerCompat.from(applicationContext).areNotificationsEnabled()
@@ -237,6 +256,9 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
     override fun onDestroy() {
         super.onDestroy()
         val serviceIntent = Intent(applicationContext, ConnectionService::class.java)
+        serviceIntent.apply {
+            `package` = applicationContext.packageName
+        }
         stopService(serviceIntent)
     }
 
