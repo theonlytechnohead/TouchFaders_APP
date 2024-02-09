@@ -1,5 +1,6 @@
 package net.ddns.anderserver.touchfadersapp
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.ComponentName
@@ -24,7 +25,9 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.NotificationManagerCompat
 import androidx.preference.PreferenceManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -179,6 +182,21 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
         super.onStart()
         val serviceIntent = Intent(applicationContext, ConnectionService::class.java)
         bindService(serviceIntent, connection, 0)
+
+        val notificationsEnabled = NotificationManagerCompat.from(applicationContext).areNotificationsEnabled()
+        Log.i("Notifications", notificationsEnabled.toString())
+        if (!notificationsEnabled) {
+            val requestPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+                if (it) {
+                    Toast.makeText(applicationContext, "Thanks for enabling notifications!", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(applicationContext, "Uh oh, things might not work properly!", Toast.LENGTH_SHORT).show()
+                }
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                requestPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
     }
 
     @SuppressLint("NotifyDataSetChanged", "UnspecifiedRegisterReceiverFlag")
