@@ -192,7 +192,7 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
 
     @Override
     public long getItemId(int position) {
-        return channels.get(position).hashCode();
+        return channels.get(position).stableID();
     }
 
     @Override

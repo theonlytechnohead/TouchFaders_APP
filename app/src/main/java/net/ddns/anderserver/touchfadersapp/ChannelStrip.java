@@ -6,6 +6,10 @@ import java.util.Objects;
 
 public class ChannelStrip {
 
+    private static long currentID = 0;
+
+    private final long id;
+
     public int index;
 
     public int level;
@@ -22,6 +26,11 @@ public class ChannelStrip {
     public int groupIndex = -1;
     public boolean hide = false;
 
+
+    public ChannelStrip() {
+        this.id = currentID++;
+    }
+
     @Override
     public boolean equals(@Nullable Object obj) {
         if (obj instanceof ChannelStrip) {
@@ -33,5 +42,9 @@ public class ChannelStrip {
     @Override
     public int hashCode() {
         return Objects.hash(index);
+    }
+
+    public long stableID() {
+        return this.id;
     }
 }
