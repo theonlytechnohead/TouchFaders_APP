@@ -469,7 +469,7 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
             }
         }
 
-        refreshAllItems();
+//        refreshAllItems();
     }
 
     void refreshAllItems() {
