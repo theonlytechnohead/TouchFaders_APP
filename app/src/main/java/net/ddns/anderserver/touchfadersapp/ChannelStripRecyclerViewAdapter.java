@@ -208,7 +208,7 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
                 // move group
                 swapChannel(i, i + 1);
                 notifyItemMoved(i, i + 1);
-                notifyItemChanged(i);
+//                notifyItemChanged(i);
                 if (target.group) {
                     moveSubchannelsToGroup(-target.index);
                 }
@@ -225,11 +225,11 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
                         swapChannel(i + 1, i);
                         notifyItemMoved(i + 1, i);
                     }
-                    notifyItemChanged(i);
+//                    notifyItemChanged(i);
                 } else {
                     swapChannel(i, i - 1);
                     notifyItemMoved(i, i - 1);
-                    notifyItemChanged(i);
+//                    notifyItemChanged(i);
                 }
             }
         }
