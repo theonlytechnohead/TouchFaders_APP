@@ -51,6 +51,7 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
 
     public ChannelStripRecyclerViewAdapter(ItemMoveCallback.StartDragListener startDragListener, Context context, int numChannels, HashMap<Integer, Integer> channelLayer, HashMap<Integer, Object> layout, ArrayList<Integer> channelColours, float width) {
         this.context = context;
+        this.setHasStableIds(true);
         this.startDragListener = startDragListener;
         colourArray = context.getResources().getIntArray(R.array.mixer_colours);
         colourArrayLighter = context.getResources().getIntArray(R.array.mixer_colours_lighter);
