@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<androidx.appcompat.widget.LinearLayoutCompat
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
     android:id="@+id/faderBackground">
@@ -12,6 +13,7 @@
         style="@style/Widget.Theme.TouchFaders.BoxedVerticalSeekBar"
         android:layout_width="35dp"
         android:layout_height="0dp"
+        android:layout_weight="1"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
         app:layout_constraintBottom_toTopOf="@+id/stripLayout"
@@ -21,7 +23,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/stripLayout"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="55dp"
         android:background="@drawable/rectangle_rounded"
         android:orientation="vertical"
@@ -87,4 +89,4 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.appcompat.widget.LinearLayoutCompat>

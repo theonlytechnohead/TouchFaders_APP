@@ -46,12 +46,10 @@ public class ItemMoveCallback extends ItemTouchHelper.Callback {
     @Override
     public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
         if (actionState != ItemTouchHelper.ACTION_STATE_IDLE) {
-            if (viewHolder instanceof ChannelStripRecyclerViewAdapter.ChannelStripViewHolder) {
-                ChannelStripRecyclerViewAdapter.ChannelStripViewHolder channelStripViewHolder = (ChannelStripRecyclerViewAdapter.ChannelStripViewHolder) viewHolder;
+            if (viewHolder instanceof ChannelStripRecyclerViewAdapter.ChannelStripViewHolder channelStripViewHolder) {
                 adapter.onChannelSelected(channelStripViewHolder);
             }
-            if (viewHolder instanceof GroupRecyclerViewAdapter.GroupViewHolder) {
-                GroupRecyclerViewAdapter.GroupViewHolder groupViewHolder = (GroupRecyclerViewAdapter.GroupViewHolder) viewHolder;
+            if (viewHolder instanceof GroupRecyclerViewAdapter.GroupViewHolder groupViewHolder) {
                 adapter.onChannelSelected(groupViewHolder);
             }
         }
@@ -61,12 +59,10 @@ public class ItemMoveCallback extends ItemTouchHelper.Callback {
     @Override
     public void clearView(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
         super.clearView(recyclerView, viewHolder);
-        if (viewHolder instanceof ChannelStripRecyclerViewAdapter.ChannelStripViewHolder) {
-            ChannelStripRecyclerViewAdapter.ChannelStripViewHolder channelStripViewHolder = (ChannelStripRecyclerViewAdapter.ChannelStripViewHolder) viewHolder;
+        if (viewHolder instanceof ChannelStripRecyclerViewAdapter.ChannelStripViewHolder channelStripViewHolder) {
             adapter.onChannelClear(channelStripViewHolder);
         }
-        if (viewHolder instanceof GroupRecyclerViewAdapter.GroupViewHolder) {
-            GroupRecyclerViewAdapter.GroupViewHolder groupViewHolder = (GroupRecyclerViewAdapter.GroupViewHolder) viewHolder;
+        if (viewHolder instanceof GroupRecyclerViewAdapter.GroupViewHolder groupViewHolder) {
             adapter.onChannelClear(groupViewHolder);
         }
     }

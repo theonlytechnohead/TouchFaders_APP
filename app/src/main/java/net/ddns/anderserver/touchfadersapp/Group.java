@@ -24,8 +24,7 @@ public class Group {
 
     @Override
     public boolean equals(@Nullable Object obj) {
-        if (obj instanceof Group) {
-            Group other = (Group) obj;
+        if (obj instanceof Group other) {
             if (index != other.index) return false;
             return channels == other.channels;
         }

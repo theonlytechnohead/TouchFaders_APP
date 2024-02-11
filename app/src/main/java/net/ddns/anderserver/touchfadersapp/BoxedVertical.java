@@ -18,6 +18,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
 /**
@@ -155,7 +156,7 @@ public class BoxedVertical extends View {
     }
 
     @Override
-    protected void onDraw(Canvas canvas) {
+    protected void onDraw(@NonNull Canvas canvas) {
         if (firstRun) {
             setValue(mPoints);
             firstRun = false;
@@ -245,14 +246,14 @@ public class BoxedVertical extends View {
             this.getParent().requestDisallowInterceptTouchEvent(true);
 
             switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
+                case MotionEvent.ACTION_DOWN -> {
                     touchAllowed = true;
                     touchStarted_X = (int) event.getAxisValue(MotionEvent.AXIS_X);
                     touchStarted_Y = (int) event.getAxisValue(MotionEvent.AXIS_Y);
                     if (!touchDisabled) updateOnTouch(event);
                     progressOffset = (int) (Math.round(event.getY()) - mProgressSweep);
-                    break;
-                case MotionEvent.ACTION_MOVE:
+                }
+                case MotionEvent.ACTION_MOVE -> {
                     int difference_X = abs((int) event.getAxisValue(MotionEvent.AXIS_X) - touchStarted_X);
                     if (25 <= difference_X && touchAllowed) {
                         this.getParent().requestDisallowInterceptTouchEvent(false);
@@ -263,12 +264,11 @@ public class BoxedVertical extends View {
                         touchStarted_Y = max;
                         updateOnTouch(event);
                     }
-                    break;
-                case MotionEvent.ACTION_UP:
-                case MotionEvent.ACTION_CANCEL:
+                }
+                case MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                     setPressed(false);
                     this.getParent().requestDisallowInterceptTouchEvent(false);
-                    break;
+                }
             }
             return true;
         }

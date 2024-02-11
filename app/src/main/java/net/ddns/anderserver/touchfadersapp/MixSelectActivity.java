@@ -43,30 +43,14 @@ public class MixSelectActivity extends AppCompatActivity implements MixSelectRec
             for (int i = 0; i < connectionService.mixes(); i++) {
                 Integer mixColour = connectionService.mixColours().get(i);
                 switch (mixColour) {
-                    default:
-                        mixColours.add(getColor(R.color.mixer_blue));
-                        break;
-                    case 1:
-                        mixColours.add(getColor(R.color.mixer_orange));
-                        break;
-                    case 2:
-                        mixColours.add(getColor(R.color.mixer_brown));
-                        break;
-                    case 3:
-                        mixColours.add(getColor(R.color.mixer_purple));
-                        break;
-                    case 4:
-                        mixColours.add(getColor(R.color.mixer_cyan));
-                        break;
-                    case 5:
-                        mixColours.add(getColor(R.color.mixer_pink));
-                        break;
-                    case 6:
-                        mixColours.add(getColor(R.color.mixer_bergundy));
-                        break;
-                    case 7:
-                        mixColours.add(getColor(R.color.mixer_green));
-                        break;
+                    default -> mixColours.add(getColor(R.color.mixer_blue));
+                    case 1 -> mixColours.add(getColor(R.color.mixer_orange));
+                    case 2 -> mixColours.add(getColor(R.color.mixer_brown));
+                    case 3 -> mixColours.add(getColor(R.color.mixer_purple));
+                    case 4 -> mixColours.add(getColor(R.color.mixer_cyan));
+                    case 5 -> mixColours.add(getColor(R.color.mixer_pink));
+                    case 6 -> mixColours.add(getColor(R.color.mixer_bergundy));
+                    case 7 -> mixColours.add(getColor(R.color.mixer_green));
                 }
             }
 

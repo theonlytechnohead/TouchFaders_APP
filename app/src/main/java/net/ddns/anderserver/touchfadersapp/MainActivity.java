@@ -343,6 +343,7 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
             adapter.setFaderMuteListener(((view, index, muted) -> {
             }));
             recyclerView = findViewById(R.id.faderRecyclerView);
+            recyclerView.setHasFixedSize(true);
             ItemTouchHelper.Callback callback = new ItemMoveCallback(adapter);
             touchHelper = new ItemTouchHelper(callback);
             touchHelper.attachToRecyclerView(recyclerView);
@@ -543,8 +544,7 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
             JSONObject json = new JSONObject();
             for (Map.Entry<Integer, Object> inputEntry : inputLayout.entrySet()) {
                 try {
-                    if (inputEntry.getValue() instanceof Group) {
-                        Group group = (Group) inputEntry.getValue();
+                    if (inputEntry.getValue() instanceof Group group) {
                         json.put(inputEntry.getKey().toString(), new JSONObject(group.toMap()));
                     } else {
                         json.put(inputEntry.getKey().toString(), inputEntry.getValue());

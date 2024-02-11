@@ -293,7 +293,7 @@ class ConnectionService : Service() {
         state = States.WAITING
         val newNotification = buildNotification("Pending connection")
         updateNotification(newNotification)
-        // disconnects via TCP
+        // disconnects via UDP
         CoroutineScope(Dispatchers.Default).launch {
             async(Dispatchers.IO) {
                 val data = Build.MODEL.toByteArray()
