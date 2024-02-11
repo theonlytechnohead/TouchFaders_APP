@@ -114,11 +114,6 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
             holder.fader.setGradientEnd(channelStrip.colour);
             holder.fader.setGradientStart(channelStrip.colourLighter);
             holder.fader.setMute(channelStrip.sendMuted);
-            final float scale = context.getResources().getDisplayMetrics().density;
-            int pixels = (int) (width * scale + 0.5f);
-            ViewGroup.LayoutParams faderParams = holder.faderBackground.getLayoutParams();
-            faderParams.width = pixels;
-            holder.faderBackground.setLayoutParams(faderParams);
             if (channelStrip.group) {
                 holder.channelNumber.setVisibility(View.INVISIBLE);
             } else {
@@ -301,6 +296,11 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
             super(itemView);
             ChannelStripViewHolder holder = this;
             faderBackground = itemView.findViewById(R.id.faderBackground);
+            final float scale = context.getResources().getDisplayMetrics().density;
+            int pixels = (int) (width * scale + 0.5f);
+            ViewGroup.LayoutParams faderParams = holder.faderBackground.getLayoutParams();
+            faderParams.width = pixels;
+            holder.faderBackground.setLayoutParams(faderParams);
             channelBackground = itemView.findViewById(R.id.stripLayout);
             fader = itemView.findViewById(R.id.fader);
             fader.setOnBoxedPointsChangeListener((boxedPoints, points) -> {
