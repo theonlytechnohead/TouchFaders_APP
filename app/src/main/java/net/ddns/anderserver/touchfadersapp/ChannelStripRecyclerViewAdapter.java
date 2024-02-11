@@ -116,9 +116,9 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
             holder.fader.setMute(channelStrip.sendMuted);
             final float scale = context.getResources().getDisplayMetrics().density;
             int pixels = (int) (width * scale + 0.5f);
-            ViewGroup.LayoutParams faderParams = holder.fader.getLayoutParams();
+            ViewGroup.LayoutParams faderParams = holder.faderBackground.getLayoutParams();
             faderParams.width = pixels;
-            holder.fader.setLayoutParams(faderParams);
+            holder.faderBackground.setLayoutParams(faderParams);
             if (channelStrip.group) {
                 holder.channelNumber.setVisibility(View.INVISIBLE);
             } else {

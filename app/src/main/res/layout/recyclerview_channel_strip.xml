@@ -3,14 +3,14 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
+    android:layout_width="45dp"
     android:layout_height="match_parent"
     android:id="@+id/faderBackground">
 
     <net.ddns.anderserver.touchfadersapp.BoxedVertical
         android:id="@+id/fader"
         style="@style/Widget.Theme.TouchFaders.BoxedVerticalSeekBar"
-        android:layout_width="35dp"
+        android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
@@ -30,24 +30,24 @@
         app:layout_constraintStart_toStartOf="parent">
 
         <FrameLayout
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="0dp"
             app:layout_constraintBottom_toTopOf="@+id/channelName"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
             <com.github.captain_miao.view.TopAlignedTextView
                 android:id="@+id/channelNumber"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="30dp"
+                android:layout_height="29dp"
                 android:layout_marginStart="4sp"
                 android:layout_marginTop="3sp"
-                android:gravity="center"
                 android:includeFontPadding="false"
-                tools:text="01"
                 android:textColor="@color/grey"
                 android:textSize="26sp"
-                android:typeface="monospace" />
+                android:typeface="monospace"
+                tools:text="01" />
 
         </FrameLayout>
 
@@ -73,17 +73,17 @@
 
         <TextView
             android:id="@+id/channelPatch"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="14dp"
+            android:includeFontPadding="false"
             android:paddingStart="2dp"
             android:paddingEnd="2dp"
-            android:includeFontPadding="false"
-            tools:text="IN 01"
-            android:textAlignment="center"
             android:textColor="@color/very_light_grey"
             android:textSize="12sp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:text="IN 01" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

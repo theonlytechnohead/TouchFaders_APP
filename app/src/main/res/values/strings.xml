@@ -1068,9 +1068,9 @@
     </array>
 
     <array name="fader_width_values">
-        <item>"35"</item>
-        <item>"43.75"</item>
-        <item>"52.5"</item>
-        <item>"70"</item>
+        <item>"45"</item>
+        <item>"53.75"</item>
+        <item>"62.5"</item>
+        <item>"80"</item>
     </array>
 </resources>
