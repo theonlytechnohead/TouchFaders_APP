@@ -344,7 +344,7 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
             }));
             recyclerView = findViewById(R.id.faderRecyclerView);
             recyclerView.setHasFixedSize(true);
-            recyclerView.setItemViewCacheSize(16);
+            recyclerView.setItemViewCacheSize(numChannels);
             recyclerView.getRecycledViewPool().setMaxRecycledViews(1, numChannels);
             ItemTouchHelper.Callback callback = new ItemMoveCallback(adapter);
             touchHelper = new ItemTouchHelper(callback);
