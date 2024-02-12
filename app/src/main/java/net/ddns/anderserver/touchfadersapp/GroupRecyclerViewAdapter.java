@@ -68,11 +68,6 @@ public class GroupRecyclerViewAdapter extends RecyclerView.Adapter<GroupRecycler
         holder.fader.setGradientEnd(channelStrip.colour);
         holder.fader.setGradientStart(channelStrip.colourLighter);
         holder.fader.setMute(channelStrip.sendMuted);
-        final float scale = context.getResources().getDisplayMetrics().density;
-        int pixels = (int) (width * scale + 0.5f);
-        ViewGroup.LayoutParams faderParams = holder.fader.getLayoutParams();
-        faderParams.width = pixels;
-        holder.fader.setLayoutParams(faderParams);
         String number = String.valueOf(channelStrip.index + 1);
         holder.channelNumber.setText(number);
         holder.channelName.setText(channelStrip.name);
@@ -149,6 +144,11 @@ public class GroupRecyclerViewAdapter extends RecyclerView.Adapter<GroupRecycler
             super(itemView);
             GroupViewHolder holder = this;
             faderBackground = itemView.findViewById(R.id.faderBackground);
+            final float scale = context.getResources().getDisplayMetrics().density;
+            int pixels = (int) (width * scale + 0.5f);
+            ViewGroup.LayoutParams faderParams = holder.faderBackground.getLayoutParams();
+            faderParams.width = pixels;
+            holder.faderBackground.setLayoutParams(faderParams);
             channelBackground = itemView.findViewById(R.id.stripLayout);
             fader = itemView.findViewById(R.id.fader);
             fader.setOnBoxedPointsChangeListener((boxedPoints, points) -> {

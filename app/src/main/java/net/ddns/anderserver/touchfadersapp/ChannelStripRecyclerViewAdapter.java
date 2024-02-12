@@ -164,19 +164,7 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
             ChannelStrip group = getGroup(channelStrip.groupIndex);
             holder.faderBackground.setBackgroundColor(group.colourDarker);
         } else {
-            int position = holder.getAdapterPosition();
-            position = position - groupsBefore(position);
-            if ((position / 8) % 2 == 0) {
-                if (position % 2 == 0)
-                    holder.faderBackground.setBackgroundColor(context.getColor(R.color.fader_light_even));
-                else
-                    holder.faderBackground.setBackgroundColor(context.getColor(R.color.fader_light_odd));
-            } else {
-                if (position % 2 == 0)
-                    holder.faderBackground.setBackgroundColor(context.getColor(R.color.fader_dark_even));
-                else
-                    holder.faderBackground.setBackgroundColor(context.getColor(R.color.fader_dark_odd));
-            }
+            holder.faderBackground.setBackgroundColor(channelStrip.colourDarker);
         }
     }
 
@@ -208,7 +196,6 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
                 // move group
                 swapChannel(i, i + 1);
                 notifyItemMoved(i, i + 1);
-//                notifyItemChanged(i);
                 if (target.group) {
                     moveSubchannelsToGroup(-target.index);
                 }
@@ -225,11 +212,9 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
                         swapChannel(i + 1, i);
                         notifyItemMoved(i + 1, i);
                     }
-//                    notifyItemChanged(i);
                 } else {
                     swapChannel(i, i - 1);
                     notifyItemMoved(i, i - 1);
-//                    notifyItemChanged(i);
                 }
             }
         }

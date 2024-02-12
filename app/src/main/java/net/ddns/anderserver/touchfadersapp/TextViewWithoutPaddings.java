@@ -10,9 +10,9 @@ import androidx.annotation.NonNull;
 
 public class TextViewWithoutPaddings extends androidx.appcompat.widget.AppCompatTextView {
 
-    private final Paint mPaint = new Paint();
+    private final Paint paint = new Paint();
 
-    private final Rect mBounds = new Rect();
+    private final Rect bounds = new Rect();
 
     public TextViewWithoutPaddings(Context context) {
         super(context);
@@ -30,28 +30,28 @@ public class TextViewWithoutPaddings extends androidx.appcompat.widget.AppCompat
     protected void onDraw(@NonNull Canvas canvas) {
         final String text = calculateTextParams();
 
-        final int left = mBounds.left;
-        final int bottom = mBounds.bottom;
-        mBounds.offset(-mBounds.left, -mBounds.top);
-        mPaint.setAntiAlias(true);
-        mPaint.setColor(getCurrentTextColor());
-        canvas.drawText(text, -left, mBounds.bottom - bottom, mPaint);
+        final int left = bounds.left;
+        final int bottom = bounds.bottom;
+        bounds.offset(-bounds.left, -bounds.top);
+        paint.setAntiAlias(true);
+        paint.setColor(getCurrentTextColor());
+        canvas.drawText(text, -left, bounds.bottom - bottom, paint);
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         calculateTextParams();
-        setMeasuredDimension(mBounds.width() + 1, -mBounds.top + 1);
+        setMeasuredDimension(bounds.width() + 1, -bounds.top + 1);
     }
 
     private String calculateTextParams() {
         final String text = getText().toString();
         final int textLength = text.length();
-        mPaint.setTextSize(getTextSize());
-        mPaint.getTextBounds(text, 0, textLength, mBounds);
+        paint.setTextSize(getTextSize());
+        paint.getTextBounds(text, 0, textLength, bounds);
         if (textLength == 0) {
-            mBounds.right = mBounds.left;
+            bounds.right = bounds.left;
         }
         return text;
     }
