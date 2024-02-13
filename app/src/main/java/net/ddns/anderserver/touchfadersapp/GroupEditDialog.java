@@ -138,7 +138,7 @@ public class GroupEditDialog extends AppCompatDialogFragment {
                     }
                 }
             });
-            childDialog.show(requireActivity().getSupportFragmentManager(), "group channels dialog");
+            childDialog.show(requireActivity().getSupportFragmentManager(), "Group channel selection dialog");
         });
 
         builder.setView(layout);

@@ -50,12 +50,12 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
 
     var sharedPreferences: SharedPreferences? = null
 
-    var listenUDP = true
+    private var listenUDP = true
 
     lateinit var connectionService: ConnectionService
     var bound = false
 
-    var broadcastReceiver: BroadcastReceiver? = null
+    private var broadcastReceiver: BroadcastReceiver? = null
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main
@@ -150,7 +150,7 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
             }
         })
 
-        adapter = DeviceSelectRecyclerViewAdapter(applicationContext, deviceNames)
+        adapter = DeviceSelectRecyclerViewAdapter(applicationContext, binding.deviceRecyclerView, deviceNames)
         adapter.setClickListener(clickListener)
         binding.deviceRecyclerView.adapter = adapter
 
@@ -190,6 +190,10 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
                     `package` = context?.packageName
                 }
                 startActivity(mixIntent)
+            } else if (intent?.action == CONNECTION_FAILED) {
+                val name = intent.extras?.getString(DEVICE_NAME)
+                val index = deviceNames.indexOf(name)
+                adapter.enableDeviceButton(index)
             }
         }
     }
@@ -234,10 +238,13 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
         // must update whole backgrounds on whole dataset
         adapter.notifyDataSetChanged()
 
+        val intentFilter = IntentFilter()
+        intentFilter.addAction(START_MIX_ACTIVITY)
+        intentFilter.addAction(CONNECTION_FAILED)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            registerReceiver(broadcastReceiver, IntentFilter(START_MIX_ACTIVITY), RECEIVER_NOT_EXPORTED)
+            registerReceiver(broadcastReceiver, intentFilter, RECEIVER_NOT_EXPORTED)
         } else {
-            registerReceiver(broadcastReceiver, IntentFilter(START_MIX_ACTIVITY))
+            registerReceiver(broadcastReceiver, intentFilter)
         }
     }
 
@@ -323,7 +330,6 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
             val name = deviceNames[index]
             val ip = devices[name]
             if (ip != null) {
-                Toast.makeText(applicationContext, "Connecting to $name at $ip", Toast.LENGTH_SHORT).show()
                 binding.ipEditText.setText(ip.toString().removePrefix("/"))
                 connectionService.Connect(ip, name)
             }
@@ -349,6 +355,8 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
         const val IP_ADDRESS_PREFERENCES = "ipAddress"
 
         const val START_MIX_ACTIVITY = "START_MIX_ACTIVITY"
+        const val CONNECTION_FAILED = "CONNECTION_FAILED"
+        const val DEVICE_NAME = "DEVICE_NAME"
 
         const val EXTRA_DEMO_MODE = "EXTRA_DEMO_MODE"
 

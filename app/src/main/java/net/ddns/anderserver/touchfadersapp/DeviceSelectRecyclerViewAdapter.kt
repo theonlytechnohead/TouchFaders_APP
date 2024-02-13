@@ -7,9 +7,15 @@ import android.view.ViewGroup
 import android.widget.Button
 import androidx.recyclerview.widget.RecyclerView
 
-class DeviceSelectRecyclerViewAdapter internal constructor(context: Context?, private val deviceNames: MutableList<String>) : RecyclerView.Adapter<DeviceSelectRecyclerViewAdapter.ViewHolder>() {
+class DeviceSelectRecyclerViewAdapter internal constructor(context: Context?, recyclerView: RecyclerView, private val deviceNames: MutableList<String>) : RecyclerView.Adapter<DeviceSelectRecyclerViewAdapter.ViewHolder>() {
 
     private var clickListener: DeviceButtonClickListener? = null
+
+    private lateinit var recyclerView: RecyclerView
+
+    init {
+        this.recyclerView = recyclerView
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.recyclerview_device_selection, parent, false)
@@ -26,6 +32,14 @@ class DeviceSelectRecyclerViewAdapter internal constructor(context: Context?, pr
         if (!deviceNames.contains(name)) {
             deviceNames.add(deviceNames.size, name)
             this.notifyItemInserted(deviceNames.size - 1)
+        }
+    }
+
+    fun enableDeviceButton(index: Int) {
+        if (index in 0..<itemCount) {
+            val holder: ViewHolder =
+                recyclerView.findViewHolderForAdapterPosition(index) as ViewHolder
+            holder.deviceSelectButton.isEnabled = true;
         }
     }
 

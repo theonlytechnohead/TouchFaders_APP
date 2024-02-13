@@ -10,6 +10,7 @@ import android.content.Intent
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
+import android.widget.Toast
 import com.illposed.osc.MessageSelector
 import com.illposed.osc.OSCMessage
 import com.illposed.osc.OSCMessageListener
@@ -115,6 +116,7 @@ class ConnectionService : Service() {
                 try {
                     socket.connect(socketAddress, 100)
                 } catch (e: IOException) {
+                    failed(name, address)
                     return@async
                 }
                 socket.soTimeout = 100
@@ -126,6 +128,7 @@ class ConnectionService : Service() {
                     bytesRead =
                         socket.getInputStream().read(byteArrayReceive, 0, socket.receiveBufferSize)
                 } catch (e: IOException) {
+                    failed(name, address)
                     return@async
                 } finally {
                     socket.close()
@@ -176,8 +179,26 @@ class ConnectionService : Service() {
                         }
                         sendBroadcast(startMixIntent)
                     }
+                    // SUCCESS!
+                    return@async
                 }
+                failed(name, address)
+                return@async
             }
+        }
+    }
+
+    private fun failed(name: String?, ip: InetAddress) {
+        DEVICE_IP = null
+        DEVICE_NAME = null
+        val connectionFailedIntent = Intent(StartupActivity.CONNECTION_FAILED)
+        connectionFailedIntent.putExtra(StartupActivity.DEVICE_NAME, name)
+        connectionFailedIntent.apply {
+            `package` = applicationContext.packageName
+        }
+        sendBroadcast(connectionFailedIntent)
+        CoroutineScope(Dispatchers.Main).launch {
+            Toast.makeText(applicationContext, "Failed to connect to ${name ?: ip.toString().removePrefix("/")}", Toast.LENGTH_SHORT).show()
         }
     }
 
