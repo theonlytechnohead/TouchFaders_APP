@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
-public class GroupRecyclerViewAdapter extends RecyclerView.Adapter<GroupRecyclerViewAdapter.GroupViewHolder> implements ItemMoveCallback.ItemTouchHelperContract {
+public class GroupRecyclerViewAdapter extends RecyclerView.Adapter<GroupRecyclerViewAdapter.ChannelViewHolder> implements ItemMoveCallback.ItemTouchHelperContract {
 
     private final Context context;
 
@@ -27,8 +27,8 @@ public class GroupRecyclerViewAdapter extends RecyclerView.Adapter<GroupRecycler
 
     private int colourIndex;
 
-    private ChannelStripRecyclerViewAdapter.FaderValueChangedListener faderValueChangedListener;
-    private ChannelStripRecyclerViewAdapter.ChannelMuteListener channelMuteListener;
+    private ChannelsRecyclerViewAdapter.FaderValueChangedListener faderValueChangedListener;
+    private ChannelsRecyclerViewAdapter.ChannelMuteListener channelMuteListener;
     private final ItemMoveCallback.StartDragListener startDragListener;
 
     final int[] colourArray;
@@ -55,13 +55,13 @@ public class GroupRecyclerViewAdapter extends RecyclerView.Adapter<GroupRecycler
 
     @NonNull
     @Override
-    public GroupViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ChannelViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recyclerview_channel_strip, parent, false);
-        return new GroupViewHolder(view);
+        return new ChannelViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull GroupViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ChannelViewHolder holder, int position) {
         ChannelStrip channelStrip = channels.get(holder.getAdapterPosition());
         holder.position = channelStrip.index;
         holder.fader.setValue(channelStrip.level);
@@ -119,17 +119,17 @@ public class GroupRecyclerViewAdapter extends RecyclerView.Adapter<GroupRecycler
 
     @Override
     public void onChannelSelected(RecyclerView.ViewHolder viewHolder) {
-        if (viewHolder instanceof GroupViewHolder)
-            ((GroupViewHolder) viewHolder).faderBackground.setBackgroundColor(channels.get(viewHolder.getAdapterPosition()).colourLighter);
+        if (viewHolder instanceof ChannelViewHolder)
+            ((ChannelViewHolder) viewHolder).faderBackground.setBackgroundColor(channels.get(viewHolder.getAdapterPosition()).colourLighter);
     }
 
     @Override
     public void onChannelClear(RecyclerView.ViewHolder viewHolder) {
-        if (viewHolder instanceof GroupViewHolder)
-            ((GroupViewHolder) viewHolder).faderBackground.setBackgroundColor(colourArrayDarker[colourIndex]);
+        if (viewHolder instanceof ChannelViewHolder)
+            ((ChannelViewHolder) viewHolder).faderBackground.setBackgroundColor(colourArrayDarker[colourIndex]);
     }
 
-    public class GroupViewHolder extends RecyclerView.ViewHolder {
+    public class ChannelViewHolder extends RecyclerView.ViewHolder {
 
         int position;
         final ConstraintLayout faderBackground;
@@ -140,9 +140,9 @@ public class GroupRecyclerViewAdapter extends RecyclerView.Adapter<GroupRecycler
         final TextView channelName;
 
         @SuppressLint("ClickableViewAccessibility")
-        public GroupViewHolder(@NonNull View itemView) {
+        public ChannelViewHolder(@NonNull View itemView) {
             super(itemView);
-            GroupViewHolder holder = this;
+            ChannelViewHolder holder = this;
             faderBackground = itemView.findViewById(R.id.faderBackground);
             final float scale = context.getResources().getDisplayMetrics().density;
             int pixels = (int) (width * scale + 0.5f);
@@ -213,7 +213,7 @@ public class GroupRecyclerViewAdapter extends RecyclerView.Adapter<GroupRecycler
         }
     }
 
-    public void setFaderValueChangedListener(ChannelStripRecyclerViewAdapter.FaderValueChangedListener listener) {
+    public void setFaderValueChangedListener(ChannelsRecyclerViewAdapter.FaderValueChangedListener listener) {
         faderValueChangedListener = listener;
     }
 

@@ -46,11 +46,11 @@ public class ItemMoveCallback extends ItemTouchHelper.Callback {
     @Override
     public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
         if (actionState != ItemTouchHelper.ACTION_STATE_IDLE) {
-            if (viewHolder instanceof ChannelStripRecyclerViewAdapter.ChannelStripViewHolder channelStripViewHolder) {
+            if (viewHolder instanceof ChannelsRecyclerViewAdapter.ChannelStripViewHolder channelStripViewHolder) {
                 adapter.onChannelSelected(channelStripViewHolder);
             }
-            if (viewHolder instanceof GroupRecyclerViewAdapter.GroupViewHolder groupViewHolder) {
-                adapter.onChannelSelected(groupViewHolder);
+            if (viewHolder instanceof GroupRecyclerViewAdapter.ChannelViewHolder channelViewHolder) {
+                adapter.onChannelSelected(channelViewHolder);
             }
         }
         super.onSelectedChanged(viewHolder, actionState);
@@ -59,11 +59,11 @@ public class ItemMoveCallback extends ItemTouchHelper.Callback {
     @Override
     public void clearView(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
         super.clearView(recyclerView, viewHolder);
-        if (viewHolder instanceof ChannelStripRecyclerViewAdapter.ChannelStripViewHolder channelStripViewHolder) {
+        if (viewHolder instanceof ChannelsRecyclerViewAdapter.ChannelStripViewHolder channelStripViewHolder) {
             adapter.onChannelClear(channelStripViewHolder);
         }
-        if (viewHolder instanceof GroupRecyclerViewAdapter.GroupViewHolder groupViewHolder) {
-            adapter.onChannelClear(groupViewHolder);
+        if (viewHolder instanceof GroupRecyclerViewAdapter.ChannelViewHolder channelViewHolder) {
+            adapter.onChannelClear(channelViewHolder);
         }
     }
 

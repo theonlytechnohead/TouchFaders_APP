@@ -49,7 +49,7 @@ public class GroupSelectDialog extends AppCompatDialogFragment {
         int index = 0;
         for (Map.Entry<Integer, ChannelStrip> entry : allChannels.entrySet()) {
             ChannelStrip channel = entry.getValue();
-            channelLabels[index++] = "" + (channel.index + 1) + ": " + channel.name + " (" + channel.patch + ")";
+            channelLabels[index++] = (channel.index + 1) + ": " + channel.name + " (" + channel.patch + ")";
         }
         return channelLabels;
     }

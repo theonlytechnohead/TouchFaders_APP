@@ -23,14 +23,14 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
 
-public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements ItemMoveCallback.ItemTouchHelperContract {
+public class ChannelsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements ItemMoveCallback.ItemTouchHelperContract {
 
     private final Context context;
-    private RecyclerView recyclerView;
+    private final RecyclerView recyclerView;
 
     private final ArrayList<ChannelStrip> channels = new ArrayList<>();
     private final HashMap<Integer, ChannelStrip> hiddenChannels = new HashMap<>();
-    private boolean hidden;
+    private boolean hideUnusedChannelstrips;
     private final float width;
 
     private FaderValueChangedListener faderValueChangedListener;
@@ -47,17 +47,24 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
     int groups = 0;
     private final HashMap<Integer, ArrayList<ChannelStrip>> groupedChannels = new HashMap<>();
 
-    public ChannelStripRecyclerViewAdapter(ItemMoveCallback.StartDragListener startDragListener, Context context, int numChannels, HashMap<Integer, Integer> channelLayer, HashMap<Integer, Object> layout, ArrayList<Integer> channelColours, float width) {
+    enum ViewType {
+        NONE,
+        CHANNEL,
+        GROUP
+    }
+
+    public ChannelsRecyclerViewAdapter(ItemMoveCallback.StartDragListener startDragListener, Context context, RecyclerView recyclerView, int numChannels, HashMap<Integer, Integer> channelLayer, HashMap<Integer, Object> layout, ArrayList<Integer> channelColours, float width) {
         this.context = context;
+        this.recyclerView = recyclerView;
         this.setHasStableIds(true);
         this.startDragListener = startDragListener;
-        colourArray = context.getResources().getIntArray(R.array.mixer_colours);
-        colourArrayLighter = context.getResources().getIntArray(R.array.mixer_colours_lighter);
-        colourArrayDarker = context.getResources().getIntArray(R.array.mixer_colours_darker);
-        darkGreyColour = context.getColor(R.color.dark_grey);
-        greyColour = context.getColor(R.color.grey);
-        whiteColour = context.getColor(R.color.white);
-        this.hidden = false;
+        this.colourArray = context.getResources().getIntArray(R.array.mixer_colours);
+        this.colourArrayLighter = context.getResources().getIntArray(R.array.mixer_colours_lighter);
+        this.colourArrayDarker = context.getResources().getIntArray(R.array.mixer_colours_darker);
+        this.darkGreyColour = context.getColor(R.color.dark_grey);
+        this.greyColour = context.getColor(R.color.grey);
+        this.whiteColour = context.getColor(R.color.white);
+        this.hideUnusedChannelstrips = false;
         this.width = width;
         TreeMap<Integer, ChannelStrip> channelLayout = new TreeMap<>();
         for (int i = 0; i < numChannels; i++) {
@@ -84,14 +91,12 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        if (recyclerView == null)
-            recyclerView = (RecyclerView) parent;
-        if (viewType == 1) {
+        if (viewType == ViewType.CHANNEL.ordinal()) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recyclerview_channel_strip, parent, false);
             return new ChannelStripViewHolder(view);
         } else {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.group, parent, false);
-            return new SubChannelViewHolder(view);
+            return new SubChannelsViewHolder(view);
         }
     }
 
@@ -99,17 +104,15 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
     @Override
     public int getItemViewType(int position) {
         ChannelStrip channel = channels.get(position);
-        if (channel.groupIndex != -1) return 2;
-        return 1;
+        if (channel.groupIndex != -1) return ViewType.GROUP.ordinal();
+        return ViewType.CHANNEL.ordinal();
     }
 
     // Gets called every time a ViewHolder is reused (with a new position)
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
-        if (viewHolder instanceof ChannelStripViewHolder) {
-            ChannelStripViewHolder holder = (ChannelStripViewHolder) viewHolder;
+        if (viewHolder instanceof ChannelStripViewHolder holder) {
             ChannelStrip channelStrip = channels.get(holder.getAdapterPosition());
-            holder.position = channelStrip.index;
             holder.fader.setValue(channelStrip.level);
             holder.fader.setGradientEnd(channelStrip.colour);
             holder.fader.setGradientStart(channelStrip.colourLighter);
@@ -135,14 +138,13 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
             }
             setBackgroundColour(holder);
         }
-        if (viewHolder instanceof SubChannelViewHolder) {
-            SubChannelViewHolder holder = (SubChannelViewHolder) viewHolder;
+        if (viewHolder instanceof SubChannelsViewHolder subChannelsHolder) {
             ChannelStrip subChannels = channels.get(viewHolder.getAdapterPosition());
-            holder.adapter.setColourIndex(subChannels.colourIndex);
+            subChannelsHolder.adapter.setColourIndex(subChannels.colourIndex);
             ArrayList<ChannelStrip> grouped = groupedChannels.get(subChannels.groupIndex);
             if (!subChannels.hide) {
-                holder.adapter.setChannels(grouped);
-                holder.adapter.setFaderValueChangedListener((index, points) -> {
+                subChannelsHolder.adapter.setChannels(grouped);
+                subChannelsHolder.adapter.setFaderValueChangedListener((index, points) -> {
                     if (grouped != null) {
                         ChannelStrip group = getGroup(subChannels.groupIndex);
                         group.level = grouped.stream().mapToInt(channel -> channel.level).filter(channel -> channel >= 0).max().orElse(823);
@@ -153,7 +155,7 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
                         subChannels.level = group.level;
                     }
                 });
-            } else holder.adapter.setChannels(null);
+            } else subChannelsHolder.adapter.setChannels(null);
         }
     }
 
@@ -257,8 +259,8 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
 
     @Override
     public void onChannelSelected(RecyclerView.ViewHolder viewHolder) {
-        if (viewHolder instanceof ChannelStripViewHolder)
-            ((ChannelStripViewHolder) viewHolder).faderBackground.setBackgroundColor(channels.get(viewHolder.getAdapterPosition()).colourLighter);
+        if (viewHolder instanceof ChannelStripViewHolder holder)
+            holder.faderBackground.setBackgroundColor(channels.get(viewHolder.getAdapterPosition()).colourLighter);
     }
 
     @Override
@@ -269,9 +271,8 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
             moveSubchannelsToGroup(-moving.index);
     }
 
-    public class ChannelStripViewHolder extends RecyclerView.ViewHolder implements ChannelStripRecyclerViewAdapter.FaderValueChangedListener {
+    public class ChannelStripViewHolder extends RecyclerView.ViewHolder implements ChannelsRecyclerViewAdapter.FaderValueChangedListener {
 
-        int position;
         final ConstraintLayout faderBackground;
         final ConstraintLayout channelBackground;
         final BoxedVertical fader;
@@ -310,7 +311,7 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
                     }
                     channels.get(holder.getAdapterPosition() + 1).level = points;
                     // get the actual subchannel view holder
-                    SubChannelViewHolder subChannelHolder = (SubChannelViewHolder) recyclerView.findViewHolderForAdapterPosition(holder.getAdapterPosition() + 1);
+                    SubChannelsViewHolder subChannelHolder = (SubChannelsViewHolder) recyclerView.findViewHolderForAdapterPosition(holder.getAdapterPosition() + 1);
                     // use the subchannel holder to update subchannels
                     if (subChannelHolder != null) {
                         subChannelHolder.updateSubChannels(change);
@@ -421,36 +422,35 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
         }
     }
 
-    public class SubChannelViewHolder extends RecyclerView.ViewHolder {
+    public class SubChannelsViewHolder extends RecyclerView.ViewHolder {
 
         final GroupRecyclerViewAdapter adapter;
-        final RecyclerView recyclerView;
+        final RecyclerView subChannelsRecyclerView;
         ItemTouchHelper touchHelper;
 
-        public SubChannelViewHolder(@NonNull View itemView) {
+        public SubChannelsViewHolder(@NonNull View itemView) {
             super(itemView);
-            SubChannelViewHolder holder = this;
             adapter = new GroupRecyclerViewAdapter(context, width, viewHolder -> touchHelper.startDrag(viewHolder));
-            recyclerView = itemView.findViewById(R.id.groupRecyclerView);
+            subChannelsRecyclerView = itemView.findViewById(R.id.groupRecyclerView);
             ItemTouchHelper.Callback callback = new ItemMoveCallback(adapter);
             touchHelper = new ItemTouchHelper(callback);
-            touchHelper.attachToRecyclerView(recyclerView);
-            recyclerView.setAdapter(adapter);
+            touchHelper.attachToRecyclerView(subChannelsRecyclerView);
+            subChannelsRecyclerView.setAdapter(adapter);
         }
 
         public void updateSubChannels(int change) {
             for (int i = 0; i < adapter.getItemCount(); i++) {
-                GroupRecyclerViewAdapter.GroupViewHolder groupedChannelHolder = (GroupRecyclerViewAdapter.GroupViewHolder) recyclerView.findViewHolderForAdapterPosition(i);
-                if (groupedChannelHolder != null) {
-                    groupedChannelHolder.fader.setValue(groupedChannelHolder.fader.getValue() + change);
+                GroupRecyclerViewAdapter.ChannelViewHolder channelViewHolder = (GroupRecyclerViewAdapter.ChannelViewHolder) subChannelsRecyclerView.findViewHolderForAdapterPosition(i);
+                if (channelViewHolder != null) {
+                    channelViewHolder.fader.setValue(channelViewHolder.fader.getValue() + change);
                 }
             }
         }
     }
 
     public void toggleChannelHide() {
-        hidden = !hidden;
-        if (hidden) {
+        hideUnusedChannelstrips = !hideUnusedChannelstrips;
+        if (hideUnusedChannelstrips) {
             for (int i = channels.size() - 1; 0 <= i; i--) {
                 ChannelStrip channelStrip = channels.get(i);
                 if (channelStrip.level == 0) {
@@ -566,7 +566,7 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
 
         groupChannel.level = 823;
         groupChannel.sendMuted = false;
-        groupChannel.name = "GRP " + groups;
+        groupChannel.name = "GROUP" + groups;
         groupChannel.patch = "";
         groupChannel.colourIndex = groups % colourArray.length;
         groupChannel.colour = colourArray[groupChannel.colourIndex];
@@ -671,8 +671,8 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
         }
     }
 
-    public boolean getHidden() {
-        return hidden;
+    public boolean getHideUnusedChannelstrips() {
+        return hideUnusedChannelstrips;
     }
 
     public HashMap<Integer, Integer> getChannelMap() {

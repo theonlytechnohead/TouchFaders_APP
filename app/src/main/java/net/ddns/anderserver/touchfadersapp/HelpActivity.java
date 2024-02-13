@@ -34,7 +34,7 @@ import java.util.Map;
 public class HelpActivity extends AppCompatActivity implements ItemMoveCallback.StartDragListener {
 
     RecyclerView recyclerView;
-    ChannelStripRecyclerViewAdapter adapter;
+    ChannelsRecyclerViewAdapter adapter;
     ItemTouchHelper touchHelper;
 
     Context instanceContext;
@@ -102,20 +102,20 @@ public class HelpActivity extends AppCompatActivity implements ItemMoveCallback.
         super.onStart();
         float width = 70;
         channelLayer = loadMap();
-        adapter = new ChannelStripRecyclerViewAdapter(this, instanceContext, numChannels, channelLayer, loadLayout(), channelColours, width);
+        recyclerView = findViewById(R.id.faderRecyclerView);
+        adapter = new ChannelsRecyclerViewAdapter(this, instanceContext, recyclerView, numChannels, channelLayer, loadLayout(), channelColours, width);
         adapter.setValuesChangeListener((index, points) -> {
         });
         adapter.setFaderMuteListener(((view, index, muted) -> {
         }));
-        recyclerView = findViewById(R.id.faderRecyclerView);
         ItemTouchHelper.Callback callback = new ItemMoveCallback(adapter);
         touchHelper = new ItemTouchHelper(callback);
         touchHelper.attachToRecyclerView(recyclerView);
         recyclerView.setAdapter(adapter);
         for (int i = 0; i < adapter.getItemCount(); i++) {
             adapter.setFaderLevel(i, 623);
-            adapter.setChannelName(i, "CH " + (i + 1));
-            adapter.setChannelPatchIn(i, "IN " + (i + 1));
+            adapter.setChannelName(i, "ch " + (i + 1));
+            adapter.setChannelPatchIn(i, String.valueOf(i + 1));
         }
     }
 
@@ -131,7 +131,7 @@ public class HelpActivity extends AppCompatActivity implements ItemMoveCallback.
 
         findViewById(R.id.hide_button).setOnClickListener((view -> {
             adapter.toggleChannelHide();
-            if (adapter.getHidden()) {
+            if (adapter.getHideUnusedChannelstrips()) {
                 view.setBackgroundColor(getColor(R.color.grey));
             } else {
                 view.setBackgroundColor(getColor(R.color.dark_grey));

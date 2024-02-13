@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
     boolean runUDP = true;
 
     RecyclerView recyclerView;
-    ChannelStripRecyclerViewAdapter adapter;
+    ChannelsRecyclerViewAdapter adapter;
     ItemTouchHelper touchHelper;
 
     Context instanceContext;
@@ -111,10 +111,10 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
             width = Float.parseFloat(Objects.requireNonNull(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getResources().getString(R.string.setting_fader_width), "35")));
 
             channelLayer = loadMap();
-            adapter = new ChannelStripRecyclerViewAdapter(MainActivity.this, instanceContext, numChannels, channelLayer, loadLayout(), channelColours, width);
+            recyclerView = findViewById(R.id.faderRecyclerView);
+            adapter = new ChannelsRecyclerViewAdapter(MainActivity.this, instanceContext, recyclerView, numChannels, channelLayer, loadLayout(), channelColours, width);
             adapter.setValuesChangeListener((index, points) -> SendOSCFaderValue(index + 1, points));
             adapter.setFaderMuteListener(((view, index, muted) -> SendOSCChannelMute(index + 1, muted)));
-            recyclerView = findViewById(R.id.faderRecyclerView);
             ItemTouchHelper.Callback callback = new ItemMoveCallback(adapter);
             touchHelper = new ItemTouchHelper(callback);
             touchHelper.attachToRecyclerView(recyclerView);
@@ -335,14 +335,14 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
             Intent serviceIntent = new Intent(this, ConnectionService.class);
             bindService(serviceIntent, connection, 0);
         } else {
-            width = Float.parseFloat(Objects.requireNonNull(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getResources().getString(R.string.setting_fader_width), "35")));
+            recyclerView = findViewById(R.id.faderRecyclerView);
+            width = Float.parseFloat(Objects.requireNonNull(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getResources().getString(R.string.setting_fader_width), "45")));
             channelLayer = loadMap();
-            adapter = new ChannelStripRecyclerViewAdapter(this, instanceContext, numChannels, channelLayer, loadLayout(), channelColours, width);
+            adapter = new ChannelsRecyclerViewAdapter(this, instanceContext, recyclerView, numChannels, channelLayer, loadLayout(), channelColours, width);
             adapter.setValuesChangeListener((index, points) -> {
             });
             adapter.setFaderMuteListener(((view, index, muted) -> {
             }));
-            recyclerView = findViewById(R.id.faderRecyclerView);
             recyclerView.setHasFixedSize(true);
             recyclerView.setItemViewCacheSize(numChannels);
             recyclerView.getRecycledViewPool().setMaxRecycledViews(1, numChannels);
@@ -352,8 +352,8 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
             recyclerView.setAdapter(adapter);
             for (int i = 0; i < adapter.getItemCount(); i++) {
                 adapter.setFaderLevel(i, 623);
-                adapter.setChannelName(i, "CH " + (i + 1));
-                adapter.setChannelPatchIn(i, "IN " + (i + 1));
+                adapter.setChannelName(i, "ch " + (i + 1));
+                adapter.setChannelPatchIn(i, String.valueOf(i + 1));
             }
         }
     }
@@ -372,7 +372,7 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
 
         findViewById(R.id.hide_button).setOnClickListener((view -> {
             adapter.toggleChannelHide();
-            if (adapter.getHidden()) {
+            if (adapter.getHideUnusedChannelstrips()) {
                 view.setBackgroundColor(getColor(R.color.grey));
             } else {
                 view.setBackgroundColor(getColor(R.color.dark_grey));

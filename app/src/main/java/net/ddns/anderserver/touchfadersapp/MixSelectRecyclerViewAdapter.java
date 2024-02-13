@@ -36,7 +36,7 @@ public class MixSelectRecyclerViewAdapter extends RecyclerView.Adapter<MixSelect
 
     @Override
     public void onBindViewHolder(@NonNull MixSelectRecyclerViewAdapter.ViewHolder holder, int position) {
-        String text = "" + (holder.getAdapterPosition() + 1) + ": " + mixNames.get(holder.getAdapterPosition());
+        String text = (holder.getAdapterPosition() + 1) + ": " + mixNames.get(holder.getAdapterPosition());
         holder.mixSelectButton.setText(text);
         holder.mixSelectButton.setEnabled(true);
         holder.mixSelectButton.setBackgroundColor(mixColours.get(holder.getAdapterPosition()));
