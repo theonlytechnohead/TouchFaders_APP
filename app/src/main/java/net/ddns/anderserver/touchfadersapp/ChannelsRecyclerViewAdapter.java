@@ -140,7 +140,7 @@ public class ChannelsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         }
         if (viewHolder instanceof SubChannelsViewHolder subChannelsHolder) {
             ChannelStrip subChannels = channels.get(viewHolder.getAdapterPosition());
-            subChannelsHolder.adapter.setColourIndex(subChannels.colourIndex);
+            subChannelsHolder.adapter.setColourByIndex(subChannels.colourIndex);
             ArrayList<ChannelStrip> grouped = groupedChannels.get(subChannels.groupIndex);
             if (!subChannels.hide) {
                 subChannelsHolder.adapter.setChannels(grouped);

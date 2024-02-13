@@ -43,14 +43,13 @@ public class GroupRecyclerViewAdapter extends RecyclerView.Adapter<GroupRecycler
         this.context = context;
         this.width = width;
         this.startDragListener = startDragListener;
-        //        this.group = group;
 
-        colourArray = context.getResources().getIntArray(R.array.mixer_colours);
-        colourArrayLighter = context.getResources().getIntArray(R.array.mixer_colours_lighter);
-        colourArrayDarker = context.getResources().getIntArray(R.array.mixer_colours_darker);
-        darkGreyColour = context.getColor(R.color.dark_grey);
-        greyColour = context.getColor(R.color.grey);
-        whiteColour = context.getColor(R.color.white);
+        this.colourArray = context.getResources().getIntArray(R.array.mixer_colours);
+        this.colourArrayLighter = context.getResources().getIntArray(R.array.mixer_colours_lighter);
+        this.colourArrayDarker = context.getResources().getIntArray(R.array.mixer_colours_darker);
+        this.darkGreyColour = context.getColor(R.color.dark_grey);
+        this.greyColour = context.getColor(R.color.grey);
+        this.whiteColour = context.getColor(R.color.white);
     }
 
     @NonNull
@@ -102,13 +101,11 @@ public class GroupRecyclerViewAdapter extends RecyclerView.Adapter<GroupRecycler
             for (int i = from; i < to; i++) {
                 swapChannel(i, i + 1);
                 notifyItemMoved(i, i + 1);
-                notifyItemChanged(i);
             }
         } else {
             for (int i = from; i > to; i--) {
                 swapChannel(i, i - 1);
                 notifyItemMoved(i, i - 1);
-                notifyItemChanged(i);
             }
         }
     }
@@ -119,14 +116,14 @@ public class GroupRecyclerViewAdapter extends RecyclerView.Adapter<GroupRecycler
 
     @Override
     public void onChannelSelected(RecyclerView.ViewHolder viewHolder) {
-        if (viewHolder instanceof ChannelViewHolder)
-            ((ChannelViewHolder) viewHolder).faderBackground.setBackgroundColor(channels.get(viewHolder.getAdapterPosition()).colourLighter);
+        if (viewHolder instanceof ChannelViewHolder channelViewHolder)
+            channelViewHolder.faderBackground.setBackgroundColor(channels.get(viewHolder.getAdapterPosition()).colourLighter);
     }
 
     @Override
     public void onChannelClear(RecyclerView.ViewHolder viewHolder) {
-        if (viewHolder instanceof ChannelViewHolder)
-            ((ChannelViewHolder) viewHolder).faderBackground.setBackgroundColor(colourArrayDarker[colourIndex]);
+        if (viewHolder instanceof ChannelViewHolder channelViewHolder)
+            channelViewHolder.faderBackground.setBackgroundColor(colourArrayDarker[colourIndex]);
     }
 
     public class ChannelViewHolder extends RecyclerView.ViewHolder {
@@ -194,21 +191,19 @@ public class GroupRecyclerViewAdapter extends RecyclerView.Adapter<GroupRecycler
         }
     }
 
-    public void setColourIndex(int index) {
+    public void setColourByIndex(int index) {
         this.colourIndex = index;
         for (int i = 0; i < channels.size(); i++) {
             notifyItemChanged(i);
         }
     }
 
-    @SuppressLint("NotifyDataSetChanged")
     public void setChannels(ArrayList<ChannelStrip> channels) {
         if (channels != null) {
             this.channels = new ArrayList<>(channels);
             notifyItemRangeInserted(0, channels.size());
         } else {
-            // must update backgrounds on whole dataset
-            notifyDataSetChanged();
+            notifyItemRangeRemoved(0, this.channels.size());
             this.channels.clear();
         }
     }
