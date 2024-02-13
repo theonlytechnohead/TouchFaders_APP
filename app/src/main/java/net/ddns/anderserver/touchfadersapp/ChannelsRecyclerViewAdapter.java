@@ -375,34 +375,40 @@ public class ChannelsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
 
                     @Override
                     public boolean onSingleTapConfirmed(@NonNull MotionEvent e) {
-                        ChannelStrip channelStrip = channels.get(holder.getAdapterPosition());
-                        if (channelStrip.group) {
-                            GroupEditDialog editDialog = new GroupEditDialog(channelStrip.index, channelStrip.name, channelStrip.colourIndex, ungroupedChannels(), groupedChannels(channelStrip.index));
-                            editDialog.setResultListener((dialogInterface, i) -> {
-                                if (!Objects.equals(channelStrip.name, editDialog.name)) {
-                                    channelStrip.name = editDialog.name;
-                                    notifyItemChanged(holder.getAdapterPosition());
-                                }
-                                if (channelStrip.colourIndex != editDialog.colour) {
-                                    channelStrip.colourIndex = editDialog.colour;
-                                    channelStrip.colour = colourArray[channelStrip.colourIndex];
-                                    channelStrip.colourLighter = colourArrayLighter[channelStrip.colourIndex];
-                                    channelStrip.colourDarker = colourArrayDarker[channelStrip.colourIndex];
-                                    notifyItemChanged(holder.getAdapterPosition());
-                                    channels.get(holder.getAdapterPosition() + 1).colourIndex = editDialog.colour;
-                                    notifyItemChanged(holder.getAdapterPosition() + 1);
-                                }
-                                updateGroup(holder.getAdapterPosition(), -channelStrip.index, editDialog.addedChannels, editDialog.removedChannels);
-                                ArrayList<ChannelStrip> subchannels = groupedChannels.get(-channelStrip.index);
-                                if (subchannels != null) {
-                                    channelStrip.level = subchannels.stream().mapToInt(channel -> channel.level).filter(channel -> channel >= 0).max().orElse(823);
-                                    channels.get(holder.getAdapterPosition() + 1).level = channelStrip.level;
-                                    notifyItemChanged(holder.getAdapterPosition());
-                                }
-                            });
-                            FragmentManager fragmentManager = ((FragmentActivity) context).getSupportFragmentManager();
-                            editDialog.show(fragmentManager, "group edit dialog");
-                        }
+                        // if this isn't a group viewholder, ignore
+                        if (!channels.get(holder.getAdapterPosition()).group)
+                            return super.onSingleTapConfirmed(e);
+                        // else, setup and spawn an edit dialog
+                        ChannelStrip groupChannelStrip = channels.get(holder.getAdapterPosition());
+                        GroupEditDialog editDialog = new GroupEditDialog(groupChannelStrip.index, groupChannelStrip.name, groupChannelStrip.colourIndex, ungroupedChannels(), groupedChannels(groupChannelStrip.index));
+                        editDialog.setResultListener((dialogInterface, i) -> {
+                            if (!Objects.equals(groupChannelStrip.name, editDialog.name)) {
+                                // update group viewholder
+                                groupChannelStrip.name = editDialog.name;
+                                notifyItemChanged(holder.getAdapterPosition());
+                            }
+                            if (groupChannelStrip.colourIndex != editDialog.colour) {
+                                // update group viewholder
+                                groupChannelStrip.colourIndex = editDialog.colour;
+                                groupChannelStrip.colour = colourArray[groupChannelStrip.colourIndex];
+                                groupChannelStrip.colourLighter = colourArrayLighter[groupChannelStrip.colourIndex];
+                                groupChannelStrip.colourDarker = colourArrayDarker[groupChannelStrip.colourIndex];
+                                notifyItemChanged(holder.getAdapterPosition());
+                                // update subchannels viewholder
+                                channels.get(holder.getAdapterPosition() + 1).colourIndex = editDialog.colour;
+                                notifyItemChanged(holder.getAdapterPosition() + 1);
+                            }
+                            // update which channels are in the group
+                            updateGroup(holder.getAdapterPosition(), -groupChannelStrip.index, editDialog.addedChannels, editDialog.removedChannels);
+                            ArrayList<ChannelStrip> subchannels = groupedChannels.get(-groupChannelStrip.index);
+                            if (subchannels != null) {
+                                groupChannelStrip.level = subchannels.stream().mapToInt(channel -> channel.level).filter(channel -> channel >= 0).max().orElse(823);
+                                fader.setValue(groupChannelStrip.level);
+                                channels.get(holder.getAdapterPosition() + 1).level = groupChannelStrip.level;
+                            }
+                        });
+                        FragmentManager fragmentManager = ((FragmentActivity) context).getSupportFragmentManager();
+                        editDialog.show(fragmentManager, "Group edit dialog");
                         return super.onSingleTapConfirmed(e);
                     }
                 });
