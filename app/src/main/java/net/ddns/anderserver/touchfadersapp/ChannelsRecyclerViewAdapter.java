@@ -128,10 +128,12 @@ public class ChannelsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
             holder.channelPatch.setText(channelStrip.patch);
             holder.channelName.setBackgroundColor(channelStrip.colour);
             if (channelStrip.channelMuted) {
+                // whole channel is muted
                 holder.channelNumber.setTextColor(greyColour);
                 holder.channelPatch.setTextColor(whiteColour);
                 holder.channelBackground.setBackgroundColor(darkGreyColour);
             } else {
+                // whole channel is on
                 holder.channelNumber.setTextColor(channelStrip.colour);
                 holder.channelPatch.setTextColor(channelStrip.colourDarker);
                 holder.channelBackground.setBackgroundColor(channelStrip.colourLighter);
@@ -162,14 +164,32 @@ public class ChannelsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
     private void setBackgroundColour(ChannelStripViewHolder holder) {
         ChannelStrip channelStrip = channels.get(holder.getAdapterPosition());
         if (channelStrip.group) {
-            if (channelStrip.hide)
+            // channel is a group master fader
+            if (channelStrip.hide) {
+                // the subchannels are hidden, don't highlight
                 holder.faderBackground.setBackgroundColor(channelStrip.colourDarker);
-            else holder.faderBackground.setBackgroundColor(channelStrip.colour);
+            } else {
+                // the subchannels are shown, do highlight
+                holder.faderBackground.setBackgroundColor(channelStrip.colour);
+            }
         } else if (channelStrip.groupIndex != -1) {
+            // TODO: this doesn't seem to ever execute?
+            // channel is part of a group, use the group colour
             ChannelStrip group = getGroup(channelStrip.groupIndex);
-            holder.faderBackground.setBackgroundColor(group.colourDarker);
+            if (channelStrip.sendMuted) {
+                holder.faderBackground.setBackgroundColor(group.colour);
+            } else {
+                holder.faderBackground.setBackgroundColor(group.colourDarker);
+            }
         } else {
-            holder.faderBackground.setBackgroundColor(channelStrip.colourDarker);
+            // channel is not part of a group
+            if (channelStrip.sendMuted) {
+                // channel send is muted
+                holder.faderBackground.setBackgroundColor(greyColour);
+            } else {
+                // channel send is on
+                holder.faderBackground.setBackgroundColor(channelStrip.colourDarker);
+            }
         }
     }
 

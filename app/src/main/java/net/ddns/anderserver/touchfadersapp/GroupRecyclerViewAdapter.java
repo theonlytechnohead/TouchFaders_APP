@@ -73,15 +73,21 @@ public class GroupRecyclerViewAdapter extends RecyclerView.Adapter<GroupRecycler
         holder.channelPatch.setText(channelStrip.patch);
         holder.channelName.setBackgroundColor(channelStrip.colour);
         if (channelStrip.channelMuted) {
+            // whole channel is muted
             holder.channelNumber.setTextColor(greyColour);
             holder.channelPatch.setTextColor(whiteColour);
             holder.channelBackground.setBackgroundColor(darkGreyColour);
         } else {
+            // whole channel is on
             holder.channelNumber.setTextColor(colourArray[colourIndex]);
             holder.channelPatch.setTextColor(colourArrayDarker[colourIndex]);
             holder.channelBackground.setBackgroundColor(colourArrayLighter[colourIndex]);
         }
-        holder.faderBackground.setBackgroundColor(colourArrayDarker[colourIndex]);
+        if (channelStrip.sendMuted) {
+            holder.faderBackground.setBackgroundColor(greyColour);
+        } else {
+            holder.faderBackground.setBackgroundColor(colourArray[colourIndex]);
+        }
     }
 
     @Override
@@ -122,8 +128,13 @@ public class GroupRecyclerViewAdapter extends RecyclerView.Adapter<GroupRecycler
 
     @Override
     public void onChannelClear(RecyclerView.ViewHolder viewHolder) {
-        if (viewHolder instanceof ChannelViewHolder channelViewHolder)
-            channelViewHolder.faderBackground.setBackgroundColor(colourArrayDarker[colourIndex]);
+        if (viewHolder instanceof ChannelViewHolder channelViewHolder) {
+            if (channels.get(channelViewHolder.getAdapterPosition()).sendMuted) {
+                channelViewHolder.faderBackground.setBackgroundColor(greyColour);
+            } else {
+                channelViewHolder.faderBackground.setBackgroundColor(colourArray[colourIndex]);
+            }
+        }
     }
 
     public class ChannelViewHolder extends RecyclerView.ViewHolder {
