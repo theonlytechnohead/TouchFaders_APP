@@ -2,8 +2,6 @@ package net.ddns.anderserver.touchfadersapp;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.os.Handler;
-import android.os.Looper;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -24,11 +22,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
-import java.util.concurrent.Executors;
 
 public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements ItemMoveCallback.ItemTouchHelperContract {
 
     private final Context context;
+    private RecyclerView recyclerView;
 
     private final ArrayList<ChannelStrip> channels = new ArrayList<>();
     private final HashMap<Integer, ChannelStrip> hiddenChannels = new HashMap<>();
@@ -86,6 +84,8 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        if (recyclerView == null)
+            recyclerView = (RecyclerView) parent;
         if (viewType == 1) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recyclerview_channel_strip, parent, false);
             return new ChannelStripViewHolder(view);
@@ -146,8 +146,11 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
                     if (grouped != null) {
                         ChannelStrip group = getGroup(subChannels.groupIndex);
                         group.level = grouped.stream().mapToInt(channel -> channel.level).filter(channel -> channel >= 0).max().orElse(823);
+                        ChannelStripViewHolder groupViewHolder = (ChannelStripViewHolder) recyclerView.findViewHolderForAdapterPosition(viewHolder.getAdapterPosition() - 1);
+                        if (groupViewHolder != null) {
+                            groupViewHolder.fader.setValue(group.level);
+                        }
                         subChannels.level = group.level;
-                        notifyItemChanged(viewHolder.getAdapterPosition() - 1);
                     }
                 });
             } else holder.adapter.setChannels(null);
@@ -306,7 +309,12 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
                         }
                     }
                     channels.get(holder.getAdapterPosition() + 1).level = points;
-                    notifyItemChanged(holder.getAdapterPosition() + 1);
+                    // get the actual subchannel view holder
+                    SubChannelViewHolder subChannelHolder = (SubChannelViewHolder) recyclerView.findViewHolderForAdapterPosition(holder.getAdapterPosition() + 1);
+                    // use the subchannel holder to update subchannels
+                    if (subChannelHolder != null) {
+                        subChannelHolder.updateSubChannels(change);
+                    }
                 }
             });
             channelNumber = itemView.findViewById(R.id.channelNumber);
@@ -429,6 +437,15 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
             touchHelper.attachToRecyclerView(recyclerView);
             recyclerView.setAdapter(adapter);
         }
+
+        public void updateSubChannels(int change) {
+            for (int i = 0; i < adapter.getItemCount(); i++) {
+                GroupRecyclerViewAdapter.GroupViewHolder groupedChannelHolder = (GroupRecyclerViewAdapter.GroupViewHolder) recyclerView.findViewHolderForAdapterPosition(i);
+                if (groupedChannelHolder != null) {
+                    groupedChannelHolder.fader.setValue(groupedChannelHolder.fader.getValue() + change);
+                }
+            }
+        }
     }
 
     public void toggleChannelHide() {
@@ -453,37 +470,6 @@ public class ChannelStripRecyclerViewAdapter extends RecyclerView.Adapter<Recycl
                 hiddenChannels.clear();
             }
         }
-
-//        refreshAllItems();
-    }
-
-    void refreshAllItems() {
-        Handler handler = new Handler(Looper.getMainLooper());
-        Executors.newSingleThreadExecutor().execute(() -> {
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            for (int i = 0; i < channels.size(); i++) {
-                try {
-                    Thread.sleep(16);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                int index = i;
-                handler.post(() -> notifyItemChanged(index));
-            }
-        });
-    }
-
-    private int groupsBefore(int channelIndex) {
-        int output = 0;
-        for (int i = 0; i < channelIndex; i++) {
-            if (channels.get(i).group)
-                output++;
-        }
-        return output;
     }
 
     private ArrayList<ChannelStrip> ungroupedChannels() {

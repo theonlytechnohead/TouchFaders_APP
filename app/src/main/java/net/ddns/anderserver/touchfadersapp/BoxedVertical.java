@@ -339,6 +339,10 @@ public class BoxedVertical extends View {
         resetGradients();
     }
 
+    public int getValue() {
+        return this.value;
+    }
+
     public boolean isEnabled() {
         return enabled;
     }
