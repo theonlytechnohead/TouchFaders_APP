@@ -37,12 +37,12 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <com.github.captain_miao.view.TopAlignedTextView
+            <TextView
                 android:id="@+id/channelNumber"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginStart="4sp"
-                android:layout_marginTop="3sp"
+                android:layout_marginStart="2sp"
+                android:layout_marginTop="-2sp"
                 android:includeFontPadding="false"
                 android:scrollHorizontally="false"
                 android:textColor="@color/grey"
