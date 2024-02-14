@@ -306,15 +306,12 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
                 }
                 val packet = DatagramPacket(recvBuf, recvBuf.size)
                 socket.receive(packet)
-                val length = packet.length
-                val senderIP = packet.address.hostAddress
-                val senderName = String(recvBuf.copyOfRange(3, length - 1))
-//                Log.i("UDP", senderName)
+                packet.address.hostAddress
+                val senderName = String(recvBuf.copyOf(packet.length))
                 handler.post { adapter.addDevice(senderName) }
                 if (!devices.containsKey(senderName)) {
-                    devices[senderName] = InetAddress.getByName(senderIP)
+                    devices[senderName] = InetAddress.getByName(packet.address.hostAddress)
                 }
-                //Log.i("UDP", senderIP)
             } catch (e: SocketTimeoutException) {
                 // Nothing really to do here
             } catch (e: IOException) {
