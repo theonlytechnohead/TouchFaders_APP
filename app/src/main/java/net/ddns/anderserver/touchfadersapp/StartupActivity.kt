@@ -187,7 +187,7 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
                         adapter.addDevice(serviceInfo.serviceName)
                     }
                     launch(Dispatchers.IO) {
-                        val address = InetAddress.getByName(serviceInfo.serviceName)
+                        val address = InetAddress.getByAddress(InetAddress.getByName(serviceInfo.serviceName).address)
                         Log.i("DNS", "Found address for ${serviceInfo.serviceName}: $address")
                         devices[serviceInfo.serviceName] = address
                     }
