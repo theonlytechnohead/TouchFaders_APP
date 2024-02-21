@@ -11,6 +11,9 @@ import android.content.ServiceConnection
 import android.content.SharedPreferences
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.net.nsd.NsdManager
+import android.net.nsd.NsdManager.DiscoveryListener
+import android.net.nsd.NsdServiceInfo
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -29,10 +32,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationManagerCompat
 import androidx.preference.PreferenceManager
-import com.github.druk.rx2dnssd.BonjourService
-import com.github.druk.rx2dnssd.Rx2DnssdEmbedded
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -50,9 +49,10 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
 
     var sharedPreferences: SharedPreferences? = null
 
-    private lateinit var rx2dnssd: Rx2DnssdEmbedded
-    private lateinit var browseDisposable: Disposable
-    private var listenUDP = true
+    private lateinit var nsdManager: NsdManager
+    private lateinit var discoveryListener: DiscoveryListener
+    private lateinit var serviceInfoCallback: NsdManager.ServiceInfoCallback
+    private lateinit var resolveListener: NsdManager.ResolveListener
 
     lateinit var connectionService: ConnectionService
     var bound = false
@@ -171,7 +171,104 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
         broadcastReceiver = Receiver()
 
         // listen for host applications
-        rx2dnssd = Rx2DnssdEmbedded(applicationContext)
+        nsdManager = getSystemService(Context.NSD_SERVICE) as NsdManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            serviceInfoCallback = object : NsdManager.ServiceInfoCallback {
+                override fun onServiceInfoCallbackRegistrationFailed(errorCode: Int) {
+                    Log.w("DNS", "Couldn't register, code: $errorCode")
+                }
+
+                override fun onServiceUpdated(serviceInfo: NsdServiceInfo) {
+                    Log.i("DNS", "Service info for ${serviceInfo.serviceName} resolves ${serviceInfo.hostAddresses.size} addresses")
+                    serviceInfo.hostAddresses.forEach {
+                        Log.i("DNS", "\t$it")
+                    }
+                    Handler(Looper.getMainLooper()).post {
+                        adapter.addDevice(serviceInfo.serviceName)
+                    }
+                    launch(Dispatchers.IO) {
+                        val address = InetAddress.getByName(serviceInfo.serviceName)
+                        Log.i("DNS", "Found address for ${serviceInfo.serviceName}: $address")
+                        devices[serviceInfo.serviceName] = address
+                    }
+                }
+
+                override fun onServiceLost() {
+                    Log.i("DNS", "Lost a service")
+                }
+
+                override fun onServiceInfoCallbackUnregistered() {
+                    Log.i("DNS", "Service info callback was unregistered")
+                }
+
+            }
+        } else {
+            resolveListener = object : NsdManager.ResolveListener {
+                override fun onServiceResolved(serviceInfo: NsdServiceInfo?) {
+                    Log.i("DNS", "Resolved: ${serviceInfo!!.serviceName} to ${serviceInfo.host}")
+                    Handler(Looper.getMainLooper()).post {
+                        adapter.addDevice(serviceInfo.serviceName)
+                    }
+                    if (!devices.containsKey(serviceInfo.serviceName)) {
+                        devices[serviceInfo.serviceName] = serviceInfo.host
+                    }
+                }
+
+                override fun onResolveFailed(serviceInfo: NsdServiceInfo?, errorCode: Int) {
+                    // we don't really care
+                }
+            }
+        }
+        discoveryListener = object : DiscoveryListener {
+            override fun onDiscoveryStarted(serviceType: String?) {
+                Log.i("DNS", "Started listening for $serviceType")
+            }
+
+            override fun onStartDiscoveryFailed(serviceType: String?, errorCode: Int) {
+                Log.w("DNS", "Failed to listen for $serviceType, code: $errorCode")
+            }
+
+            override fun onServiceFound(service: NsdServiceInfo?) {
+                Log.i("DNS", "Found: ${service!!.serviceName}")
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                    nsdManager.registerServiceInfoCallback(service, mainExecutor, serviceInfoCallback)
+                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    nsdManager.resolveService(service, mainExecutor, resolveListener)
+                } else {
+                    nsdManager.resolveService(service, resolveListener)
+                }
+            }
+
+            override fun onServiceLost(service: NsdServiceInfo?) {
+                Log.i("DNS", "Lost: ${service!!.serviceName}")
+                Handler(Looper.getMainLooper()).post {
+                    adapter.removeDevice(service.serviceName)
+                }
+                devices.remove(service.serviceName)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                    try {
+                        nsdManager.unregisterServiceInfoCallback(serviceInfoCallback)
+                    } catch (e: IllegalArgumentException) {
+                        // we don't care
+                    }
+                }
+            }
+
+            override fun onDiscoveryStopped(serviceType: String?) {
+                Log.i("DNS", "Stopped listening for $serviceType")
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                    try {
+                        nsdManager.unregisterServiceInfoCallback(serviceInfoCallback)
+                    } catch (e: IllegalArgumentException) {
+                        // we don't care
+                    }
+                }
+            }
+
+            override fun onStopDiscoveryFailed(serviceType: String?, errorCode: Int) {
+                Log.i("DNS", "Failed to stop for $serviceType, code: $errorCode")
+            }
+        }
     }
 
     private fun hideUI() {
@@ -231,10 +328,10 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
     override fun onResume() {
         super.onResume()
         hideUI()
-        browse()
         launch(Dispatchers.IO) {
             checkNetwork()
         }
+        nsdManager.discoverServices("_touchfaders._tcp", NsdManager.PROTOCOL_DNS_SD, discoveryListener)
         devices.clear()
         deviceNames.clear()
         // must update whole backgrounds on whole dataset
@@ -252,6 +349,14 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
 
     override fun onPause() {
         super.onPause()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            try {
+                nsdManager.unregisterServiceInfoCallback(serviceInfoCallback)
+            } catch (e: IllegalArgumentException) {
+                // we don't care
+            }
+        }
+        nsdManager.stopServiceDiscovery(discoveryListener)
         unregisterReceiver(broadcastReceiver)
     }
 
@@ -268,41 +373,6 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
             `package` = applicationContext.packageName
         }
         stopService(serviceIntent)
-    }
-
-    private fun browse() {
-        val handler = Handler(Looper.getMainLooper())
-        browseDisposable = rx2dnssd.browse(
-            "_touchfaders._tcp",
-            "local."
-        )
-            .compose(rx2dnssd.resolve())
-            .flatMap {
-                rx2dnssd.queryIPRecords(it)
-            }
-            .subscribeOn(AndroidSchedulers.mainThread())
-            .subscribe({ service: BonjourService ->
-                if (service.isLost) {
-                    handler.post {
-                        adapter.removeDevice(service.serviceName)
-                        Toast.makeText(
-                            applicationContext,
-                            "Lost ${service.serviceName}",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                    devices.remove(service.serviceName)
-                } else {
-                    handler.post {
-                        adapter.addDevice(service.serviceName)
-                    }
-                    if (!devices.containsKey(service.serviceName))
-                        devices[service.serviceName] = service.inet4Address!!
-                }
-            }, {
-                // error happened!
-                it.printStackTrace()
-            })
     }
 
     private fun checkNetwork() {
