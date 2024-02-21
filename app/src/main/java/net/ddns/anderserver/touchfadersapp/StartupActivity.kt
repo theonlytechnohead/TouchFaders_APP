@@ -29,15 +29,15 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationManagerCompat
 import androidx.preference.PreferenceManager
+import com.github.druk.rx2dnssd.BonjourService
+import com.github.druk.rx2dnssd.Rx2DnssdEmbedded
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import net.ddns.anderserver.touchfadersapp.databinding.StartupBinding
-import java.io.IOException
-import java.net.DatagramPacket
-import java.net.DatagramSocket
 import java.net.InetAddress
-import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import kotlin.coroutines.CoroutineContext
 
@@ -50,6 +50,8 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
 
     var sharedPreferences: SharedPreferences? = null
 
+    private lateinit var rx2dnssd: Rx2DnssdEmbedded
+    private lateinit var browseDisposable: Disposable
     private var listenUDP = true
 
     lateinit var connectionService: ConnectionService
@@ -167,6 +169,9 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
 
         // create broadcast receiver to start activity
         broadcastReceiver = Receiver()
+
+        // listen for host applications
+        rx2dnssd = Rx2DnssdEmbedded(applicationContext)
     }
 
     private fun hideUI() {
@@ -226,10 +231,7 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
     override fun onResume() {
         super.onResume()
         hideUI()
-        launch(Dispatchers.IO) {
-            listenUDP = true
-            UDPListener()
-        }
+        browse()
         launch(Dispatchers.IO) {
             checkNetwork()
         }
@@ -250,7 +252,6 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
 
     override fun onPause() {
         super.onPause()
-        listenUDP = false
         unregisterReceiver(broadcastReceiver)
     }
 
@@ -267,6 +268,41 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
             `package` = applicationContext.packageName
         }
         stopService(serviceIntent)
+    }
+
+    private fun browse() {
+        val handler = Handler(Looper.getMainLooper())
+        browseDisposable = rx2dnssd.browse(
+            "_touchfaders._tcp",
+            "local."
+        )
+            .compose(rx2dnssd.resolve())
+            .flatMap {
+                rx2dnssd.queryIPRecords(it)
+            }
+            .subscribeOn(AndroidSchedulers.mainThread())
+            .subscribe({ service: BonjourService ->
+                if (service.isLost) {
+                    handler.post {
+                        adapter.removeDevice(service.serviceName)
+                        Toast.makeText(
+                            applicationContext,
+                            "Lost ${service.serviceName}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                    devices.remove(service.serviceName)
+                } else {
+                    handler.post {
+                        adapter.addDevice(service.serviceName)
+                    }
+                    if (!devices.containsKey(service.serviceName))
+                        devices[service.serviceName] = service.inet4Address!!
+                }
+            }, {
+                // error happened!
+                it.printStackTrace()
+            })
     }
 
     private fun checkNetwork() {
@@ -288,38 +324,6 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
                     .show()
             }
         }
-    }
-
-    @Suppress("FunctionName")
-    private fun UDPListener() {
-        val handler = Handler(Looper.getMainLooper())
-        var socket = DatagramSocket(8877)
-        socket.soTimeout = 100
-        socket.broadcast = true
-        while (listenUDP) {
-            try {
-                val recvBuf = ByteArray(socket.receiveBufferSize)
-                if (socket.isClosed) {
-                    socket = DatagramSocket(8877)
-                    socket.soTimeout = 100
-                    socket.broadcast = true
-                }
-                val packet = DatagramPacket(recvBuf, recvBuf.size)
-                socket.receive(packet)
-                packet.address.hostAddress
-                val senderName = String(recvBuf.copyOf(packet.length))
-                handler.post { adapter.addDevice(senderName) }
-                if (!devices.containsKey(senderName)) {
-                    devices[senderName] = InetAddress.getByName(packet.address.hostAddress)
-                }
-            } catch (e: SocketTimeoutException) {
-                // Nothing really to do here
-            } catch (e: IOException) {
-                Log.e("UDP client has IOException", "error: ", e)
-                listenUDP = false
-            }
-        }
-        socket.close()
     }
 
     private val clickListener = object : DeviceSelectRecyclerViewAdapter.DeviceButtonClickListener {
