@@ -205,7 +205,7 @@ class ConnectionService : Service() {
     var state = States.WAITING
     fun state(): States = state
 
-    fun address(): String = DEVICE_IP.toString().trim('/')
+    fun address(): InetAddress? = DEVICE_IP
 
     private var receivePort: Int? = null
     fun receivePort(): Int = receivePort ?: 0
