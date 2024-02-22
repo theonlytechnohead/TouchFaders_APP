@@ -210,7 +210,9 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
                         adapter.addDevice(serviceInfo.serviceName)
                     }
                     if (!devices.containsKey(serviceInfo.serviceName)) {
-                        devices[serviceInfo.serviceName] = serviceInfo.host
+                        val address = InetAddress.getByName(serviceInfo.serviceName)
+                        Log.i("DNS", "Found address for ${serviceInfo.serviceName}: $address")
+                        devices[serviceInfo.serviceName] = address
                     }
                 }
 
