@@ -1,4 +1,4 @@
-package net.ddns.anderserver.touchfadersapp
+package net.ddns.anderserver.touchfadersapp.startup
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -12,7 +12,6 @@ import android.content.SharedPreferences
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.nsd.NsdManager
-import android.net.nsd.NsdManager.DiscoveryListener
 import android.net.nsd.NsdServiceInfo
 import android.os.Build
 import android.os.Bundle
@@ -35,6 +34,12 @@ import androidx.preference.PreferenceManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import net.ddns.anderserver.touchfadersapp.ConnectionService
+import net.ddns.anderserver.touchfadersapp.DeviceSelectRecyclerViewAdapter
+import net.ddns.anderserver.touchfadersapp.HelpActivity
+import net.ddns.anderserver.touchfadersapp.MainActivity
+import net.ddns.anderserver.touchfadersapp.MixSelectActivity
+import net.ddns.anderserver.touchfadersapp.SettingsActivity
 import net.ddns.anderserver.touchfadersapp.databinding.StartupBinding
 import java.net.InetAddress
 import java.net.UnknownHostException
@@ -50,7 +55,7 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
     var sharedPreferences: SharedPreferences? = null
 
     private lateinit var nsdManager: NsdManager
-    private lateinit var discoveryListener: DiscoveryListener
+    private lateinit var discoveryListener: NsdManager.DiscoveryListener
     private lateinit var serviceInfoCallback: NsdManager.ServiceInfoCallback
     private lateinit var resolveListener: NsdManager.ResolveListener
 
@@ -152,7 +157,11 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
             }
         })
 
-        adapter = DeviceSelectRecyclerViewAdapter(applicationContext, binding.deviceRecyclerView, deviceNames)
+        adapter = DeviceSelectRecyclerViewAdapter(
+            applicationContext,
+            binding.deviceRecyclerView,
+            deviceNames
+        )
         adapter.setClickListener(clickListener)
         binding.deviceRecyclerView.adapter = adapter
 
@@ -171,7 +180,7 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
         broadcastReceiver = Receiver()
 
         // listen for host applications
-        nsdManager = getSystemService(Context.NSD_SERVICE) as NsdManager
+        nsdManager = getSystemService(NSD_SERVICE) as NsdManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             serviceInfoCallback = object : NsdManager.ServiceInfoCallback {
                 override fun onServiceInfoCallbackRegistrationFailed(errorCode: Int) {
@@ -221,7 +230,7 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
                 }
             }
         }
-        discoveryListener = object : DiscoveryListener {
+        discoveryListener = object : NsdManager.DiscoveryListener {
             override fun onDiscoveryStarted(serviceType: String?) {
                 Log.i("DNS", "Started listening for $serviceType")
             }
