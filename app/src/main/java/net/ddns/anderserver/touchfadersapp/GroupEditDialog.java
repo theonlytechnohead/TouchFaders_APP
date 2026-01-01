@@ -19,6 +19,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatDialogFragment;
 
+import net.ddns.anderserver.touchfadersapp.classses.ChannelStrip;
+
 import java.util.ArrayList;
 
 public class GroupEditDialog extends AppCompatDialogFragment {

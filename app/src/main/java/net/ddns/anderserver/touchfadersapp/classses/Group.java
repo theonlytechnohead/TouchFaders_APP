@@ -1,4 +1,4 @@
-package net.ddns.anderserver.touchfadersapp;
+package net.ddns.anderserver.touchfadersapp.classses;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -37,7 +37,7 @@ public class Group {
         return Objects.hash(index);
     }
 
-    Map<String, Object> toMap() {
+    public Map<String, Object> toMap() {
         Map<String, Object> map = new HashMap<>();
         map.put("index", index);
         map.put("name", name);

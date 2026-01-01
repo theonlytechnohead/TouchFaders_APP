@@ -1,4 +1,4 @@
-package net.ddns.anderserver.touchfadersapp;
+package net.ddns.anderserver.touchfadersapp.classses;
 
 import androidx.annotation.Nullable;
 

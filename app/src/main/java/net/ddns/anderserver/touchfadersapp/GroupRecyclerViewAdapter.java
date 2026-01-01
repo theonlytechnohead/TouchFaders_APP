@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
+import net.ddns.anderserver.touchfadersapp.classses.ChannelStrip;
 import net.ddns.anderserver.touchfadersapp.custom.BoxedVertical;
 
 import java.util.ArrayList;
