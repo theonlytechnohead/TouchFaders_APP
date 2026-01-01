@@ -10,7 +10,7 @@
 	tools:background="?attr/fullscreenBackgroundColor"
 	android:orientation="vertical"
 	android:theme="@style/ThemeOverlay.TouchFaders.FullscreenContainer"
-	tools:context=".MainActivity">
+	tools:context=".main.MainActivity">
 
 
 	<androidx.constraintlayout.widget.ConstraintLayout

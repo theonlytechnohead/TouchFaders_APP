@@ -19,8 +19,8 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
-import net.ddns.anderserver.touchfadersapp.ChannelsRecyclerViewAdapter;
-import net.ddns.anderserver.touchfadersapp.ItemMoveCallback;
+import net.ddns.anderserver.touchfadersapp.main.ChannelsRecyclerViewAdapter;
+import net.ddns.anderserver.touchfadersapp.main.ItemMoveCallback;
 import net.ddns.anderserver.touchfadersapp.R;
 import net.ddns.anderserver.touchfadersapp.custom.BoxedVertical;
 

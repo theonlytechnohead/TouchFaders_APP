@@ -1,4 +1,4 @@
-package net.ddns.anderserver.touchfadersapp;
+package net.ddns.anderserver.touchfadersapp.main.dialogs;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -19,6 +19,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatDialogFragment;
 
+import net.ddns.anderserver.touchfadersapp.R;
 import net.ddns.anderserver.touchfadersapp.classses.ChannelStrip;
 
 import java.util.ArrayList;
@@ -26,13 +27,13 @@ import java.util.ArrayList;
 public class GroupEditDialog extends AppCompatDialogFragment {
 
     final int index;
-    String name;
-    int colour;
+    public String name;
+    public int colour;
     final ArrayList<ChannelStrip> ungroupedChannels;
     final ArrayList<ChannelStrip> groupedChannels;
     final ArrayList<ChannelStrip> allChannels;
-    final ArrayList<ChannelStrip> addedChannels;
-    final ArrayList<ChannelStrip> removedChannels;
+    public final ArrayList<ChannelStrip> addedChannels;
+    public final ArrayList<ChannelStrip> removedChannels;
 
     DialogInterface.OnClickListener resultListener;
     DialogInterface.OnClickListener removeListener;

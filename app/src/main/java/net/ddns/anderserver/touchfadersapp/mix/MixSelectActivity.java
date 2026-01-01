@@ -12,7 +12,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
-import net.ddns.anderserver.touchfadersapp.MainActivity;
+import net.ddns.anderserver.touchfadersapp.main.MainActivity;
 import net.ddns.anderserver.touchfadersapp.R;
 import net.ddns.anderserver.touchfadersapp.service.ConnectionService;
 

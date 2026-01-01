@@ -1,4 +1,4 @@
-package net.ddns.anderserver.touchfadersapp;
+package net.ddns.anderserver.touchfadersapp.main;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -16,9 +16,11 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+import net.ddns.anderserver.touchfadersapp.R;
 import net.ddns.anderserver.touchfadersapp.classses.ChannelStrip;
 import net.ddns.anderserver.touchfadersapp.classses.Group;
 import net.ddns.anderserver.touchfadersapp.custom.BoxedVertical;
+import net.ddns.anderserver.touchfadersapp.main.dialogs.GroupEditDialog;
 
 import java.util.ArrayList;
 import java.util.Collections;

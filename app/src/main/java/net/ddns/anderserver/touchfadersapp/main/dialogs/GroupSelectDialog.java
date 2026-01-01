@@ -1,4 +1,4 @@
-package net.ddns.anderserver.touchfadersapp;
+package net.ddns.anderserver.touchfadersapp.main.dialogs;
 
 import android.app.Dialog;
 import android.content.DialogInterface;

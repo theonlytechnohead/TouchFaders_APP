@@ -1,4 +1,4 @@
-package net.ddns.anderserver.touchfadersapp;
+package net.ddns.anderserver.touchfadersapp.main;
 
 import android.annotation.SuppressLint;
 import android.content.ComponentName;
@@ -34,6 +34,7 @@ import com.illposed.osc.OSCMessageEvent;
 import com.illposed.osc.OSCMessageListener;
 import com.illposed.osc.messageselector.OSCPatternAddressMessageSelector;
 
+import net.ddns.anderserver.touchfadersapp.R;
 import net.ddns.anderserver.touchfadersapp.classses.Group;
 import net.ddns.anderserver.touchfadersapp.custom.BoxedVertical;
 import net.ddns.anderserver.touchfadersapp.service.ConnectionService;
