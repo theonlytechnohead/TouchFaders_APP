@@ -349,6 +349,7 @@ public class MainActivity extends AppCompatActivity implements ItemMoveCallback.
             });
             adapter.setFaderMuteListener(((view, index, muted) -> {
             }));
+            //noinspection InvalidSetHasFixedSize
             recyclerView.setHasFixedSize(true);
             recyclerView.setItemViewCacheSize(numChannels);
             recyclerView.getRecycledViewPool().setMaxRecycledViews(1, numChannels);
