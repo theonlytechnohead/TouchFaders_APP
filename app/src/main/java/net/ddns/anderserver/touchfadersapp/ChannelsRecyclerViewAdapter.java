@@ -48,9 +48,7 @@ public class ChannelsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
     private final HashMap<Integer, ArrayList<ChannelStrip>> groupedChannels = new HashMap<>();
 
     enum ViewType {
-        NONE,
-        CHANNEL,
-        GROUP
+        NONE, CHANNEL, GROUP
     }
 
     public ChannelsRecyclerViewAdapter(ItemMoveCallback.StartDragListener startDragListener, Context context, RecyclerView recyclerView, int numChannels, HashMap<Integer, Integer> channelLayer, HashMap<Integer, Object> layout, ArrayList<Integer> channelColours, float width) {
@@ -287,8 +285,7 @@ public class ChannelsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
     public void onChannelClear(RecyclerView.ViewHolder viewHolder) {
         setBackgroundColour((ChannelStripViewHolder) viewHolder);
         ChannelStrip moving = channels.get(viewHolder.getAdapterPosition());
-        if (moving.group)
-            moveSubchannelsToGroup(-moving.index);
+        if (moving.group) moveSubchannelsToGroup(-moving.index);
     }
 
     public class ChannelStripViewHolder extends RecyclerView.ViewHolder implements ChannelsRecyclerViewAdapter.FaderValueChangedListener {
@@ -427,6 +424,7 @@ public class ChannelsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                                 channels.get(holder.getAdapterPosition() + 1).level = groupChannelStrip.level;
                             }
                         });
+                        editDialog.setRemoveListener(((dialogInterface, i) -> removeGroup(holder.getAdapterPosition(), -groupChannelStrip.index)));
                         FragmentManager fragmentManager = ((FragmentActivity) context).getSupportFragmentManager();
                         editDialog.show(fragmentManager, "Group edit dialog");
                         return super.onSingleTapConfirmed(e);
@@ -613,6 +611,20 @@ public class ChannelsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         notifyItemInserted(0);
     }
 
+    void removeGroup(int position, int group) {
+        ArrayList<ChannelStrip> currentChannels = groupedChannels.get(group);
+        if (currentChannels == null) currentChannels = new ArrayList<>();
+        updateGroup(position, group, new ArrayList<>(), new ArrayList<>(currentChannels));
+
+        int subchannelIndex = getSubchannelIndex(group);
+        channels.remove(subchannelIndex);
+        notifyItemRemoved(subchannelIndex);
+
+        int groupIndex = getIndex(-group);
+        channels.remove(groupIndex);
+        notifyItemRemoved(groupIndex);
+    }
+
     void setChannelStrip(int index, int level, boolean sendMuted, String name, boolean channelMuted, String patch, int colourIndex) {
         int channelIndex = getIndex(index);
         if (channelIndex < 0) {
@@ -706,13 +718,11 @@ public class ChannelsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         ArrayList<ChannelStrip> allChannels = channels;
         for (Map.Entry<Integer, ChannelStrip> entry : hiddenChannels.entrySet()) {
             ChannelStrip channelStrip = entry.getValue();
-            if (!channelStrip.group)
-                allChannels.add(entry.getKey(), channelStrip);
+            if (!channelStrip.group) allChannels.add(entry.getKey(), channelStrip);
         }
         for (int i = 0; i < allChannels.size(); i++) {
             ChannelStrip channelStrip = allChannels.get(i);
-            if (!channelStrip.group)
-                channelMap.put(channelStrip.index, i);
+            if (!channelStrip.group) channelMap.put(channelStrip.index, i);
         }
         return channelMap;
     }

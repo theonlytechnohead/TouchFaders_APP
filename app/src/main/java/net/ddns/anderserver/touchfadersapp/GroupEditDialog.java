@@ -33,6 +33,7 @@ public class GroupEditDialog extends AppCompatDialogFragment {
     final ArrayList<ChannelStrip> removedChannels;
 
     DialogInterface.OnClickListener resultListener;
+    DialogInterface.OnClickListener removeListener;
 
     public GroupEditDialog(int index, String name, int colour, ArrayList<ChannelStrip> ungroupedChannels, ArrayList<ChannelStrip> groupedChannels) {
         this.index = -index;
@@ -49,6 +50,10 @@ public class GroupEditDialog extends AppCompatDialogFragment {
 
     public void setResultListener(DialogInterface.OnClickListener resultListener) {
         this.resultListener = resultListener;
+    }
+
+    public void setRemoveListener(DialogInterface.OnClickListener removeListener) {
+        this.removeListener = removeListener;
     }
 
     @NonNull
@@ -144,8 +149,8 @@ public class GroupEditDialog extends AppCompatDialogFragment {
         builder.setView(layout);
 
         builder.setPositiveButton("Done", resultListener);
+        builder.setNeutralButton("Remove", removeListener);
         builder.setNegativeButton("Cancel", null);
         return builder.create();
     }
 }
-
