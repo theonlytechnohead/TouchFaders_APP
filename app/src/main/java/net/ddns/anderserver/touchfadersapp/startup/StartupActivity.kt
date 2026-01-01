@@ -18,14 +18,8 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.Log
-import android.view.KeyEvent
 import android.view.View
-import android.view.inputmethod.EditorInfo
-import android.view.inputmethod.InputMethodManager
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -40,7 +34,6 @@ import net.ddns.anderserver.touchfadersapp.mix.MixSelectActivity
 import net.ddns.anderserver.touchfadersapp.service.ConnectionService
 import net.ddns.anderserver.touchfadersapp.settings.SettingsActivity
 import java.net.InetAddress
-import java.net.UnknownHostException
 import kotlin.coroutines.CoroutineContext
 
 class StartupActivity : AppCompatActivity(), CoroutineScope {
@@ -132,28 +125,6 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
             }
             startActivity(intent)
         }
-
-        binding.ipEditText.setText(sharedPreferences?.getString("ipAddress", "192.168.1.2"))
-        binding.ipEditText.setOnEditorActionListener { _: TextView?, actionId: Int, _: KeyEvent? ->
-            if (actionId == EditorInfo.IME_ACTION_GO) {
-                val currentView = this.currentFocus
-                if (currentView != null) {
-                    val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-                    imm.hideSoftInputFromWindow(currentView.windowToken, 0)
-                }
-                val handler = Handler(Looper.getMainLooper())
-                handler.post { binding.startButton.performClick() }
-                return@setOnEditorActionListener true
-            }
-            false
-        }
-        binding.ipEditText.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(s: Editable) {
-                sharedPreferences?.edit()?.putString(IP_ADDRESS_PREFERENCES, s.toString())?.apply()
-            }
-        })
 
         adapter = DeviceSelectRecyclerViewAdapter(
             binding.deviceRecyclerView,
@@ -384,19 +355,7 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
     }
 
     private fun checkNetwork() {
-        if (isConnected(applicationContext)) {
-            binding.startButton.setOnClickListener {
-                val address: InetAddress
-                try {
-                    address = InetAddress.getByName(binding.ipEditText.text.toString())
-                } catch (e: UnknownHostException) {
-                    return@setOnClickListener
-                }
-                connectionService.Connect(address)
-                return@setOnClickListener
-            }
-        } else {
-            binding.startButton.setOnClickListener { checkNetwork() }
+        if (!isConnected(applicationContext)) {
             Handler(Looper.getMainLooper()).post {
                 Toast.makeText(this, "You're not connected to a network!", Toast.LENGTH_SHORT)
                     .show()
@@ -409,7 +368,6 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
             val name = deviceNames[index]
             val ip = devices[name]
             if (ip != null) {
-                binding.ipEditText.setText(ip.toString().removePrefix("/"))
                 connectionService.Connect(ip, name)
             }
         }
