@@ -1,10 +1,11 @@
-package net.ddns.anderserver.touchfadersapp
+package net.ddns.anderserver.touchfadersapp.settings
 
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
+import net.ddns.anderserver.touchfadersapp.R
 import net.ddns.anderserver.touchfadersapp.databinding.SettingsBinding
 
 class SettingsActivity : AppCompatActivity() {

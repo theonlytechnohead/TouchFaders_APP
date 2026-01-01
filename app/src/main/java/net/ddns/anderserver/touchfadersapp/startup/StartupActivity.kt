@@ -39,7 +39,7 @@ import net.ddns.anderserver.touchfadersapp.DeviceSelectRecyclerViewAdapter
 import net.ddns.anderserver.touchfadersapp.HelpActivity
 import net.ddns.anderserver.touchfadersapp.MainActivity
 import net.ddns.anderserver.touchfadersapp.MixSelectActivity
-import net.ddns.anderserver.touchfadersapp.SettingsActivity
+import net.ddns.anderserver.touchfadersapp.settings.SettingsActivity
 import net.ddns.anderserver.touchfadersapp.databinding.StartupBinding
 import java.net.InetAddress
 import java.net.UnknownHostException
