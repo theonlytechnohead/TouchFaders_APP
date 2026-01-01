@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:id="@+id/faderBackground">
 
-    <net.ddns.anderserver.touchfadersapp.BoxedVertical
+    <net.ddns.anderserver.touchfadersapp.custom.BoxedVertical
         android:id="@+id/fader"
         style="@style/Widget.Theme.TouchFaders.BoxedVerticalSeekBar"
         android:layout_width="0dp"

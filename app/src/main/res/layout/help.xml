@@ -42,7 +42,7 @@
 			app:layout_constraintStart_toStartOf="parent"
 			app:layout_constraintTop_toTopOf="parent" />
 
-		<net.ddns.anderserver.touchfadersapp.BoxedVertical
+		<net.ddns.anderserver.touchfadersapp.custom.BoxedVertical
 			android:id="@+id/mixMeter"
 			android:layout_width="35dp"
 			android:layout_height="0dp"

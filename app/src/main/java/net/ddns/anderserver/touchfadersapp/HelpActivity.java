@@ -19,6 +19,8 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+import net.ddns.anderserver.touchfadersapp.custom.BoxedVertical;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 

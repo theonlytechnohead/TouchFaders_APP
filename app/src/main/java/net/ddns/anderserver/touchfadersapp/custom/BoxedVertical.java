@@ -1,4 +1,4 @@
-package net.ddns.anderserver.touchfadersapp;
+package net.ddns.anderserver.touchfadersapp.custom;
 
 import static java.lang.Math.abs;
 
@@ -20,6 +20,8 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+
+import net.ddns.anderserver.touchfadersapp.R;
 
 /**
  * Created by alpaslanbak on 29/09/2017.

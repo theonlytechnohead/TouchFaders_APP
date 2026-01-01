@@ -16,6 +16,8 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+import net.ddns.anderserver.touchfadersapp.custom.BoxedVertical;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
