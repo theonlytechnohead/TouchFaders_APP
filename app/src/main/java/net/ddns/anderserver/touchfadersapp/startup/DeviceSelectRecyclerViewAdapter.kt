@@ -1,4 +1,4 @@
-package net.ddns.anderserver.touchfadersapp
+package net.ddns.anderserver.touchfadersapp.startup
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.recyclerview.widget.RecyclerView
+import net.ddns.anderserver.touchfadersapp.R
 
 class DeviceSelectRecyclerViewAdapter internal constructor(context: Context?, recyclerView: RecyclerView, private val deviceNames: MutableList<String>) : RecyclerView.Adapter<DeviceSelectRecyclerViewAdapter.ViewHolder>() {
 
