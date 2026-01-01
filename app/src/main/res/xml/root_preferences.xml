@@ -3,7 +3,7 @@
     <PreferenceCategory app:title="Faders">
 
         <ListPreference
-            app:defaultValue="35"
+            app:defaultValue="45"
             app:entries="@array/fader_width_entries"
             app:entryValues="@array/fader_width_values"
             app:key="@string/setting_fader_width"
