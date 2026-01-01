@@ -587,7 +587,7 @@ public class ChannelsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         return null;
     }
 
-    void addGroup() {
+    public void addGroup() {
         groups++;
         ChannelStrip groupChannel = new ChannelStrip();
         groupChannel.index = -groups;
@@ -651,7 +651,7 @@ public class ChannelsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         }
     }
 
-    void setFaderLevel(int index, int level) {
+    public void setFaderLevel(int index, int level) {
         int channelIndex = getIndex(index);
         if (channelIndex < 0) {
             Objects.requireNonNull(hiddenChannels.get(index)).level = level;
@@ -661,7 +661,7 @@ public class ChannelsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         }
     }
 
-    void setChannelPatchIn(int index, String patchIn) {
+    public void setChannelPatchIn(int index, String patchIn) {
         int channelIndex = getIndex(index);
         if (channelIndex < 0) {
             Objects.requireNonNull(hiddenChannels.get(index)).patch = patchIn;
@@ -671,7 +671,7 @@ public class ChannelsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         }
     }
 
-    void setChannelName(int index, String name) {
+    public void setChannelName(int index, String name) {
         int channelIndex = getIndex(index);
         if (channelIndex < 0) {
             Objects.requireNonNull(hiddenChannels.get(index)).name = name;
@@ -760,7 +760,7 @@ public class ChannelsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         return layout;
     }
 
-    void setValuesChangeListener(FaderValueChangedListener listener) {
+    public void setValuesChangeListener(FaderValueChangedListener listener) {
         faderValueChangedListener = listener;
     }
 
@@ -768,7 +768,7 @@ public class ChannelsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         void onValueChanged(int index, int points);
     }
 
-    void setFaderMuteListener(ChannelMuteListener listener) {
+    public void setFaderMuteListener(ChannelMuteListener listener) {
         channelMuteListener = listener;
     }
 

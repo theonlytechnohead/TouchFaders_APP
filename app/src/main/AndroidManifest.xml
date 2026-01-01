@@ -43,7 +43,7 @@
             android:screenOrientation="sensorLandscape"
             android:theme="@style/Theme.TouchFaders.Fullscreen" />
         <activity
-            android:name=".HelpActivity"
+            android:name=".startup.HelpActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:launchMode="singleTask"
             android:screenOrientation="sensorLandscape"

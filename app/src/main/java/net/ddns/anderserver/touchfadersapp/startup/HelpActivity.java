@@ -1,4 +1,4 @@
-package net.ddns.anderserver.touchfadersapp;
+package net.ddns.anderserver.touchfadersapp.startup;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -19,6 +19,9 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+import net.ddns.anderserver.touchfadersapp.ChannelsRecyclerViewAdapter;
+import net.ddns.anderserver.touchfadersapp.ItemMoveCallback;
+import net.ddns.anderserver.touchfadersapp.R;
 import net.ddns.anderserver.touchfadersapp.custom.BoxedVertical;
 
 import org.json.JSONException;
