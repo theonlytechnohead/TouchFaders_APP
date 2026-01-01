@@ -35,9 +35,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import net.ddns.anderserver.touchfadersapp.service.ConnectionService
-import net.ddns.anderserver.touchfadersapp.startup.DeviceSelectRecyclerViewAdapter
 import net.ddns.anderserver.touchfadersapp.MainActivity
-import net.ddns.anderserver.touchfadersapp.MixSelectActivity
+import net.ddns.anderserver.touchfadersapp.mix.MixSelectActivity
 import net.ddns.anderserver.touchfadersapp.settings.SettingsActivity
 import net.ddns.anderserver.touchfadersapp.databinding.StartupBinding
 import java.net.InetAddress

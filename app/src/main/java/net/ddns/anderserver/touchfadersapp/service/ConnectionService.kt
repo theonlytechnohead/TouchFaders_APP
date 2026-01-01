@@ -22,7 +22,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import net.ddns.anderserver.touchfadersapp.MainActivity
-import net.ddns.anderserver.touchfadersapp.MixSelectActivity
+import net.ddns.anderserver.touchfadersapp.mix.MixSelectActivity
 import net.ddns.anderserver.touchfadersapp.R
 import net.ddns.anderserver.touchfadersapp.startup.StartupActivity
 import java.io.IOException

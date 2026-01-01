@@ -1,4 +1,4 @@
-package net.ddns.anderserver.touchfadersapp;
+package net.ddns.anderserver.touchfadersapp.mix;
 
 import android.content.ComponentName;
 import android.content.Intent;
@@ -12,6 +12,8 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
+import net.ddns.anderserver.touchfadersapp.MainActivity;
+import net.ddns.anderserver.touchfadersapp.R;
 import net.ddns.anderserver.touchfadersapp.service.ConnectionService;
 
 import java.util.ArrayList;
