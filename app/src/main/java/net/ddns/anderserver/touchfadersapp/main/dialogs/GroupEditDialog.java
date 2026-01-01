@@ -16,8 +16,9 @@ import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatDialogFragment;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import net.ddns.anderserver.touchfadersapp.R;
 import net.ddns.anderserver.touchfadersapp.classses.ChannelStrip;
@@ -65,7 +66,7 @@ public class GroupEditDialog extends AppCompatDialogFragment {
         super.onCreateDialog(savedInstanceState);
         requireActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireActivity());
         builder.setTitle("Edit " + name);
 
         LayoutInflater inflater = requireActivity().getLayoutInflater();

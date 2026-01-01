@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <style name="Theme.TouchFaders.Fullscreen" parent="Theme.TouchFaders">
         <item name="android:actionBarStyle">@style/Widget.Theme.TouchFaders.ActionBar.Fullscreen
         </item>

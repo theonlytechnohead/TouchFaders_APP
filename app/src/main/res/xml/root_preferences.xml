@@ -8,7 +8,7 @@
             app:entryValues="@array/fader_width_values"
             app:key="@string/setting_fader_width"
             app:title="Width"
-            app:useSimpleSummaryProvider="true"/>
+            app:useSimpleSummaryProvider="true" />
 
     </PreferenceCategory>
 

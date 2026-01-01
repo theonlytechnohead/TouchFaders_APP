@@ -11,7 +11,6 @@
 	android:theme="@style/ThemeOverlay.TouchFaders.FullscreenContainer"
 	tools:context=".main.MainActivity">
 
-
 	<androidx.recyclerview.widget.RecyclerView
 		android:id="@+id/groupRecyclerView"
 		android:layout_width="wrap_content"

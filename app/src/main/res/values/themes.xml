@@ -1,6 +1,6 @@
 <resources>
 	<!-- Base application theme. -->
-	<style name="Theme.TouchFaders" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+	<style name="Theme.TouchFaders" parent="Theme.Material3.DayNight.NoActionBar">
 		<!-- Primary brand color. -->
 		<item name="colorPrimary">@color/light_blue_900</item>
 		<item name="colorPrimaryVariant">@color/light_blue_600</item>
@@ -18,18 +18,32 @@
 		<item name="android:textColorSecondary">@color/light_grey</item>
 		<item name="android:windowBackground">@color/background</item>
 
-		<item name="alertDialogTheme">@style/Theme.TouchFaders.Dialog</item>
+        <item name="alertDialogTheme">@style/Theme.TouchFaders.Dialog</item>
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.TouchFaders.MaterialAlertDialog</item>
 	</style>
 
-	<style name="Theme.TouchFaders.Dialog" parent="Theme.AppCompat.DayNight.Dialog.Alert">
-		<item name="android:colorControlNormal">@color/white</item>
-		<item name="android:colorControlActivated">@color/light_blue_600</item>
-		<item name="android:textColor">@color/white</item>
-		<item name="textColorAlertDialogListItem">@color/white</item>
-		<item name="android:background">@color/background</item>
+    <style name="Theme.TouchFaders.Dialog" parent="Theme.Material3.DayNight.Dialog.Alert">
+        <item name="android:colorControlNormal">@color/white</item>
+        <item name="android:colorControlActivated">@color/light_blue_600</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="textColorAlertDialogListItem">@color/white</item>
+        <item name="android:background">@color/background</item>
+        <item name="buttonBarPositiveButtonStyle">@style/Widget.Theme.TouchFaders.MaterialAlertDialog.PositiveButtonStyle</item>
+        <item name="buttonBarNeutralButtonStyle">@style/Widget.Theme.TouchFaders.MaterialAlertDialog.NeutralButtonStyle</item>
+        <item name="buttonBarNegativeButtonStyle">@style/Widget.Theme.TouchFaders.MaterialAlertDialog.NegativeButtonStyle</item>
+    </style>
+
+	<style name="ThemeOverlay.TouchFaders.MaterialAlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:backgroundTint">@color/background</item>
+        <item name="materialAlertDialogTitleTextStyle">@style/Widget.Theme.TouchFaders.MaterialAlertDialog.TitleText</item>
+        <item name="materialAlertDialogBodyTextStyle">@style/Widget.Theme.TouchFaders.MaterialAlertDialog.BodyText</item>
+        <item name="buttonBarPositiveButtonStyle">@style/Widget.Theme.TouchFaders.MaterialAlertDialog.PositiveButtonStyle</item>
+        <item name="buttonBarNeutralButtonStyle">@style/Widget.Theme.TouchFaders.MaterialAlertDialog.NeutralButtonStyle</item>
+        <item name="buttonBarNegativeButtonStyle">@style/Widget.Theme.TouchFaders.MaterialAlertDialog.NegativeButtonStyle</item>
 	</style>
 
-	<style name="Theme.TouchFaders.Spinner" parent="Theme.AppCompat.DayNight">
+	<style name="Theme.TouchFaders.Spinner" parent="Theme.Material3.DayNight">
 		<item name="android:popupBackground">@color/background</item>
 	</style>
 

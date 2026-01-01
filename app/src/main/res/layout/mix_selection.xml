@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:background="?attr/fullscreenBackgroundColor"
-    android:theme="@style/ThemeOverlay.TouchFaders.FullscreenContainer">
+    android:theme="@style/ThemeOverlay.TouchFaders.FullscreenContainer"
+    tools:background="?attr/fullscreenBackgroundColor">
 
     <LinearLayout
         android:id="@+id/mix_select_layout"
@@ -33,18 +32,23 @@
         android:id="@+id/back_button"
         android:text="@string/exit"
         android:textSize="0sp"
-        android:layout_width="35sp"
+        android:layout_width="0sp"
         android:layout_height="35sp"
-        android:backgroundTint="@color/red"
-        android:insetTop="0dp"
-        android:insetBottom="0dp"
+        android:layout_margin="5dp"
+        app:layout_constraintDimensionRatio="1:1"
+        android:padding="0dp"
         android:minWidth="0dp"
         android:minHeight="0dp"
-        android:padding="0dp"
-        android:layout_margin="5dp"
+        android:insetTop="0dp"
+        android:insetLeft="0dp"
+        android:insetRight="0dp"
+        android:insetBottom="0dp"
+        android:backgroundTint="@color/red"
         android:stateListAnimator="@null"
         app:icon="@android:drawable/ic_menu_close_clear_cancel"
-        app:iconSize="35sp"
+        app:iconSize="0dp"
+        app:iconPadding="0dp"
+        app:iconGravity="textStart"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
