@@ -36,6 +36,7 @@ import com.illposed.osc.messageselector.OSCPatternAddressMessageSelector;
 
 import net.ddns.anderserver.touchfadersapp.classses.Group;
 import net.ddns.anderserver.touchfadersapp.custom.BoxedVertical;
+import net.ddns.anderserver.touchfadersapp.service.ConnectionService;
 import net.ddns.anderserver.touchfadersapp.startup.StartupActivity;
 
 import org.json.JSONException;

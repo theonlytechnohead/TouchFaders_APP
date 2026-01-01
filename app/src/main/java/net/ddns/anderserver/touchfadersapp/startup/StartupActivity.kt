@@ -34,7 +34,7 @@ import androidx.preference.PreferenceManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import net.ddns.anderserver.touchfadersapp.ConnectionService
+import net.ddns.anderserver.touchfadersapp.service.ConnectionService
 import net.ddns.anderserver.touchfadersapp.DeviceSelectRecyclerViewAdapter
 import net.ddns.anderserver.touchfadersapp.MainActivity
 import net.ddns.anderserver.touchfadersapp.MixSelectActivity

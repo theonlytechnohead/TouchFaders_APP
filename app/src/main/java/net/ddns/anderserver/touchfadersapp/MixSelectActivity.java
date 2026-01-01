@@ -12,6 +12,8 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
+import net.ddns.anderserver.touchfadersapp.service.ConnectionService;
+
 import java.util.ArrayList;
 import java.util.List;
 

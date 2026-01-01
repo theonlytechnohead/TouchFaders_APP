@@ -1,11 +1,10 @@
-package net.ddns.anderserver.touchfadersapp
+package net.ddns.anderserver.touchfadersapp.service
 
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
-import android.content.Context
 import android.content.Intent
 import android.os.Binder
 import android.os.Build
@@ -22,6 +21,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import net.ddns.anderserver.touchfadersapp.MainActivity
+import net.ddns.anderserver.touchfadersapp.MixSelectActivity
+import net.ddns.anderserver.touchfadersapp.R
 import net.ddns.anderserver.touchfadersapp.startup.StartupActivity
 import java.io.IOException
 import java.net.DatagramPacket
@@ -49,7 +51,7 @@ class ConnectionService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val notificationService =
-            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 NOTIFICATION_CHANNEL_ID,
@@ -91,7 +93,7 @@ class ConnectionService : Service() {
 
     private fun updateNotification(notification: Notification) {
         val notificationService =
-            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         notificationService.notify(ONGOING_NOTIFICATION_ID, notification)
     }
 
@@ -174,7 +176,7 @@ class ConnectionService : Service() {
                             }"
                         )
                         updateNotification(newNotification)
-                        val startMixIntent = Intent(StartupActivity.START_MIX_ACTIVITY)
+                        val startMixIntent = Intent(StartupActivity.Companion.START_MIX_ACTIVITY)
                         startMixIntent.apply {
                             `package` = applicationContext.packageName
                         }
@@ -192,8 +194,8 @@ class ConnectionService : Service() {
     private fun failed(name: String?, ip: InetAddress) {
         DEVICE_IP = null
         DEVICE_NAME = null
-        val connectionFailedIntent = Intent(StartupActivity.CONNECTION_FAILED)
-        connectionFailedIntent.putExtra(StartupActivity.DEVICE_NAME, name)
+        val connectionFailedIntent = Intent(StartupActivity.Companion.CONNECTION_FAILED)
+        connectionFailedIntent.putExtra(StartupActivity.Companion.DEVICE_NAME, name)
         connectionFailedIntent.apply {
             `package` = applicationContext.packageName
         }
@@ -346,7 +348,7 @@ class ConnectionService : Service() {
         super.onDestroy()
         Disconnect()
         val notificationService =
-            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         notificationService.cancel(ONGOING_NOTIFICATION_ID)
     }
 }
