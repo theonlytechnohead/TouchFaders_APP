@@ -21,8 +21,6 @@ import java.util.List;
 
 public class MixSelectActivity extends AppCompatActivity implements MixSelectRecyclerViewAdapter.MixButtonClickListener {
 
-    public static String EXTRA_MIX_INDEX = "EXTRA_MIX_INDEX";
-
     MixSelectRecyclerViewAdapter adapter;
 
     ConnectionService connectionService;
@@ -47,7 +45,6 @@ public class MixSelectActivity extends AppCompatActivity implements MixSelectRec
             for (int i = 0; i < connectionService.mixes(); i++) {
                 Integer mixColour = connectionService.mixColours().get(i);
                 switch (mixColour) {
-                    default -> mixColours.add(getColor(R.color.mixer_blue));
                     case 1 -> mixColours.add(getColor(R.color.mixer_orange));
                     case 2 -> mixColours.add(getColor(R.color.mixer_brown));
                     case 3 -> mixColours.add(getColor(R.color.mixer_purple));
@@ -55,12 +52,13 @@ public class MixSelectActivity extends AppCompatActivity implements MixSelectRec
                     case 5 -> mixColours.add(getColor(R.color.mixer_pink));
                     case 6 -> mixColours.add(getColor(R.color.mixer_bergundy));
                     case 7 -> mixColours.add(getColor(R.color.mixer_green));
+                    default -> mixColours.add(getColor(R.color.mixer_blue));
                 }
             }
 
             // set up the RecyclerView
             RecyclerView recyclerView = findViewById(R.id.mix_select_recyclerview);
-            adapter = new MixSelectRecyclerViewAdapter(getApplicationContext(), mixNames, mixColours);
+            adapter = new MixSelectRecyclerViewAdapter(mixNames, mixColours);
             adapter.setClickListener(MixSelectActivity.this);
             recyclerView.setAdapter(adapter);
         }

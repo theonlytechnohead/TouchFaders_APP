@@ -3,6 +3,7 @@ package net.ddns.anderserver.touchfadersapp.settings
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.edit
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import net.ddns.anderserver.touchfadersapp.R
@@ -35,8 +36,9 @@ class SettingsActivity : AppCompatActivity() {
         binding.backButton.setOnClickListener { finish() }
 
         binding.resetLayoutButton.setOnClickListener {
-            PreferenceManager.getDefaultSharedPreferences(applicationContext).edit()
-                .remove("channel_layer").apply()
+            PreferenceManager.getDefaultSharedPreferences(applicationContext).edit {
+                remove("channel_layer")
+            }
             finish()
         }
     }

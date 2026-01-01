@@ -1,6 +1,5 @@
 package net.ddns.anderserver.touchfadersapp.mix;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +18,7 @@ public class MixSelectRecyclerViewAdapter extends RecyclerView.Adapter<MixSelect
     private final List<Integer> mixColours;
     private MixButtonClickListener clickListener;
 
-    MixSelectRecyclerViewAdapter(Context context, List<String> names, List<Integer> colours) {
+    MixSelectRecyclerViewAdapter(List<String> names, List<Integer> colours) {
         this.mixNames = names;
         this.mixColours = colours;
     }
@@ -63,14 +62,9 @@ public class MixSelectRecyclerViewAdapter extends RecyclerView.Adapter<MixSelect
         }
 
         @Override
-        public void onItemClick (View view, int index) {
+        public void onItemClick(View view, int index) {
             if (clickListener != null) clickListener.onItemClick(view, index);
         }
-    }
-
-    // convenience method for getting data at click position
-    String getMixName(int id) {
-        return mixNames.get(id);
     }
 
     // allows clicks events to be caught

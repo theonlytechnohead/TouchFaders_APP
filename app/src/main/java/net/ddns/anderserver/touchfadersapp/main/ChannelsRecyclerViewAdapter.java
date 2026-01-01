@@ -217,7 +217,7 @@ public class ChannelsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                 if (moving.group) {
                     // move subchannels
                     ArrayList<ChannelStrip> subchannels = groupedChannels.get(-moving.index);
-                    if (subchannels != null && 0 < subchannels.size() && !moving.hide) {
+                    if (subchannels != null && !subchannels.isEmpty() && !moving.hide) {
                         swapChannel(i + 1, i + 2);
                         notifyItemMoved(i + 1, i + 2);
                     }
@@ -237,7 +237,7 @@ public class ChannelsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                     notifyItemMoved(i, i - 1);
                     // move subchannels
                     ArrayList<ChannelStrip> subchannels = groupedChannels.get(-moving.index);
-                    if (subchannels != null && 0 < subchannels.size() && !moving.hide) {
+                    if (subchannels != null && !subchannels.isEmpty() && !moving.hide) {
                         swapChannel(i + 1, i);
                         notifyItemMoved(i + 1, i);
                     }
@@ -490,7 +490,7 @@ public class ChannelsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                 }
             }
         } else {
-            if (hiddenChannels.size() > 0) {
+            if (!hiddenChannels.isEmpty()) {
                 for (Map.Entry<Integer, ChannelStrip> entry : hiddenChannels.entrySet()) {
                     int i = entry.getKey();
                     ChannelStrip channelStrip = entry.getValue();
@@ -546,7 +546,7 @@ public class ChannelsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
             notifyItemInserted(position + 2);
         }
         moveSubchannelsToGroup(group);
-        if (currentChannels.size() == 0) groupedChannels.remove(group);
+        if (currentChannels.isEmpty()) groupedChannels.remove(group);
         else groupedChannels.put(group, currentChannels);
         int subchannelsIndex = getSubchannelIndex(group);
         notifyItemChanged(subchannelsIndex);

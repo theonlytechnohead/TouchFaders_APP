@@ -34,11 +34,11 @@ import androidx.preference.PreferenceManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import net.ddns.anderserver.touchfadersapp.service.ConnectionService
+import net.ddns.anderserver.touchfadersapp.databinding.StartupBinding
 import net.ddns.anderserver.touchfadersapp.main.MainActivity
 import net.ddns.anderserver.touchfadersapp.mix.MixSelectActivity
+import net.ddns.anderserver.touchfadersapp.service.ConnectionService
 import net.ddns.anderserver.touchfadersapp.settings.SettingsActivity
-import net.ddns.anderserver.touchfadersapp.databinding.StartupBinding
 import java.net.InetAddress
 import java.net.UnknownHostException
 import kotlin.coroutines.CoroutineContext
@@ -156,7 +156,6 @@ class StartupActivity : AppCompatActivity(), CoroutineScope {
         })
 
         adapter = DeviceSelectRecyclerViewAdapter(
-            applicationContext,
             binding.deviceRecyclerView,
             deviceNames
         )

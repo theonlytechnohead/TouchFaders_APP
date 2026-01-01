@@ -21,9 +21,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import net.ddns.anderserver.touchfadersapp.R
 import net.ddns.anderserver.touchfadersapp.main.MainActivity
 import net.ddns.anderserver.touchfadersapp.mix.MixSelectActivity
-import net.ddns.anderserver.touchfadersapp.R
 import net.ddns.anderserver.touchfadersapp.startup.StartupActivity
 import java.io.IOException
 import java.net.DatagramPacket
@@ -176,7 +176,7 @@ class ConnectionService : Service() {
                             }"
                         )
                         updateNotification(newNotification)
-                        val startMixIntent = Intent(StartupActivity.Companion.START_MIX_ACTIVITY)
+                        val startMixIntent = Intent(StartupActivity.START_MIX_ACTIVITY)
                         startMixIntent.apply {
                             `package` = applicationContext.packageName
                         }
@@ -194,8 +194,8 @@ class ConnectionService : Service() {
     private fun failed(name: String?, ip: InetAddress) {
         DEVICE_IP = null
         DEVICE_NAME = null
-        val connectionFailedIntent = Intent(StartupActivity.Companion.CONNECTION_FAILED)
-        connectionFailedIntent.putExtra(StartupActivity.Companion.DEVICE_NAME, name)
+        val connectionFailedIntent = Intent(StartupActivity.CONNECTION_FAILED)
+        connectionFailedIntent.putExtra(StartupActivity.DEVICE_NAME, name)
         connectionFailedIntent.apply {
             `package` = applicationContext.packageName
         }
